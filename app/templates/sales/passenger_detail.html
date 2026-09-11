@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Passenger {{ passenger.clientid }} | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Passenger {{ passenger.clientid }}</h1>
+  <dl>
+    <dt>CLIENT ID</dt><dd>{{ passenger.clientid }}</dd>
+    <dt>FIRST NAME</dt><dd>{{ passenger.firstname }}</dd><dt>LAST NAME</dt><dd>{{ passenger.lastname }}</dd>
+    <dt>ADDRESS</dt><dd>{{ passenger.address }}</dd><dt>CITY</dt><dd>{{ passenger.city }}</dd>
+    <dt>COUNTRY</dt><dd>{{ passenger.country }}</dd><dt>ZIPCODE</dt><dd>{{ passenger.zipcode }}</dd>
+    <dt>TELEPHONE</dt><dd>{{ passenger.telephone }}</dd><dt>EMAIL</dt><dd>{{ passenger.email }}</dd>
+  </dl>
+  <p><a role="button" href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a> <a role="button" href="/sales/sell/?clientid={{ passenger.clientid }}">Sell ticket</a></p>
+  <h2>Tickets</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>TICKET ID</th><th>FLIGHT NUM</th><th>DATE</th><th>DEP</th><th>LAND</th><th>SEAT</th></tr></thead>
+    <tbody>{% for ticket in tickets %}<tr><td><a href="{% url 'sales:ticket_detail' ticket.ticketid %}">{{ ticket.ticketid }}</a></td><td>{{ ticket.flight.flightnum }}</td><td>{{ ticket.flight.flightdate|date:"Y-m-d" }}</td><td>{{ ticket.flight.airportdep_id }}</td><td>{{ ticket.flight.airportarr_id }}</td><td>{{ ticket.seat }}</td></tr>{% empty %}<tr><td colspan="6">No tickets.</td></tr>{% endfor %}</tbody>
+  </table></div>
+{% endblock %}

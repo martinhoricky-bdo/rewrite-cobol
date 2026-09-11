@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Passengers | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Passengers</h1>
+  <p><a role="button" href="{% url 'sales:passenger_create' %}">New passenger</a></p>
+  <form method="get">
+    <div class="search-fields">
+      {% for field in form %}<label>{{ field.label }} {{ field }} {{ field.errors }}</label>{% endfor %}
+    </div>
+    <button type="submit">Search</button>
+  </form>
+  <div class="table-wrap"><table>
+    <thead><tr><th>CLIENT ID</th><th>LAST NAME</th><th>FIRST NAME</th><th>CITY</th><th>COUNTRY</th><th>TELEPHONE</th><th>EMAIL</th><th>ACTIONS</th></tr></thead>
+    <tbody>{% for passenger in page_obj %}<tr>
+      <td>{{ passenger.clientid }}</td><td>{{ passenger.lastname }}</td><td>{{ passenger.firstname }}</td><td>{{ passenger.city }}</td><td>{{ passenger.country }}</td><td>{{ passenger.telephone }}</td><td>{{ passenger.email }}</td>
+      <td><a href="{% url 'sales:passenger_detail' passenger.clientid %}">Detail</a> <a href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a></td>
+    </tr>{% empty %}<tr><td colspan="8">No passengers found.</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% include "partials/pagination.html" %}
+{% endblock %}

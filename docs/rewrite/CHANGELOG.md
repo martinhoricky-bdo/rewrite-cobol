@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R08 – Sales: cestující
+- PR: #19 (codex/R08-passengers)
+- Přidáno: filtrování, seznam, detail, založení a editace cestujících včetně validačních a view testů.
+- Změněno: navigace role Sales obsahuje položku Passengers.
+- Odchylky od specifikace: žádné.
+
 ## R07 – Sales: tisk palubní vstupenky
 - PR: #17 (codex/R07-boarding-pass)
 - Přidáno: služba formátování dat a samostatná tisková stránka palubní vstupenky s testy.
