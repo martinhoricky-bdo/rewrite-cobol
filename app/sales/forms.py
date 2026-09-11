@@ -2,7 +2,16 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-from core.messages import E_FLT_01, E_FLT_02, E_SEL_01, E_SEL_02, E_SEL_03, E_SEL_04, E_TKT_01
+from core.messages import (
+    E_FLT_01,
+    E_FLT_02,
+    E_SEL_01,
+    E_SEL_02,
+    E_SEL_03,
+    E_SEL_04,
+    E_SEL_11,
+    E_TKT_01,
+)
 
 from .models import Passenger
 
@@ -42,6 +51,37 @@ class SellStep1Form(forms.Form):
             "max_value": E_SEL_04,
         },
     )
+
+
+class SellStep2Form(forms.Form):
+    def __init__(self, count, data=None, initial=None):
+        super().__init__(data=data, initial=initial)
+        for number in range(1, count + 1):
+            self.fields[f"client_{number}"] = forms.IntegerField(
+                min_value=1,
+                label="CLIENTID",
+                error_messages={
+                    "required": E_SEL_01,
+                    "invalid": E_SEL_01,
+                    "min_value": E_SEL_01,
+                },
+                widget=forms.NumberInput(
+                    attrs={
+                        "hx-get": "/sales/sell/passenger-name/",
+                        "hx-trigger": "change",
+                        "hx-target": f"#name-{number}",
+                    }
+                ),
+            )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        seen = set()
+        for client_id in cleaned_data.values():
+            if client_id in seen:
+                raise ValidationError(E_SEL_11.format(id=client_id))
+            seen.add(client_id)
+        return cleaned_data
 
 
 class PassengerFilterForm(forms.Form):
