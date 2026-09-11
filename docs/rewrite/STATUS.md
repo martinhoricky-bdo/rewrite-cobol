@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 21:51
-- Aktuální krok: R06 (Codex pracuje)
+- Poslední aktualizace: 2026-09-11 22:02
+- Aktuální krok: R06 (Codex – 2. běh)
 - Blokuje: nic
 
 ## Hotovo
@@ -21,7 +21,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R06 hledání letenek + detail | #14 | – | zadáno 21:51, čeká se na PR |
+| R06 hledání letenek + detail | #14 | – | 1. běh 21:52: hotovo lokálně (testy OK), push 403 (prostředí); 2. běh zadán 22:02 |
 
 ## Fronta
 R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
@@ -29,4 +29,4 @@ R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a →
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
-- Push 403 se opakuje nepravidelně (R01/1, R03/1 selhaly; R01/2, R02 prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
+- Push 403 se opakuje nepravidelně (R01/1, R03/1, R06/1 selhaly; R01/2, R02, R03/2, R04, R05 prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
