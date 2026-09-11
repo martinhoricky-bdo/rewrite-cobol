@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R07 – Sales: tisk palubní vstupenky
+- PR: #17 (codex/R07-boarding-pass)
+- Přidáno: služba formátování dat a samostatná tisková stránka palubní vstupenky s testy.
+- Změněno: detail letenky nyní otevírá palubní vstupenku v nové záložce.
+- Odchylky od specifikace: žádné.
+
 ## R06 – Sales: hledání letenek a detail
 - PR: #15 (codex/R06-search-tickets)
 - Přidáno: prioritní hledání letenek, stránkované výsledky a detail letenky včetně nákupu.

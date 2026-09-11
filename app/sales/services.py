@@ -5,6 +5,45 @@ from django.db.models import QuerySet
 
 from .models import Ticket
 
+LEGACY_MONTHS = (
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC",
+)
+
+
+def legacy_date(d: date) -> str:
+    return f"{d.day:02d}{LEGACY_MONTHS[d.month - 1]}{d.year:04d}"
+
+
+def boarding_pass_context(ticket: Ticket) -> dict[str, str]:
+    flight = ticket.flight
+    passenger = ticket.client
+    dep_code = flight.airportdep_id
+    arr_code = flight.airportarr_id
+    return {
+        "passenger_name": f"{passenger.firstname} {passenger.lastname}".upper(),
+        "seat": ticket.seat,
+        "flightnum": flight.flightnum,
+        "dep_code": dep_code,
+        "arr_code": arr_code,
+        "dep_city": f"{flight.airportdep.city}-{dep_code}".upper(),
+        "arr_city": f"{flight.airportarr.city}-{arr_code}".upper(),
+        "flightdate_iso": flight.flightdate.isoformat(),
+        "flightdate_legacy": legacy_date(flight.flightdate),
+        "deptime": flight.deptime.strftime("%H:%M"),
+        "ticketid": ticket.ticketid,
+    }
+
 
 def search_tickets(
     *,
