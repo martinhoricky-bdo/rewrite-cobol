@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R03 – Seed vývojových dat z legacy souborů
+- PR: #9 (codex/R03-seed-demo)
+- Přidáno: parsery legacy JSON/XML, idempotentní seed služby, příkaz `seed_demo` a testovací fixtures/testy.
+- Změněno: dokumentace vývojových účtů a konfigurace aplikace `legacy_import`.
+- Odchylky od specifikace: žádné.
+
 ## R02 – Datové schéma legacy tabulek
 - PR: #7 (codex/R02-schema)
 - Přidáno: Django modely legacy tabulek, databázové constraints a indexy, sekvence letenek, admin registrace, factories a testy schématu.
