@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "fleet",
     "operations",
     "sales",
+    "legacy_import",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
