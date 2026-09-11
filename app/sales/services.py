@@ -3,7 +3,7 @@ from datetime import date
 from django.db import connection
 from django.db.models import QuerySet
 
-from .models import Ticket
+from .models import Passenger, Ticket
 
 LEGACY_MONTHS = (
     "JAN",
@@ -19,6 +19,25 @@ LEGACY_MONTHS = (
     "NOV",
     "DEC",
 )
+
+
+def filter_passengers(
+    *,
+    clientid: int | None = None,
+    lastname: str | None = None,
+    firstname: str | None = None,
+    email: str | None = None,
+) -> QuerySet[Passenger]:
+    passengers = Passenger.objects.all()
+    if clientid is not None:
+        passengers = passengers.filter(clientid=clientid)
+    if lastname:
+        passengers = passengers.filter(lastname__istartswith=lastname)
+    if firstname:
+        passengers = passengers.filter(firstname__istartswith=firstname)
+    if email:
+        passengers = passengers.filter(email__icontains=email)
+    return passengers.order_by("lastname", "firstname", "clientid")
 
 
 def legacy_date(d: date) -> str:
