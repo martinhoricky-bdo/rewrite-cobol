@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sell tickets | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Sell tickets</h1>
+  <div class="sell-grid">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="research">
+      {% for field in form %}
+        <label>{{ field.label }} {{ field }} {{ field.errors }}</label>
+      {% endfor %}
+      <button type="submit">Research</button>
+    </form>
+    {% if quote %}
+      <section aria-label="Sale quote">
+        <h2>Flight and client</h2>
+        <dl>
+          <dt>FLIGHT NUM</dt><dd>{{ quote.flightnum }}</dd>
+          <dt>DATE</dt><dd>{{ quote.flightdate|date:"Y-m-d" }}</dd>
+          <dt>DEP TIME</dt><dd>{{ quote.deptime|time:"H:i" }}</dd>
+          <dt>LAND TIME</dt><dd>{{ quote.arrtime|time:"H:i" }}</dd>
+          <dt>DEP AIRPORT</dt><dd>{{ quote.airportdep }}</dd>
+          <dt>LAND AIRPORT</dt><dd>{{ quote.airportarr }}</dd>
+          <dt>PRICE</dt><dd>{{ quote.unit_price|floatformat:2 }} EUR</dd>
+          <dt>TOTAL PRICE</dt><dd>{{ quote.total_price|floatformat:2 }} EUR</dd>
+          <dt>CLIENT</dt><dd>{{ quote.client_name }}</dd>
+          <dt>FREE SEATS</dt><dd>{{ quote.free_seats }}</dd>
+        </dl>
+        <a role="button" href="{% url 'sales:sell_step2' %}">Insert passengers</a>
+      </section>
+    {% endif %}
+  </div>
+{% endblock %}

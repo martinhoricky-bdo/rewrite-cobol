@@ -8,6 +8,7 @@ for role in (Role.SALES, Role.CEO, Role.SCHEDULE, Role.CREW):
 for role in (Role.SALES, Role.CEO):
     MENU[role].append(("Search ticket", "sales:ticket_search"))
 MENU[Role.SALES].append(("Passengers", "sales:passenger_list"))
+MENU[Role.SALES].append(("Sell", "sales:sell_step1"))
 ROLE_HOME[Role.SALES] = "sales:flight_search"
 COMMON_MENU = [
     ("Change password", "accounts:password_change"),

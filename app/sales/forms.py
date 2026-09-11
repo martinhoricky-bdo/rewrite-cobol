@@ -2,11 +2,46 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-from core.messages import E_FLT_01, E_FLT_02, E_TKT_01
+from core.messages import E_FLT_01, E_FLT_02, E_SEL_01, E_SEL_02, E_SEL_03, E_SEL_04, E_TKT_01
 
 from .models import Passenger
 
 TELEPHONE_ERROR = "Telephone may contain digits, spaces, + and - only."
+
+
+class SellStep1Form(forms.Form):
+    clientid = forms.IntegerField(
+        min_value=1,
+        label="CLIENT ID",
+        error_messages={"required": E_SEL_01, "invalid": E_SEL_01, "min_value": E_SEL_01},
+    )
+    flightnum = forms.CharField(
+        max_length=6,
+        label="FLIGHT NUM",
+        error_messages={
+            "required": E_SEL_02,
+            "invalid": E_SEL_02,
+            "max_length": E_SEL_02,
+            "null_characters_not_allowed": E_SEL_02,
+        },
+    )
+    flightdate = forms.DateField(
+        input_formats=["%Y-%m-%d"],
+        label="DATE",
+        widget=forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"}),
+        error_messages={"required": E_SEL_03, "invalid": E_SEL_03},
+    )
+    count = forms.IntegerField(
+        min_value=1,
+        max_value=9,
+        label="PASS NUMBER",
+        error_messages={
+            "required": E_SEL_04,
+            "invalid": E_SEL_04,
+            "min_value": E_SEL_04,
+            "max_value": E_SEL_04,
+        },
+    )
 
 
 class PassengerFilterForm(forms.Form):

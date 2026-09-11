@@ -4,3 +4,10 @@
 .msg-info, .msg-success { color: #067647; border-color: #067647; }
 .search-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
 .table-wrap { overflow-x: auto; }
+/* Keep the sale research fields and its recap side by side on wide screens. */
+.sell-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  align-items: start;
+}

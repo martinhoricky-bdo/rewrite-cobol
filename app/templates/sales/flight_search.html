@@ -22,7 +22,7 @@
               <td>{{ f.flightnum }}</td><td>{{ f.deptime|time:"H:i" }}</td><td>{{ f.arrtime|time:"H:i" }}</td>
               <td>{{ f.airportdep_id }}</td><td>{{ f.airportarr_id }}</td><td>{{ f.free_seats }}</td>
               <td>{{ f.flightdate|date:"Y-m-d" }}</td><td>{{ f.price|floatformat:2 }} EUR</td>
-              <td><a href="/sales/sell/?flightnum={{ f.flightnum }}&amp;date={{ f.flightdate|date:"Y-m-d" }}">Sell</a></td>
+              <td><a href="{% url 'sales:sell_step1' %}?flightnum={{ f.flightnum }}&amp;date={{ f.flightdate|date:"Y-m-d" }}">Sell</a></td>
             </tr>
           {% endfor %}
         </tbody>
