@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R05 – Sales: hledání letů
-- PR: #12 (codex/R05-search-flights)
+- PR: #13 (codex/R05-search-flights)
 - Přidáno: služba a formulář hledání letů, role-based obrazovka výsledků a sdílené stránkování.
 - Změněno: domovská stránka a navigace role Sales; menu rolí CEO, Schedule a Crew.
 - Odchylky od specifikace: žádné.
