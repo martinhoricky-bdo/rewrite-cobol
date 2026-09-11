@@ -49,7 +49,7 @@ Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější n
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: – (specifikace tímto PR vzniká; rozhodnutí o nejasných místech legacy jsou v `02-functional-spec.md` kap. 8).
 ## R06 – Sales: hledání letenek a detail
-- PR: #TBD (codex/R06-search-tickets)
+- PR: #15 (codex/R06-search-tickets)
 - Přidáno: prioritní hledání letenek, stránkované výsledky a detail letenky včetně nákupu.
 - Změněno: navigace rolí Sales a CEO a vlastní stránka 404.
 - Odchylky od specifikace: žádné.
