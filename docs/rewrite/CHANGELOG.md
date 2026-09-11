@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R10 – Sales: prodej – krok 2 a potvrzení
-- PR: #22 (codex/R10-sell-confirm)
+- PR: #23 (codex/R10-sell-confirm)
 - Přidáno: výběr a kontrola cestujících, bezpečné přidělení sedadel, atomické potvrzení prodeje a detail nákupu včetně testů.
 - Změněno: detail letenky odkazuje na detail dokončeného nákupu.
 - Odchylky od specifikace: žádné.

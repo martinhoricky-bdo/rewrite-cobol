@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 import pytest
-from django.db import connections
+from django.db import connection, connections
 
 from core.messages import E_SEL_05_ID, E_SEL_10, E_SEL_11
 from sales.models import Buy, Ticket
@@ -32,6 +32,8 @@ def make_quote(flight, client_id, count):
 
 
 def test_confirm_sale_creates_buy_and_consecutive_tickets():
+    with connection.cursor() as cursor:
+        cursor.execute("ALTER SEQUENCE ticket_ticketid_seq RESTART WITH 1")
     flight = FlightFactory()
     passengers = PassengerFactory.create_batch(3)
     seller = EmployeeFactory()
