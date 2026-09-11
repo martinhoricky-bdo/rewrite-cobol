@@ -13,6 +13,7 @@ Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-pl
 
 - Každý krok dostaneš jako **GitHub Issue** v tomto repozitáři s názvem `R<ID>: <název kroku>` (např. `R01: scaffolding projektu, Docker Compose, tooling`), labely `codex-task` a `step:R<ID>`, tělem = obsah `docs/rewrite/codex-tasks/R<ID>.md` a komentářem se zmínkou `@codex`. Zmínka spouští tvůj Codex Cloud task.
 - Pracuj jen na issue, kde jsi byl zmíněn. Jeden issue = jeden PR. V popisu PR uveď `Closes #<číslo issue>`; PR směřuje do `rewrite`.
+- **Push a PR:** vždy pushni větev do `origin` a otevři PR příkazem `gh pr create --base rewrite --head <větev> --title "R<ID>: …" --body-file <popis>`. Pokud `gh` selže (není přihlášené, chybí token), **jen pushni větev** a do issue napiš komentář `branch pushed: <název větve>` – Claude PR otevře sám. Nikdy nekonči task bez pushnuté větve.
 - Pokud zadání v issue a soubor `docs/rewrite/codex-tasks/R<ID>.md` nesouhlasí, platí soubor v repozitáři (issue je jen jeho kopie) – rozdíl uveď v PR.
 - Otázky k zadání piš jako komentář do issue (bez zmínky, nebo se zmínkou `@martinhoricky-bdo`), ne do kódu. Claude odpovídá v issue nebo upraví zadání.
 - Labely na PR nastavuje Claude: `needs-review` (po otevření), `changes-requested` (po review s výhradami), `approved` (před merge). Ty labely neměníš.
