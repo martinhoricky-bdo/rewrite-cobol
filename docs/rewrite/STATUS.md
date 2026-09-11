@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 22:26
-- Aktuální krok: R07 (Codex pracuje)
+- Poslední aktualizace: 2026-09-11 22:58
+- Aktuální krok: R08 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -18,16 +18,17 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R04 auth + role + navigace | #10 | #11 | 2026-09-11 21:28 (review čisté, 64 testů, ruční průchod všech rolí) |
 | R05 hledání letů | #12 | #13 | 2026-09-11 21:48 (review čisté, 86 testů, ruční průchod obrazovky) |
 | R06 hledání letenek + detail | #14 | #15 | 2026-09-11 22:23 (1. běh push 403; 2. běh OK, review čisté, 115 testů) |
+| R07 palubní vstupenka | #16 | #17 | 2026-09-11 22:56 (1. běh bez pushe – proxy 502; 2. běh OK, review čisté, 124 testů, ruční průchod tisku a oprávnění) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R07 palubní vstupenka | #16 | – | zadáno 22:19; 1. běh bez pushe (proxy 502), second run zadán 22:37, čeká se na PR |
+| R08 cestující | #18 | – | zadáno 22:58, čeká se na PR |
 
 ## Fronta
-R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
+R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
-- Push 403 se opakuje nepravidelně (R01/1, R03/1, R06/1 selhaly; R01/2, R02, R03/2, R04, R05 prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
+- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
