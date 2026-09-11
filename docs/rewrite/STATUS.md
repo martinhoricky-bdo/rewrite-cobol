@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 21:14
-- Aktuální krok: R04 (Codex pracuje)
+- Poslední aktualizace: 2026-09-11 21:30
+- Aktuální krok: R05 (zadávání)
 - Blokuje: nic
 
 ## Hotovo
@@ -15,14 +15,14 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R01 scaffolding | #4 | #5 | 2026-09-11 20:05 (1. běh selhal na push 403 kvůli tokenu; 2. běh OK, review čisté, 6 testů) |
 | R02 datové schéma | #6 | #7 | 2026-09-11 20:25 (review čisté, 39 testů, schéma ověřeno v PostgreSQL) |
 | R03 seed_demo | #8 | #9 | 2026-09-11 21:10 (1. běh push 403; 2. běh bez PostgreSQL – vráceno: bug `--from-date`, chybějící testy; oprava OK: 43 testů, seed 641/720/360, idempotentní) |
+| R04 auth + role + navigace | #10 | #11 | 2026-09-11 21:28 (review čisté, 64 testů, ruční průchod všech rolí) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R04 auth + role + navigace | #10 | – | zadáno 21:14, čeká se na PR |
 
 ## Fronta
-R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
+R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
