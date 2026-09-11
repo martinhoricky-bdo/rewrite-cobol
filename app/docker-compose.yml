@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: airlines
+      POSTGRES_USER: airlines
+      POSTGRES_PASSWORD: airlines
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airlines"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+      - ..:/legacy:ro
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DATABASE_URL: postgres://airlines:airlines@db:5432/airlines
+      LEGACY_ROOT: /legacy
+      SECRET_KEY: dev-only-not-secret
+    depends_on:
+      db:
+        condition: service_healthy
+  e2e:
+    profiles: ["e2e"]
+    image: mcr.microsoft.com/playwright/python:v1.47.0-jammy
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      BASE_URL: http://web:8000
+    command: sh -c "pip install -q -e .[dev] pytest-playwright && pytest -q tests/e2e"
+    depends_on: [web]
+volumes:
+  pgdata:
