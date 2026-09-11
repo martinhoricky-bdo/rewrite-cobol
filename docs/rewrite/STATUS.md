@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 20:27
-- Aktuální krok: R03 (zadávání)
+- Poslední aktualizace: 2026-09-11 20:29
+- Aktuální krok: R03 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -18,6 +18,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
+| R03 seed_demo | #8 | – | zadáno 20:29, čeká se na PR |
 
 ## Fronta
 R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
