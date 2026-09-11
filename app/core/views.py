@@ -25,6 +25,10 @@ def permission_denied(request, exception=None):
     return render(request, "403.html", {"error_message": E_AUTH_02}, status=403)
 
 
+def page_not_found(request, exception=None):
+    return render(request, "404.html", status=404)
+
+
 def healthz(request):
     try:
         with connection.cursor() as cursor:
