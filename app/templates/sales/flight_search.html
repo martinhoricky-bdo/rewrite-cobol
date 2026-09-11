@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Search flight | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Search flight</h1>
+  <form method="get">
+    <div class="search-fields">
+      {% for field in form %}
+        <label>{{ field.label }} {{ field }} {{ field.errors }}</label>
+      {% endfor %}
+    </div>
+    {{ form.non_field_errors }}
+    <button type="submit">Search</button>
+  </form>
+
+  {% if page_obj %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>FID</th><th>TDEP</th><th>TLAND</th><th>DEP</th><th>LAND</th><th>PLACES</th><th>DATE</th><th>PRICE</th><th></th></tr></thead>
+        <tbody>
+          {% for f in page_obj %}
+            <tr>
+              <td>{{ f.flightnum }}</td><td>{{ f.deptime|time:"H:i" }}</td><td>{{ f.arrtime|time:"H:i" }}</td>
+              <td>{{ f.airportdep_id }}</td><td>{{ f.airportarr_id }}</td><td>{{ f.free_seats }}</td>
+              <td>{{ f.flightdate|date:"Y-m-d" }}</td><td>{{ f.price|floatformat:2 }} EUR</td>
+              <td><a href="/sales/sell/?flightnum={{ f.flightnum }}&amp;date={{ f.flightdate|date:"Y-m-d" }}">Sell</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "partials/pagination.html" %}
+  {% endif %}
+{% endblock %}

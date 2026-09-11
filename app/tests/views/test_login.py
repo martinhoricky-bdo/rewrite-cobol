@@ -37,6 +37,10 @@ def test_role_home_is_not_available(client, deptid):
     employee = EmployeeFactory(dept=department, with_user=True)
     client.force_login(employee.user)
     response = client.get("/")
+    if deptid == 7:
+        assert response.status_code == 302
+        assert response.url == "/sales/flights/"
+        return
     label = ROLE_BY_DEPT[deptid].label
     assert response.status_code == 200
     assert f"The {label} functions are not available yet." in response.content.decode()
