@@ -5,6 +5,8 @@ Tento repozitář je PoC přepisu legacy systému COBOL AIRLINES (COBOL + DB2 + 
 - **Claude** – analýza, návrh, review PR, údržba dokumentace v `docs/rewrite/`. Řídí se `CLAUDE.md`.
 - **Codex (ty)** – implementace nové aplikace v `app/` po malých krocích definovaných v `docs/rewrite/04-migration-plan.md`.
 
+Konkrétní zadání každého kroku je v **`docs/rewrite/codex-tasks/<ID>.md`** (např. `R01.md`). Zadání je samostatné a závazné; kde se liší od obecného plánu, platí zadání. Pokud zadání pro krok neexistuje, nezačínej – Claude ho nejdřív napíše.
+
 Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-plan.md` (co dělat), `docs/rewrite/02-functional-spec.md` (jak se to má chovat), `docs/rewrite/03-target-architecture.md` (jak to postavit), `docs/rewrite/01-inventory.md` (odkud to pochází).
 
 ## 1. Větve a cíl
@@ -12,7 +14,7 @@ Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-pl
 - Cílová větev je **`rewrite`**. Nikdy nepushuj do `main` – `main` je původní COBOL a slouží jen jako reference.
 - Pro každý krok založ větev **`codex/<ID>-<slug>`** z aktuální `rewrite`, např. `codex/R05-search-flights`. `<ID>` je identifikátor kroku z plánu (`R01`…`R18`, případně `R16a`).
 - Jeden PR = jeden krok plánu. Nekombinuj kroky, nepřeskakuj závislosti uvedené v plánu. Je-li krok příliš velký, rozděl ho (`R16a`, `R16b`) a napiš to do popisu PR.
-- PR směřuje do `rewrite`. Po review a merge větev smaž.
+- PR směřuje do `rewrite`. Review a merge (squash) dělá Claude; větev po merge maže Claude. Ty po merge pokračuješ dalším krokem, jakmile existuje jeho zadání v `docs/rewrite/codex-tasks/`.
 
 ## 2. Co smíš a co nesmíš měnit
 
@@ -20,7 +22,8 @@ Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-pl
 - **Legacy adresáře jsou read-only:** `CICS/`, `COB-PROG/`, `DB2/`, `AS-400/`, `VIDEOS/` a kořenový `README.md`. Nikdy je neupravuj, nepřesouvej ani nemaž. Seed data z nich pouze čteš (přes `LEGACY_ROOT`).
 - **`docs/rewrite/`** upravuj jen takto: přidej záznam do `CHANGELOG.md` (povinné) a případně opravu zjevné chyby v dokumentaci, kterou jsi při implementaci odhalil – takovou změnu vždy zvlášť vypiš v popisu PR. Změny specifikace a plánu navrhuj v PR jako „Otevřené otázky“, neprováděj je mlčky.
 - **Zákaz GitHub Actions:** nevytvářej nic v `.github/workflows/` ani jiné CI konfigurace. Kontroly se spouštějí lokálně přes `make check`.
-- Nepřidávej závislosti nad rámec `03-target-architecture.md` bez zdůvodnění v PR. Žádné CDN – statické soubory se vendorují do `app/static/`.
+- Nepřidávej závislosti nad rámec `03-target-architecture.md` bez zdůvodnění v PR. Žádné CDN – statické soubory se vendorují do `app/static/`. Pokud prostředí nemá síť a soubor nelze stáhnout, vytvoř minimální náhradu a uveď to v PR jako odchylku.
+- Prostředí bez Dockeru: `make` cíle lze nahradit přímými příkazy (`pip install -e .[dev]`, `DATABASE_URL` na lokální PostgreSQL, `pytest`, `ruff`). Uveď v PR, jak jsi kontroly spustil.
 - Neukládej žádné tajemství do repozitáře (`.env` je v `.gitignore`; `.env.example` obsahuje jen ukázkové hodnoty).
 
 ## 3. Konvence kódu
@@ -57,7 +60,7 @@ Pravidla:
 
 ## 5. Co musí obsahovat každý PR
 
-1. Popis podle šablony v `04-migration-plan.md` (sekce „Šablona popisu PR“): ID a název kroku s odkazem na plán, co PR dělá, jak ověřit, výstup `make check`, odchylky/otevřené otázky, checklist.
+1. Popis podle šablony v `04-migration-plan.md` (sekce „Šablona popisu PR“): ID a název kroku s odkazem na plán a na zadání `docs/rewrite/codex-tasks/<ID>.md`, co PR dělá, jak ověřit, výstup `make check`, odchylky/otevřené otázky, checklist.
 2. Testy (viz kap. 4).
 3. Migrace, pokud se mění schéma (`python manage.py makemigrations <app>` s popisným názvem, např. `0003_flight_price`). Žádné ruční úpravy vygenerovaných migrací bez komentáře proč.
 4. Záznam v `docs/rewrite/CHANGELOG.md` ve formátu:

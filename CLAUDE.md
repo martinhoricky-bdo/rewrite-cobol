@@ -6,7 +6,8 @@ Repozitář: PoC přepisu legacy systému COBOL AIRLINES (COBOL + DB2 + CICS, v�
 
 1. **Analýza legacy** – zdrojem pravdy jsou soubory v `CICS/`, `COB-PROG/`, `DB2/`, `AS-400/`. Originál nelze spustit; každé tvrzení o chování musí být dohledatelné v kódu, mapě, DDL nebo snímku obrazovky. Kde se liší kód a snímek, uveď obojí.
 2. **Návrh** – `docs/rewrite/02-functional-spec.md` (chování), `03-target-architecture.md` (stack, schéma, mapování), `04-migration-plan.md` (kroky pro Codex). Změny chování označuj jako *rekonstrukce* / *návrh* / *odchylka*.
-3. **Review PR od Codexu** – viz checklist níže. Výsledek review piš do PR (GitHub review), rozhodnutí s dopadem na specifikaci promítni do `docs/rewrite/` ve vlastním PR.
+3. **Review PR od Codexu** – viz checklist níže. Výsledek review piš do PR (GitHub review). Je-li PR v pořádku, **mergni ho squash-merge do `rewrite`** a smaž větev; pak napiš zadání dalšího kroku do `docs/rewrite/codex-tasks/<ID>.md` a jeho text předej uživateli (ten ho zadává do Codex Cloud). Rozhodnutí s dopadem na specifikaci promítni do `docs/rewrite/`.
+5. **Zadání pro Codex** – každý krok plánu má samostatný, 1:1 vložitelný brief v `docs/rewrite/codex-tasks/<ID>.md`: kontext (které dokumenty jsou závazné), přesný rozsah včetně konkrétních dat a názvů, akceptační kritéria, jak spustit testy, pravidla PR. Drž frontu alespoň jednoho kroku napřed.
 4. **Údržba dokumentace** – `docs/rewrite/` je živá. Po každém merge zkontroluj, zda plán a inventář (kap. 6 „stav“) odpovídají realitě.
 
 ## Neměnná pravidla
@@ -15,7 +16,7 @@ Repozitář: PoC přepisu legacy systému COBOL AIRLINES (COBOL + DB2 + CICS, v�
 - Legacy adresáře a kořenový `README.md` se nemění.
 - Nová aplikace je jen v `app/`; dokumentace přepisu jen v `docs/rewrite/`; pravidla v `AGENTS.md` / `CLAUDE.md`.
 - Žádné soubory v `.github/workflows/` (CI se nepoužívá, kontroly běží lokálně přes `make check`).
-- Vlastní změny (dokumentace, drobné opravy) dělej ve větvi `claude/<slug>` a otevři PR do `rewrite`; nepushuj přímo do `rewrite`.
+- Vlastní změny dokumentace a zadání (`docs/rewrite/`, `AGENTS.md`, `CLAUDE.md`) commituj přímo do `rewrite` (schváleno uživatelem 2026-09-11). Cokoli v `app/` děláš přes PR.
 - Dokumenty česky, názvy programů, map, tabulek a polí v originále (`SRCHFLY`, `FLIGHTNUM`, …), UI texty anglicky.
 - Do commitů, kódu a PR nepiš identifikátory modelů AI.
 

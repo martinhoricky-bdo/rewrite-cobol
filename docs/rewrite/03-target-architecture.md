@@ -83,7 +83,7 @@ Business logika (prodej, přidělení sedadla, výpočet volných míst, generov
 
 ### 4.2 Tabulky a názvy
 
-Zásada: **názvy tabulek a sloupců zůstávají legacy, malými písmeny** (`db_table`, `db_column` = původní název). Modely mají pole pojmenovaná stejně (`flightnum`, `airportdep`), aby byla dokumentace, DDL a kód vzájemně dohledatelné. Vztahy mají navíc Django `related_name`.
+Zásada: **názvy tabulek a sloupců zůstávají legacy, malými písmeny** (`db_table`, `db_column` = původní název). Modely mají pole pojmenovaná stejně (`flightnum`, `airportdep`), aby byla dokumentace, DDL a kód vzájemně dohledatelné. Výjimka: cizí klíče se v modelu jmenují bez přípony `id` (`dept`, `airplane`, `client`, `flight`, `buy`, `emp`, `shift`, `crew`; `airportdep`/`airportarr` zůstávají), sloupec je legacy (`db_column="deptid"`), takže Django nabízí `flight.airplane` i `flight.airplane_id`. Vztahy mají `related_name`. Detailní definice polí: `codex-tasks/R02.md`.
 
 | DB2 tabulka | PostgreSQL tabulka | Django model (app) | Změny oproti DDL |
 |---|---|---|---|

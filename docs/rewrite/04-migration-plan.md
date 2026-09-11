@@ -1,6 +1,6 @@
 # 04 – Plán migrace po krocích
 
-Každý krok = jeden PR od Codexu do větve `rewrite`, větev `codex/<ID>-<slug>` (např. `codex/R05-search-flights`). Krok musí být samostatně mergovatelný: po merge aplikace stále běží, `make check` prochází, nic není „napůl“. Velikost: S = do ~300 řádků změn, M = do ~800, L = do ~1500 (včetně testů a šablon). Větší práci dělíme.
+Podrobné, samostatně vložitelné zadání každého kroku je v `docs/rewrite/codex-tasks/<ID>.md`; tento plán je přehled a definice pořadí. Každý krok = jeden PR od Codexu do větve `rewrite`, větev `codex/<ID>-<slug>` (např. `codex/R05-search-flights`). Krok musí být samostatně mergovatelný: po merge aplikace stále běží, `make check` prochází, nic není „napůl“. Velikost: S = do ~300 řádků změn, M = do ~800, L = do ~1500 (včetně testů a šablon). Větší práci dělíme.
 
 Pořadí je závazné pro závislosti; kroky bez vzájemné závislosti (např. R13 a R15) lze dělat paralelně.
 
