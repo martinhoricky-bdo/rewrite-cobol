@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R04 – Autentizace, role, kostra navigace
-- PR: #<číslo> (codex/R04-auth-roles)
+- PR: #11 (codex/R04-auth-roles)
 - Přidáno: přihlášení, odhlášení, změna hesla, vynucená změna hesla, role-based oprávnění a navigace.
 - Změněno: domovská stránka podle role, společná hlavička, katalog hlášek a dokumentace přihlášení.
 - Odchylky od specifikace: žádné.
