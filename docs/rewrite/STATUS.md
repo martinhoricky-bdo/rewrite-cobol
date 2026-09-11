@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 21:30
-- Aktuální krok: R05 (zadávání)
+- Poslední aktualizace: 2026-09-11 21:31
+- Aktuální krok: R05 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -20,6 +20,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
+| R05 hledání letů | #12 | – | zadáno 21:31, čeká se na PR |
 
 ## Fronta
 R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
