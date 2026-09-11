@@ -2,3 +2,5 @@
 .app-header small { display: block; }
 .msg-error { color: #b42318; border-color: #b42318; }
 .msg-info, .msg-success { color: #067647; border-color: #067647; }
+.search-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; }
+.table-wrap { overflow-x: auto; }
