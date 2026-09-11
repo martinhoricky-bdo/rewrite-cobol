@@ -79,4 +79,5 @@ def test_step_two_without_quote_redirects_with_message(client):
 def test_sell_permissions(client, deptid, status):
     login_role(client, deptid)
     assert client.get("/sales/sell/").status_code == status
-    assert client.get("/sales/sell/passengers/").status_code == status if status == 403 else 302
+    expected_step2 = status if status == 403 else 302
+    assert client.get("/sales/sell/passengers/").status_code == expected_step2

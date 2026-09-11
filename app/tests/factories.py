@@ -14,6 +14,7 @@ from sales.services import next_ticket_id
 class DepartmentFactory(DjangoModelFactory):
     class Meta:
         model = Department
+        django_get_or_create = ("deptid",)
 
     deptid = factory.Sequence(lambda n: n + 1)
     name = factory.Sequence(lambda n: f"Department {n + 1}")
