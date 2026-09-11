@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 20:29
-- Aktuální krok: R03 (Codex pracuje)
+- Poslední aktualizace: 2026-09-11 20:40
+- Aktuální krok: R03 (Codex – 2. běh)
 - Blokuje: nic
 
 ## Hotovo
@@ -18,7 +18,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R03 seed_demo | #8 | – | zadáno 20:29, čeká se na PR |
+| R03 seed_demo | #8 | – | 1. běh 20:32: hotovo lokálně (43 testů, seed OK), push 403 pod `chatgpt-codex-connector[bot]` (chyba prostředí, stejná jako R01/1); 2. běh zadán 20:40 |
 
 ## Fronta
 R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
@@ -26,3 +26,4 @@ R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
+- Push 403 se opakuje nepravidelně (R01/1, R03/1 selhaly; R01/2, R02 prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
