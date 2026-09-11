@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 21:12
-- Aktuální krok: R04 (zadávání)
+- Poslední aktualizace: 2026-09-11 21:14
+- Aktuální krok: R04 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -19,6 +19,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
+| R04 auth + role + navigace | #10 | – | zadáno 21:14, čeká se na PR |
 
 ## Fronta
 R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
