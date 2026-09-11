@@ -2,6 +2,11 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R00c – Zadání R04–R08, předávání přes GitHub Issues
+- Commit přímo do `rewrite`
+- Přidáno: `codex-tasks/R04.md`–`R08.md`.
+- Změněno: `AGENTS.md` kap. 0 (issue + `@codex`, labely `codex-task`, `step:R<ID>`, `needs-review`, `changes-requested`, `approved`), `CLAUDE.md` (postup zadávání, smoke test, review → merge).
+
 ## R00b – Zadání pro Codex R01–R03, proces merge
 - Commit přímo do `rewrite` (schváleno uživatelem)
 - Přidáno: `docs/rewrite/codex-tasks/R01.md`, `R02.md`, `R03.md` (samostatná zadání pro Codex Cloud).

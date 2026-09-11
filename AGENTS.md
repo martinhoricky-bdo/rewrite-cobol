@@ -9,12 +9,21 @@ Konkrétní zadání každého kroku je v **`docs/rewrite/codex-tasks/<ID>.md`**
 
 Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-plan.md` (co dělat), `docs/rewrite/02-functional-spec.md` (jak se to má chovat), `docs/rewrite/03-target-architecture.md` (jak to postavit), `docs/rewrite/01-inventory.md` (odkud to pochází).
 
+## 0. Předávání práce přes GitHub Issues (`@codex`)
+
+- Každý krok dostaneš jako **GitHub Issue** v tomto repozitáři s názvem `R<ID>: <název kroku>` (např. `R01: scaffolding projektu, Docker Compose, tooling`), labely `codex-task` a `step:R<ID>`, tělem = obsah `docs/rewrite/codex-tasks/R<ID>.md` a komentářem se zmínkou `@codex`. Zmínka spouští tvůj Codex Cloud task.
+- Pracuj jen na issue, kde jsi byl zmíněn. Jeden issue = jeden PR. V popisu PR uveď `Closes #<číslo issue>`; PR směřuje do `rewrite`.
+- Pokud zadání v issue a soubor `docs/rewrite/codex-tasks/R<ID>.md` nesouhlasí, platí soubor v repozitáři (issue je jen jeho kopie) – rozdíl uveď v PR.
+- Otázky k zadání piš jako komentář do issue (bez zmínky, nebo se zmínkou `@martinhoricky-bdo`), ne do kódu. Claude odpovídá v issue nebo upraví zadání.
+- Labely na PR nastavuje Claude: `needs-review` (po otevření), `changes-requested` (po review s výhradami), `approved` (před merge). Ty labely neměníš.
+- Po merge Claude zavře issue (nebo ho zavře `Closes #N`) a založí issue dalšího kroku. Nezačínej další krok bez issue se zmínkou.
+
 ## 1. Větve a cíl
 
 - Cílová větev je **`rewrite`**. Nikdy nepushuj do `main` – `main` je původní COBOL a slouží jen jako reference.
 - Pro každý krok založ větev **`codex/<ID>-<slug>`** z aktuální `rewrite`, např. `codex/R05-search-flights`. `<ID>` je identifikátor kroku z plánu (`R01`…`R18`, případně `R16a`).
 - Jeden PR = jeden krok plánu. Nekombinuj kroky, nepřeskakuj závislosti uvedené v plánu. Je-li krok příliš velký, rozděl ho (`R16a`, `R16b`) a napiš to do popisu PR.
-- PR směřuje do `rewrite`. Review a merge (squash) dělá Claude; větev po merge maže Claude. Ty po merge pokračuješ dalším krokem, jakmile existuje jeho zadání v `docs/rewrite/codex-tasks/`.
+- PR směřuje do `rewrite`. Review a merge (squash) dělá Claude; větev po merge maže Claude. Další krok začínáš až po zmínce `@codex` v novém issue (kap. 0).
 
 ## 2. Co smíš a co nesmíš měnit
 
