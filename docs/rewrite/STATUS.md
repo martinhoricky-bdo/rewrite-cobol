@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 20:40
-- Aktuální krok: R03 (Codex – 2. běh)
+- Poslední aktualizace: 2026-09-11 21:02
+- Aktuální krok: R03 (PR #9 vrácen k opravě)
 - Blokuje: nic
 
 ## Hotovo
@@ -18,7 +18,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R03 seed_demo | #8 | – | 1. běh 20:32: hotovo lokálně (43 testů, seed OK), push 403 pod `chatgpt-codex-connector[bot]` (chyba prostředí, stejná jako R01/1); 2. běh zadán 20:40 |
+| R03 seed_demo | #8 | #9 | 2. běh otevřel PR 20:43 (bez PostgreSQL v sandboxu); review 21:00: blokující bug `--from-date` default (seed padá), chybí `test_seed.py`/`test_flight_generation.py` → changes-requested, čeká se na opravu |
 
 ## Fronta
 R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
