@@ -12,5 +12,5 @@
   </dl>
   <h2>Purchase</h2>
   <dl><dt>BUYID</dt><dd><a href="/sales/buys/{{ ticket.buy_id }}/">{{ ticket.buy_id }}</a></dd><dt>DATE</dt><dd>{{ ticket.buy.buydate|date:"Y-m-d" }} {{ ticket.buy.buytime|time:"H:i" }}</dd><dt>SELLER</dt><dd>{{ ticket.buy.emp_id }} – {{ ticket.buy.emp.full_name }}</dd><dt>PRICE</dt><dd>{{ ticket.buy.price|floatformat:2 }} EUR</dd></dl>
-  <p><a role="button" href="{% url 'sales:ticket_search' %}">Back to search</a> <a role="button" href="/sales/tickets/{{ ticket.ticketid }}/boarding-pass/">Print boarding pass</a></p>
+  <p><a role="button" href="{% url 'sales:ticket_search' %}">Back to search</a> <a role="button" href="{% url 'sales:boarding_pass' ticket.ticketid %}" target="_blank">Print boarding pass</a></p>
 {% endblock %}

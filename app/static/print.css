@@ -1,0 +1,92 @@
+@page {
+  size: A5 landscape;
+  margin: 10mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f4f4f4;
+  color: #111;
+  font-family: "Courier New", Courier, monospace;
+}
+
+main {
+  max-width: 210mm;
+  margin: 2rem auto;
+}
+
+.boarding-pass {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  min-height: 105mm;
+  border: 2px solid currentColor;
+  background: #fff;
+}
+
+.main-pass,
+.stub {
+  padding: 10mm;
+}
+
+.main-pass {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.main-pass h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.passenger-seat {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 1rem;
+}
+
+.label,
+.passenger-seat strong {
+  display: block;
+}
+
+.label {
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.stub {
+  border-left: 2px dashed currentColor;
+}
+
+.print-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.print-controls button,
+.print-controls a {
+  padding: 0.5rem 1rem;
+  font: inherit;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  main {
+    margin: 0;
+    max-width: none;
+  }
+
+  .print-controls {
+    display: none;
+  }
+}

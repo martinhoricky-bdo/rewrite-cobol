@@ -12,7 +12,7 @@ from operations.services import search_flights
 
 from .forms import FlightSearchForm, TicketSearchForm
 from .models import Ticket
-from .services import search_tickets
+from .services import boarding_pass_context, search_tickets
 
 
 @role_required(Role.SALES, Role.CEO, Role.SCHEDULE, Role.CREW)
@@ -80,3 +80,17 @@ def ticket_detail(request, ticketid):
     if ticket is None:
         return render(request, "404.html", {"error_message": E_TKT_03}, status=404)
     return render(request, "sales/ticket_detail.html", {"ticket": ticket})
+
+
+@role_required(Role.SALES, Role.CEO)
+def boarding_pass(request, ticketid):
+    ticket = (
+        Ticket.objects.select_related(
+            "client", "flight", "flight__airportdep", "flight__airportarr"
+        )
+        .filter(ticketid=ticketid.upper())
+        .first()
+    )
+    if ticket is None:
+        return render(request, "404.html", {"error_message": E_TKT_03}, status=404)
+    return render(request, "sales/boarding_pass.html", boarding_pass_context(ticket))

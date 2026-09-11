@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Boarding pass {{ ticketid }} | COBOL AIRLINES</title>
+    <link rel="stylesheet" href="{% static 'print.css' %}">
+  </head>
+  <body>
+    <main>
+      <section class="boarding-pass" aria-label="Boarding pass for {{ passenger_name }}">
+        <div class="main-pass">
+          <h1>BOARDING PASS – COBOL AIRLINES</h1>
+          <div class="passenger-seat">
+            <p><span class="label">PASSENGER NAME</span><strong>{{ passenger_name }}</strong></p>
+            <p><span class="label">SEAT</span><strong>{{ seat }}</strong></p>
+          </div>
+          <p>FROM: {{ dep_city }}&nbsp;&nbsp;&nbsp;TO: {{ arr_city }}</p>
+          <p>FLIGHT: {{ flightnum }} / DATE: {{ flightdate_legacy }} / DEPARTURE: {{ deptime }}</p>
+        </div>
+        <aside class="stub">
+          <strong>{{ passenger_name }}</strong>
+          <p>FROM: {{ dep_code }} TO: {{ arr_code }}</p>
+          <p>FLIGHT: {{ flightnum }}</p>
+          <p>DATE: {{ flightdate_iso }}</p>
+          <p>SEAT: {{ seat }}</p>
+        </aside>
+      </section>
+      <nav class="print-controls" aria-label="Boarding pass actions">
+        <button type="button" onclick="window.print()">Print</button>
+        <a href="{% url 'sales:ticket_detail' ticketid %}">Back</a>
+      </nav>
+    </main>
+  </body>
+</html>
