@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R04 – Autentizace, role, kostra navigace
+- PR: #<číslo> (codex/R04-auth-roles)
+- Přidáno: přihlášení, odhlášení, změna hesla, vynucená změna hesla, role-based oprávnění a navigace.
+- Změněno: domovská stránka podle role, společná hlavička, katalog hlášek a dokumentace přihlášení.
+- Odchylky od specifikace: žádné.
+
 ## R03 – Seed vývojových dat z legacy souborů
 - PR: #9 (codex/R03-seed-demo)
 - Přidáno: parsery legacy JSON/XML, idempotentní seed služby, příkaz `seed_demo` a testovací fixtures/testy.

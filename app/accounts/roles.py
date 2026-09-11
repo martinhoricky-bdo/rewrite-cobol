@@ -2,13 +2,13 @@ from django.db import models
 
 
 class Role(models.TextChoices):
-    CEO = "ceo"
-    CREW = "crew"
-    HR = "hr"
-    IT = "it"
-    SALES = "sales"
-    LEGAL = "legal"
-    SCHEDULE = "schedule"
+    CEO = "ceo", "CEO"
+    CREW = "crew", "Crew"
+    HR = "hr", "HR"
+    IT = "it", "IT"
+    SALES = "sales", "Sales"
+    LEGAL = "legal", "Legal"
+    SCHEDULE = "schedule", "Schedule"
 
 
 ROLE_BY_DEPT = {

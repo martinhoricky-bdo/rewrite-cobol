@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Login | COBOL AIRLINES{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+  <article class="login-panel">
+    <h1>LOGIN PAGE</h1>
+    <h2>COBOL AIRLINES</h2>
+    <p>COBOL AIRLINES PROGRAMMING AT HEIGHTS</p>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="msg msg-error">{{ form.non_field_errors|striptags }}</div>{% endif %}
+      <label>USERID {{ form.username }}</label>
+      <label>PASSWORD {{ form.password }}</label>
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      <button type="submit">LOGIN</button>
+    </form>
+  </article>
+{% endblock %}

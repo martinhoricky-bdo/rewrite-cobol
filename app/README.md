@@ -25,7 +25,11 @@ full structure.
 Copy `.env.example` to `.env` to configure `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`,
 `DATABASE_URL`, and `LEGACY_ROOT`. Compose supplies development-safe defaults automatically.
 
-Authentication and login screens will be added in R04.
+## Přihlášení
+
+Po spuštění otevřete <http://localhost:8000/login/>. Přihlašovací údaje pro jednotlivé
+role jsou uvedeny níže v sekci [Seed data](#seed-data). Přihlášený uživatel může změnit
+heslo přes položku **Change password** a relaci ukončit přes **Logout**.
 
 ## Seed data
 
