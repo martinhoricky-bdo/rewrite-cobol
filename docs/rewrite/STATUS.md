@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-11 21:02
-- Aktuální krok: R03 (PR #9 vrácen k opravě)
+- Poslední aktualizace: 2026-09-11 21:12
+- Aktuální krok: R04 (zadávání)
 - Blokuje: nic
 
 ## Hotovo
@@ -14,14 +14,14 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | Smoke test Codex Cloud | #2 | #3 | 2026-09-11 19:33 (PR otevřel Claude, Codex větev pushnul; `gh` v sandboxu nebylo přihlášené, cache resetována) |
 | R01 scaffolding | #4 | #5 | 2026-09-11 20:05 (1. běh selhal na push 403 kvůli tokenu; 2. běh OK, review čisté, 6 testů) |
 | R02 datové schéma | #6 | #7 | 2026-09-11 20:25 (review čisté, 39 testů, schéma ověřeno v PostgreSQL) |
+| R03 seed_demo | #8 | #9 | 2026-09-11 21:10 (1. běh push 403; 2. běh bez PostgreSQL – vráceno: bug `--from-date`, chybějící testy; oprava OK: 43 testů, seed 641/720/360, idempotentní) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R03 seed_demo | #8 | #9 | 2. běh otevřel PR 20:43 (bez PostgreSQL v sandboxu); review 21:00: blokující bug `--from-date` default (seed padá), chybí `test_seed.py`/`test_flight_generation.py` → changes-requested, čeká se na opravu |
 
 ## Fronta
-R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
+R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
