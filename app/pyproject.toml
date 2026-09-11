@@ -24,7 +24,7 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["accounts*", "config*", "core*"]
+include = ["accounts*", "config*", "core*", "fleet*", "operations*", "sales*"]
 
 [tool.ruff]
 line-length = 100

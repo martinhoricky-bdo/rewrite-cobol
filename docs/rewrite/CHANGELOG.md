@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R02 – Datové schéma legacy tabulek
+- PR: #7 (codex/R02-schema)
+- Přidáno: Django modely legacy tabulek, databázové constraints a indexy, sekvence letenek, admin registrace, factories a testy schématu.
+- Změněno: aplikace `accounts` rozšířena o oddělení, zaměstnance a mapování rolí; přidány aplikace `fleet`, `operations` a `sales`.
+- Odchylky od specifikace: žádné.
+
 ## R01 – Scaffolding projektu, Docker Compose, tooling
 - PR: #5 (codex/R01-scaffolding)
 - Přidáno: Django projekt, aplikace `accounts` a `core`, Docker Compose, Makefile, vendorovaná statika a základní testy.
