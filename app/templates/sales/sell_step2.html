@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Confirm passengers | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Confirm passengers</h1>
+  <div class="sell-grid">
+    <section aria-label="Sale recap">
+      <h2>Sale recap</h2>
+      <dl>
+        <dt>CLIENT ID</dt><dd>{{ quote.client_id }}</dd>
+        <dt>FLIGHT NUM</dt><dd>{{ quote.flightnum }}</dd>
+        <dt>AIRPORT DEP</dt><dd>{{ quote.airportdep }}</dd>
+        <dt>AIRPORT LAND</dt><dd>{{ quote.airportarr }}</dd>
+        <dt>DATE</dt><dd>{{ quote.flightdate|date:"Y-m-d" }}</dd>
+        <dt>PASS NUMBER</dt><dd>{{ quote.count }}</dd>
+        <dt>PRICE</dt><dd>{{ quote.unit_price|floatformat:2 }} EUR</dd>
+        <dt>TOT PRICE</dt><dd>{{ quote.total_price|floatformat:2 }} EUR</dd>
+      </dl>
+    </section>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for row in rows %}
+        <div class="passenger-row">
+          <label>CLIENTID {{ row.field }}</label>
+          {{ row.field.errors }}
+          <span>NAME</span>
+          <span id="name-{{ forloop.counter }}" class="{% if 'does not exist' in row.name %}error{% else %}name{% endif %}">{{ row.name }}</span>
+        </div>
+      {% endfor %}
+      <button type="submit" name="action" value="check">Check names</button>
+      <button type="submit" name="action" value="confirm">Confirm passengers</button>
+      <button type="submit" name="action" value="return" formnovalidate>Return</button>
+    </form>
+  </div>
+{% endblock %}

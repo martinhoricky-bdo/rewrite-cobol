@@ -1,16 +1,20 @@
+import logging
 from dataclasses import dataclass
-from datetime import date, time
+from datetime import date, datetime, time
 from decimal import Decimal
 
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import F, QuerySet, Value
 from django.db.models.functions import Coalesce
 
-from core.messages import E_SEL_05, E_SEL_06, E_SEL_07, E_SEL_08
+from accounts.models import Employee
+from core.messages import E_SEL_05, E_SEL_05_ID, E_SEL_06, E_SEL_07, E_SEL_08, E_SEL_10, E_SEL_11
 from operations.models import Flight
 from operations.services import free_seats_subquery
 
-from .models import Passenger, Ticket
+from .models import Buy, Passenger, Ticket
+
+logger = logging.getLogger("cobol_airlines.sales")
 
 LEGACY_MONTHS = (
     "JAN",
@@ -129,6 +133,73 @@ def quote_sale(
         total_price=total_price,
         free_seats=flight.free_seats,
     )
+
+
+def seat_layout(numseats: int) -> list[str]:
+    return [f"{'ABCDEF'[index % 6]}{index // 6 + 1:02d}" for index in range(numseats)]
+
+
+def assign_seats(flight: Flight, count: int) -> list[str]:
+    occupied = set(flight.tickets.values_list("seat", flat=True))
+    available = [seat for seat in seat_layout(flight.airplane.numseats) if seat not in occupied]
+    if len(available) < count:
+        raise SaleError("E_SEL_08", E_SEL_08.format(n=len(available)))
+    return available[:count]
+
+
+def resolve_passengers(client_ids: list[int], flight: Flight) -> list[Passenger]:
+    seen = set()
+    for client_id in client_ids:
+        if client_id in seen:
+            raise SaleError("E_SEL_11", E_SEL_11.format(id=client_id))
+        seen.add(client_id)
+
+    passengers_by_id = Passenger.objects.in_bulk(client_ids)
+    for client_id in client_ids:
+        if client_id not in passengers_by_id:
+            raise SaleError("E_SEL_05", E_SEL_05_ID.format(id=client_id))
+        if flight.tickets.filter(client_id=client_id).exists():
+            raise SaleError("E_SEL_10", E_SEL_10.format(id=client_id))
+    return [passengers_by_id[client_id] for client_id in client_ids]
+
+
+def confirm_sale(
+    *, quote: SaleQuote, client_ids: list[int], seller: Employee, now: datetime
+) -> Buy:
+    if len(client_ids) != quote.count:
+        raise ValueError("Passenger count does not match the sale quote.")
+    with transaction.atomic():
+        flight = (
+            Flight.objects.select_for_update().select_related("airplane").get(pk=quote.flight_id)
+        )
+        passengers = resolve_passengers(client_ids, flight)
+        seats = assign_seats(flight, quote.count)
+        buy = Buy.objects.create(
+            buydate=now.date(),
+            buytime=now.time().replace(microsecond=0),
+            price=quote.unit_price * quote.count,
+            emp=seller,
+            client=passengers[0],
+        )
+        tickets = [
+            Ticket(
+                ticketid=next_ticket_id(),
+                buy=buy,
+                client=passenger,
+                flight=flight,
+                seat=seat,
+            )
+            for passenger, seat in zip(passengers, seats, strict=True)
+        ]
+        Ticket.objects.bulk_create(tickets)
+        logger.info(
+            "sale buyid=%s empid=%s flight=%s tickets=%s",
+            buy.pk,
+            seller.pk,
+            flight.flightnum,
+            len(tickets),
+        )
+        return buy
 
 
 def filter_passengers(

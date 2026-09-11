@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Sale {{ buy.buyid }} | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Sale {{ buy.buyid }} completed.</h1>
+  <dl>
+    <dt>BUYID</dt><dd>{{ buy.buyid }}</dd>
+    <dt>DATE</dt><dd>{{ buy.buydate|date:"Y-m-d" }}</dd>
+    <dt>TIME</dt><dd>{{ buy.buytime|time:"H:i:s" }}</dd>
+    <dt>SELLER</dt><dd>{{ buy.emp_id }} – {{ buy.emp.full_name }}</dd>
+    <dt>CLIENT</dt><dd>{{ buy.client_id }} – {{ buy.client.full_name }}</dd>
+    <dt>TOTAL PRICE</dt><dd>{{ buy.price|floatformat:2 }} EUR</dd>
+  </dl>
+  <div class="table-wrap"><table>
+    <thead><tr><th>TICKET ID</th><th>PASSENGER</th><th>SEAT</th></tr></thead>
+    <tbody>{% for ticket in buy.tickets.all %}<tr><td><a href="{% url 'sales:ticket_detail' ticket.ticketid %}">{{ ticket.ticketid }}</a></td><td>{{ ticket.client.full_name }}</td><td>{{ ticket.seat }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  <p>
+    <a role="button" href="{% url 'sales:sell_step1' %}">New sale</a>
+    <a role="button" href="/sales/buys/{{ buy.buyid }}/receipt/">Print receipt</a>
+    <a role="button" href="/sales/buys/{{ buy.buyid }}/boarding-passes/">Print all boarding passes</a>
+  </p>
+{% endblock %}
