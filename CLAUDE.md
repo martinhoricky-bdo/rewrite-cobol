@@ -53,7 +53,7 @@ Kód a data:
 - [ ] Logika ve `services.py`, views tenké, `Decimal` pro peníze, `timezone.localdate()` pro „dnes“.
 - [ ] Modely: `db_table`/`db_column` legacy názvy, constraints a indexy dle `03` kap. 4, migrace přiložené a nazvané.
 - [ ] Transakce a zámky tam, kde spec vyžaduje (prodej: `select_for_update` na letu).
-- [ ] Testy nezávisí na síti a aktuálním datu.
+- [ ] Testy nezávisí na síti a aktuálním datu; každý nový testovací soubor projde i samostatně (`pytest <soubor>`), ne jen v celé sadě.
 - [ ] `make check` je zelený i ve tvém prostředí, když je to proveditelné (spusť `cd app && make check`, nebo alespoň `ruff` a `pytest` bez Dockeru s `DATABASE_URL` na lokální PostgreSQL).
 
 Výstup review: „Approve“ jen když je vše splněno; jinak „Request changes“ s konkrétními body odkazujícími na řádky a na kapitoly specifikace.

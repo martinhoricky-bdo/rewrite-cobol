@@ -21,3 +21,9 @@ Záznam rozhodnutí, která Claude přijal v automatickém režimu bez dotazu na
 - Kontext: uživatel odkazoval na konvence z jiných projektů (soc2, clientportal), které nejsou v této session dostupné.
 - Rozhodnutí: použity vlastní labely `codex-task`, `step:R<ID>`, `smoke-test`, `needs-review`, `changes-requested`, `approved`; komentář se zmínkou `@codex` má pevný text (`CLAUDE.md`).
 - Dopad: sjednotit později, pokud uživatel dodá původní konvence.
+
+## 2026-09-11 – Testovací soubory musí projít i samostatně
+- Kontext: review R09 (PR #21) – `pytest tests/views/test_sell_step1.py` samostatně padal na `IntegrityError dept_pkey`: `DepartmentFactory` číslovala `deptid` sekvencí od 1 a sedmé generované oddělení (`FlightFactory → Shift → Crew → 6× Employee`) kolidovalo s explicitním `deptid=7` z `login_role`. V celé sadě to prošlo jen díky posunutému čítači; stejně padaly v izolaci i soubory z R06–R08.
+- Rozhodnutí: `DepartmentFactory` má `django_get_or_create = ("deptid",)` (opraveno Claudem přímo ve větvi R09). Součástí review každého dalšího kroku je spuštění nových testovacích souborů samostatně; do zadání se přidává věta „každý testovací soubor musí projít i samostatně“.
+- Dopad: `app/tests/factories.py`; proces review (`CLAUDE.md` checklist – bod „testy nezávisí na pořadí“), zadání R10+.
+
