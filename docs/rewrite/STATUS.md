@@ -22,7 +22,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R07 palubní vstupenka | #16 | – | zadáno 22:26, čeká se na PR |
+| R07 palubní vstupenka | #16 | – | zadáno 22:19; 1. běh bez pushe (proxy 502), second run zadán 22:37, čeká se na PR |
 
 ## Fronta
 R08 → R09 → R10 → R11 → R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
