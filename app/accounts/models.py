@@ -7,6 +7,8 @@ from .roles import ROLE_BY_DEPT
 
 
 class User(AbstractUser):
+    must_change_password = models.BooleanField(default=False)
+
     class Meta:
         db_table = "accounts_user"
 

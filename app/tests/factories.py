@@ -4,7 +4,7 @@ from decimal import Decimal
 import factory
 from factory.django import DjangoModelFactory
 
-from accounts.models import Department, Employee
+from accounts.models import Department, Employee, User
 from fleet.models import Airplane, Airport
 from operations.models import Crew, Flight, Shift
 from sales.models import Buy, Passenger, Ticket
@@ -17,6 +17,21 @@ class DepartmentFactory(DjangoModelFactory):
 
     deptid = factory.Sequence(lambda n: n + 1)
     name = factory.Sequence(lambda n: f"Department {n + 1}")
+
+
+class UserFactory(DjangoModelFactory):
+    class Meta:
+        model = User
+        skip_postgeneration_save = True
+
+    username = factory.Sequence(lambda n: f"1000{n:04d}")
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        password = extracted or f"pw-{self.username}"
+        self.set_password(password)
+        if create:
+            self.save(update_fields=["password"])
 
 
 class EmployeeFactory(DjangoModelFactory):
@@ -34,6 +49,9 @@ class EmployeeFactory(DjangoModelFactory):
     admidate = factory.Faker("date_object")
     salary = Decimal("50000.00")
     dept = factory.SubFactory(DepartmentFactory)
+
+    class Params:
+        with_user = factory.Trait(user=factory.SubFactory(UserFactory))
 
 
 class AirportFactory(DjangoModelFactory):

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if admin_only %}
+    <h1>Administration</h1><p><a href="/admin/">Open administration</a></p>
+  {% else %}
+    <h1>{{ role_label }}</h1><p>The {{ role_label }} functions are not available yet.</p>
+  {% endif %}
+{% endblock %}

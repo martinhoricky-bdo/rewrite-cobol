@@ -12,9 +12,14 @@
   <body>
     <header class="app-header container">
       <div><strong>{{ app_title }}</strong><small>{{ app_subtitle }}</small></div>
+      {% if user.is_authenticated %}
+        <div>USERID: {{ user.username }}{% if employee %}<br>{{ employee.full_name }} ({{ role }}){% endif %}</div>
+      {% endif %}
       <div>DATE: {{ now_local|date:"d/m/Y" }}<br>TIME: {{ now_local|time:"H:i:s" }}</div>
     </header>
-    {% block nav %}{% endblock %}
+    {% block nav %}
+      {% if menu %}<nav class="container"><ul>{% for label, url_name in menu %}<li><a href="{% url url_name %}">{{ label }}</a></li>{% endfor %}</ul></nav>{% endif %}
+    {% endblock %}
     {% if messages %}
       <section class="container">
         {% for message in messages %}<article class="msg msg-{{ message.tags }}">{{ message }}</article>{% endfor %}
