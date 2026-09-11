@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Ticket {{ ticket.ticketid }} | COBOL AIRLINES{% endblock %}
+{% block content %}
+  <h1>Ticket detail</h1>
+  <dl>
+    <dt>TICKET ID</dt><dd>{{ ticket.ticketid }}</dd>
+    <dt>FIRST NAME</dt><dd>{{ ticket.client.firstname }}</dd><dt>LAST NAME</dt><dd>{{ ticket.client.lastname }}</dd>
+    <dt>CLIENT ID</dt><dd>{{ ticket.client_id }}</dd><dt>FLIGHT NUM</dt><dd>{{ ticket.flight.flightnum }}</dd>
+    <dt>FLIGHT DATE</dt><dd>{{ ticket.flight.flightdate|date:"Y-m-d" }}</dd><dt>TIME DEP</dt><dd>{{ ticket.flight.deptime|time:"H:i" }}</dd><dt>TIME LAND</dt><dd>{{ ticket.flight.arrtime|time:"H:i" }}</dd>
+    <dt>AIRPORT DEP</dt><dd>{{ ticket.flight.airportdep_id }} – {{ ticket.flight.airportdep.city }}</dd><dt>AIRPORT LAND</dt><dd>{{ ticket.flight.airportarr_id }} – {{ ticket.flight.airportarr.city }}</dd>
+    <dt>SEAT</dt><dd>{{ ticket.seat }}</dd>
+  </dl>
+  <h2>Purchase</h2>
+  <dl><dt>BUYID</dt><dd><a href="/sales/buys/{{ ticket.buy_id }}/">{{ ticket.buy_id }}</a></dd><dt>DATE</dt><dd>{{ ticket.buy.buydate|date:"Y-m-d" }} {{ ticket.buy.buytime|time:"H:i" }}</dd><dt>SELLER</dt><dd>{{ ticket.buy.emp_id }} – {{ ticket.buy.emp.full_name }}</dd><dt>PRICE</dt><dd>{{ ticket.buy.price|floatformat:2 }} EUR</dd></dl>
+  <p><a role="button" href="{% url 'sales:ticket_search' %}">Back to search</a> <a role="button" href="/sales/tickets/{{ ticket.ticketid }}/boarding-pass/">Print boarding pass</a></p>
+{% endblock %}

@@ -48,3 +48,8 @@ Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější n
 - Přidáno: `docs/rewrite/01-inventory.md` (inventář legacy systému), `02-functional-spec.md` (funkční specifikace), `03-target-architecture.md` (cílová architektura), `04-migration-plan.md` (plán kroků R01–R18), `AGENTS.md` (pravidla pro Codex), `CLAUDE.md` (pravidla pro Claude), tento CHANGELOG.
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: – (specifikace tímto PR vzniká; rozhodnutí o nejasných místech legacy jsou v `02-functional-spec.md` kap. 8).
+## R06 – Sales: hledání letenek a detail
+- PR: #TBD (codex/R06-search-tickets)
+- Přidáno: prioritní hledání letenek, stránkované výsledky a detail letenky včetně nákupu.
+- Změněno: navigace rolí Sales a CEO a vlastní stránka 404.
+- Odchylky od specifikace: žádné.
