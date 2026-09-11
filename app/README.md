@@ -25,8 +25,9 @@ full structure.
 Copy `.env.example` to `.env` to configure `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`,
 `DATABASE_URL`, and `LEGACY_ROOT`. Compose supplies development-safe defaults automatically.
 
-Demo data seeding will be added in R03. Authentication and login screens will be added in R04.
-# Seed data
+Authentication and login screens will be added in R04.
+
+## Seed data
 
 Run `make seed` after migrations to import the legacy demo data. The command is
 idempotent; use `python manage.py seed_demo --flush` to remove and recreate seeded

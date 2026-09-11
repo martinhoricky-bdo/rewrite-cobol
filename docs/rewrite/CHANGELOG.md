@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R03 – Seed vývojových dat z legacy souborů
-- PR: #<číslo> (codex/R03-seed-demo)
+- PR: #9 (codex/R03-seed-demo)
 - Přidáno: parsery legacy JSON/XML, idempotentní seed služby, příkaz `seed_demo` a testovací fixtures/testy.
 - Změněno: dokumentace vývojových účtů a konfigurace aplikace `legacy_import`.
 - Odchylky od specifikace: žádné.
