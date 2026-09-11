@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R09 – Sales: prodej – krok 1
-- PR: #TBD (codex/R09-sell-step1)
+- PR: #21 (codex/R09-sell-step1)
 - Přidáno: výběr letu a klienta, výpočet ceny a kapacity, rekapitulace a placeholder kroku cestujících včetně testů.
 - Změněno: odkazy Sell nyní předvyplňují formulář a navigace role Sales obsahuje položku Sell.
 - Odchylky od specifikace: žádné.
