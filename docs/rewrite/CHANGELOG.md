@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R01 – Scaffolding projektu, Docker Compose, tooling
-- PR: #TBD (codex/R01-scaffolding)
+- PR: #5 (codex/R01-scaffolding)
 - Přidáno: Django projekt, aplikace `accounts` a `core`, Docker Compose, Makefile, vendorovaná statika a základní testy.
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: žádné.
