@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R08 – Sales: cestující
-- PR: #TBD (codex/R08-passengers)
+- PR: #19 (codex/R08-passengers)
 - Přidáno: filtrování, seznam, detail, založení a editace cestujících včetně validačních a view testů.
 - Změněno: navigace role Sales obsahuje položku Passengers.
 - Odchylky od specifikace: žádné.
