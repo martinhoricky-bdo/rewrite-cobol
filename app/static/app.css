@@ -1,0 +1,4 @@
+.app-header { display: flex; justify-content: space-between; align-items: center; }
+.app-header small { display: block; }
+.msg-error { color: #b42318; border-color: #b42318; }
+.msg-info, .msg-success { color: #067647; border-color: #067647; }

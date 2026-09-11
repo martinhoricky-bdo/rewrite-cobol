@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}COBOL AIRLINES{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'pico.min.css' %}">
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+    <script src="{% static 'htmx.min.js' %}" defer></script>
+  </head>
+  <body>
+    <header class="app-header container">
+      <div><strong>{{ app_title }}</strong><small>{{ app_subtitle }}</small></div>
+      <div>DATE: {{ now_local|date:"d/m/Y" }}<br>TIME: {{ now_local|time:"H:i:s" }}</div>
+    </header>
+    {% block nav %}{% endblock %}
+    {% if messages %}
+      <section class="container">
+        {% for message in messages %}<article class="msg msg-{{ message.tags }}">{{ message }}</article>{% endfor %}
+      </section>
+    {% endif %}
+    <main class="container">{% block content %}{% endblock %}</main>
+    <footer class="container">Use the menu to navigate.</footer>
+  </body>
+</html>
