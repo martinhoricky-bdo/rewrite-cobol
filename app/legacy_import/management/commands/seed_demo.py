@@ -26,13 +26,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser) -> None:
         parser.add_argument("--flush", action="store_true")
-        parser.add_argument("--from-date", type=date.fromisoformat, default=timezone.localdate)
+        parser.add_argument("--from-date", type=date.fromisoformat, default=None)
         parser.add_argument("--days", type=int, default=60)
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
         if options["days"] < 1:
             raise CommandError("--days must be a positive integer")
+        start = options["from_date"] or timezone.localdate()
+        if isinstance(start, str):
+            start = date.fromisoformat(start)
         root = Path(settings.LEGACY_ROOT)
         employee_path = root / "COB-PROG/EMPLO-INSERT/EMPLOYEE-LIST.json"
         passenger_dir = root / "COB-PROG/PASSENGER-INSERT"
@@ -49,7 +52,7 @@ class Command(BaseCommand):
         client = seed_passengers(passenger_paths)
         crews = seed_crews()
         generate_flights(date(2022, 9, 1), 30, crews)
-        generate_flights(options["from_date"], options["days"], crews)
+        generate_flights(start, options["days"], crews)
         seed_reference_purchase(client)
         counts = (
             ("dept", Department),
