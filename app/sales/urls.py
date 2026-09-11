@@ -5,6 +5,8 @@ from . import views
 app_name = "sales"
 
 urlpatterns = [
+    path("sell/", views.sell_step1, name="sell_step1"),
+    path("sell/passengers/", views.sell_step2, name="sell_step2"),
     path("passengers/", views.passenger_list, name="passenger_list"),
     path("passengers/new/", views.passenger_create, name="passenger_create"),
     path("passengers/<int:clientid>/", views.passenger_detail, name="passenger_detail"),

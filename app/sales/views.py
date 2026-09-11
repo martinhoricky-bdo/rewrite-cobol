@@ -1,4 +1,5 @@
 import re
+from decimal import DecimalException
 
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -7,14 +8,78 @@ from django.utils import timezone
 
 from accounts.permissions import role_required
 from accounts.roles import Role
-from core.messages import E_FLT_03, E_TKT_02, E_TKT_03
+from core.messages import E_FLT_03, E_SEL_09, E_TKT_02, E_TKT_03
 from operations.services import search_flights
 
-from .forms import FlightSearchForm, PassengerFilterForm, PassengerForm, TicketSearchForm
+from .forms import (
+    FlightSearchForm,
+    PassengerFilterForm,
+    PassengerForm,
+    SellStep1Form,
+    TicketSearchForm,
+)
 from .models import Passenger, Ticket
-from .services import boarding_pass_context, filter_passengers, search_tickets
+from .services import (
+    SESSION_KEY,
+    SaleError,
+    SaleQuote,
+    boarding_pass_context,
+    filter_passengers,
+    quote_sale,
+    search_tickets,
+)
 
 PASSENGER_EMAIL_WARNING = "Another passenger with this email already exists."
+
+
+def _session_quote(request):
+    data = request.session.get(SESSION_KEY)
+    if data is None:
+        return None
+    try:
+        return SaleQuote.from_session(data)
+    except (DecimalException, KeyError, TypeError, ValueError):
+        request.session.pop(SESSION_KEY, None)
+        return None
+
+
+@role_required(Role.SALES)
+def sell_step1(request):
+    quote = _session_quote(request)
+    if request.method == "POST":
+        form = SellStep1Form(request.POST)
+        if form.is_valid():
+            try:
+                quote = quote_sale(**form.cleaned_data, today=timezone.localdate())
+            except SaleError as exc:
+                request.session.pop(SESSION_KEY, None)
+                quote = None
+                messages.error(request, exc.message)
+            else:
+                request.session[SESSION_KEY] = quote.to_session()
+        else:
+            request.session.pop(SESSION_KEY, None)
+            quote = None
+            for errors in form.errors.values():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = SellStep1Form(
+            initial={
+                "clientid": request.GET.get("clientid", ""),
+                "flightnum": request.GET.get("flightnum", ""),
+                "flightdate": request.GET.get("date", ""),
+            }
+        )
+    return render(request, "sales/sell_step1.html", {"form": form, "quote": quote})
+
+
+@role_required(Role.SALES)
+def sell_step2(request):
+    if _session_quote(request) is None:
+        messages.error(request, E_SEL_09)
+        return redirect("sales:sell_step1")
+    return render(request, "sales/sell_step2_placeholder.html")
 
 
 @role_required(Role.SALES)

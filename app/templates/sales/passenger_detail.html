@@ -9,7 +9,7 @@
     <dt>COUNTRY</dt><dd>{{ passenger.country }}</dd><dt>ZIPCODE</dt><dd>{{ passenger.zipcode }}</dd>
     <dt>TELEPHONE</dt><dd>{{ passenger.telephone }}</dd><dt>EMAIL</dt><dd>{{ passenger.email }}</dd>
   </dl>
-  <p><a role="button" href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a> <a role="button" href="/sales/sell/?clientid={{ passenger.clientid }}">Sell ticket</a></p>
+  <p><a role="button" href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a> <a role="button" href="{% url 'sales:sell_step1' %}?clientid={{ passenger.clientid }}">Sell ticket</a></p>
   <h2>Tickets</h2>
   <div class="table-wrap"><table>
     <thead><tr><th>TICKET ID</th><th>FLIGHT NUM</th><th>DATE</th><th>DEP</th><th>LAND</th><th>SEAT</th></tr></thead>

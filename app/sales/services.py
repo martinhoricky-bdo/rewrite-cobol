@@ -1,7 +1,14 @@
-from datetime import date
+from dataclasses import dataclass
+from datetime import date, time
+from decimal import Decimal
 
 from django.db import connection
-from django.db.models import QuerySet
+from django.db.models import F, QuerySet, Value
+from django.db.models.functions import Coalesce
+
+from core.messages import E_SEL_05, E_SEL_06, E_SEL_07, E_SEL_08
+from operations.models import Flight
+from operations.services import free_seats_subquery
 
 from .models import Passenger, Ticket
 
@@ -19,6 +26,109 @@ LEGACY_MONTHS = (
     "NOV",
     "DEC",
 )
+
+SESSION_KEY = "sale_quote"
+
+
+class SaleError(Exception):
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+@dataclass(frozen=True)
+class SaleQuote:
+    flight_id: int
+    flightnum: str
+    flightdate: date
+    deptime: time
+    arrtime: time
+    airportdep: str
+    airportarr: str
+    client_id: int
+    client_name: str
+    count: int
+    unit_price: Decimal
+    total_price: Decimal
+    free_seats: int
+
+    def to_session(self) -> dict:
+        return {
+            "flight_id": self.flight_id,
+            "flightnum": self.flightnum,
+            "flightdate": self.flightdate.isoformat(),
+            "deptime": self.deptime.strftime("%H:%M"),
+            "arrtime": self.arrtime.strftime("%H:%M"),
+            "airportdep": self.airportdep,
+            "airportarr": self.airportarr,
+            "client_id": self.client_id,
+            "client_name": self.client_name,
+            "count": self.count,
+            "unit_price": str(self.unit_price),
+            "total_price": str(self.total_price),
+            "free_seats": self.free_seats,
+        }
+
+    @classmethod
+    def from_session(cls, data) -> "SaleQuote":
+        return cls(
+            flight_id=int(data["flight_id"]),
+            flightnum=str(data["flightnum"]),
+            flightdate=date.fromisoformat(data["flightdate"]),
+            deptime=time.fromisoformat(data["deptime"]),
+            arrtime=time.fromisoformat(data["arrtime"]),
+            airportdep=str(data["airportdep"]),
+            airportarr=str(data["airportarr"]),
+            client_id=int(data["client_id"]),
+            client_name=str(data["client_name"]),
+            count=int(data["count"]),
+            unit_price=Decimal(data["unit_price"]),
+            total_price=Decimal(data["total_price"]),
+            free_seats=int(data["free_seats"]),
+        )
+
+
+def quote_sale(
+    *, clientid: int, flightnum: str, flightdate: date, count: int, today: date
+) -> SaleQuote:
+    try:
+        passenger = Passenger.objects.get(pk=clientid)
+    except Passenger.DoesNotExist as exc:
+        raise SaleError("E_SEL_05", E_SEL_05) from exc
+
+    try:
+        flight = (
+            Flight.objects.select_related("airplane", "airportdep", "airportarr")
+            .annotate(sold=Coalesce(free_seats_subquery(), Value(0)))
+            .annotate(free_seats=F("airplane__numseats") - F("sold"))
+            .get(flightnum__iexact=flightnum, flightdate=flightdate)
+        )
+    except Flight.DoesNotExist as exc:
+        raise SaleError("E_SEL_06", E_SEL_06) from exc
+
+    if flightdate < today:
+        raise SaleError("E_SEL_07", E_SEL_07)
+    if flight.free_seats < count:
+        raise SaleError("E_SEL_08", E_SEL_08.format(n=flight.free_seats))
+
+    unit_price = flight.price.quantize(Decimal("0.01"))
+    total_price = (unit_price * count).quantize(Decimal("0.01"))
+    return SaleQuote(
+        flight_id=flight.pk,
+        flightnum=flight.flightnum,
+        flightdate=flight.flightdate,
+        deptime=flight.deptime,
+        arrtime=flight.arrtime,
+        airportdep=flight.airportdep_id,
+        airportarr=flight.airportarr_id,
+        client_id=passenger.pk,
+        client_name=passenger.full_name,
+        count=count,
+        unit_price=unit_price,
+        total_price=total_price,
+        free_seats=flight.free_seats,
+    )
 
 
 def filter_passengers(
