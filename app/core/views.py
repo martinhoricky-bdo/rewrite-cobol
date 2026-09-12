@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from django.http import JsonResponse
+from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 
 from accounts.permissions import current_role
 
@@ -27,6 +28,12 @@ def permission_denied(request, exception=None):
 
 def page_not_found(request, exception=None):
     return render(request, "404.html", status=404)
+
+
+def server_error(request):
+    # Rendered without the request context so that failing context processors
+    # (session, database) cannot break the error page itself.
+    return HttpResponseServerError(render_to_string("500.html"))
 
 
 def healthz(request):

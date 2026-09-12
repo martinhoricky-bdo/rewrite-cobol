@@ -1,5 +1,6 @@
 E_AUTH_01 = "Password or userid incorrect."
 E_AUTH_02 = "You are not allowed to access this function."
+E_AUTH_03 = "Too many failed attempts. Try again in {minutes} minutes."
 E_SYS_01 = "Communication error between system and DB, call IT dept. Error: {code}"
 E_FLT_01 = "No data inserted, try again."
 E_FLT_02 = "Wrong date format, try to insert date as YYYY-MM-DD"

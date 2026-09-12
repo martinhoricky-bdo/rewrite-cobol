@@ -25,7 +25,7 @@ class UserFactory(DjangoModelFactory):
         model = User
         skip_postgeneration_save = True
 
-    username = factory.Sequence(lambda n: f"1000{n:04d}")
+    username = factory.Sequence(lambda n: f"{90000000 + n:08d}")
 
     @factory.post_generation
     def password(self, create, extracted, **kwargs):
@@ -40,8 +40,8 @@ class EmployeeFactory(DjangoModelFactory):
         model = Employee
 
     empid = factory.Sequence(lambda n: f"{10000001 + n:08d}")
-    firstname = factory.Faker("first_name")
-    lastname = factory.Faker("last_name")
+    firstname = factory.Sequence(lambda n: f"First{n}")
+    lastname = factory.Sequence(lambda n: f"Last{n}")
     addre = factory.Faker("street_address")
     city = factory.Faker("city")
     zipcode = factory.Faker("postcode")

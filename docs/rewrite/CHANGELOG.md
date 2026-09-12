@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R18 – Hardening a závěr
+- PR: #41 (codex/R18-hardening)
+- Přidáno: limiter přihlášení, produkční bezpečnostní nastavení, Gunicorn/WhiteNoise image, chybová stránka 500 a testy navigace a chybových stránek.
+- Změněno: 404 stránka, auditní logování autentizace a prodejů a provozní dokumentace.
+- Odchylky od specifikace: E2E testy nebyly v Codex sandboxu spuštěny podle zadání issue; ověří je Claude lokálně.
+
 ## R17 – Crew „My shifts“ a CEO dashboard
 - PR: #39 (codex/R17-crew-ceo)
 - Přidáno: přehled vlastních směn posádky a agregovaný CEO dashboard s filtrem období.
