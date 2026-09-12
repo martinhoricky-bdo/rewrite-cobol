@@ -158,11 +158,11 @@ Detailně v `02-functional-spec.md` kap. 4. Technický vzor:
 
 ### 7.3 Příkaz `import_legacy` (produkční export DB2)
 
-`python manage.py import_legacy --dir <adresář s CSV> [--dry-run] [--report report.json]`
+`python manage.py import_legacy --dir <adresář s CSV> [--dry-run] [--report report.json] [--date-format iso|us]`
 
 - Očekává soubory `AIRPORT.csv, AIRPLANE.csv, DEPT.csv, EMPLO.csv, PASSENGERS.csv, CREW.csv, SHIFT.csv, FLIGHT.csv, BUY.csv, TICKET.csv` (DEL formát DB2: čárka, text v uvozovkách, hlavička nepovinná – pořadí sloupců dle DDL).
 - Pořadí importu respektuje FK: `airport, airplane, dept (bez manager), emplo, dept.manager, passengers, crew, shift, flight, buy, ticket`. Celý import v jedné transakci; `--dry-run` ji odrolluje.
-- Normalizace: ořez mezer u `CHAR`, `airportid` velkými písmeny, datum přijímá ISO i `MM/DD/YYYY` (americké lokální nastavení DB2 zjištěné v insert skriptech) – formát se detekuje z hodnoty a musí být pro celý soubor konzistentní, jinak chyba; `time` `HH:MM` i `HH:MM:SS`; `seat` doplněn na formát `X99`.
+- Normalizace: ořez mezer u `CHAR`, `airportid` velkými písmeny, datum přijímá ISO (`YYYY-MM-DD`, výchozí) nebo `MM/DD/YYYY` (americké lokální nastavení DB2 zjištěné v insert skriptech) – formát se volí explicitně přepínačem `--date-format iso|us` pro celý běh; hodnota mimo zvolený formát = chyba řádku (**odchylka** od původního návrhu autodetekce, viz `DECISIONS.md` 2026-09-12); `time` `HH:MM` i `HH:MM:SS`; `seat` doplněn na formát `X99`.
 - `FLIGHT.price` neexistuje v exportu → výchozí 120.99. `EMPLO.telephone` delší než 20 → chyba řádku.
 - Validace FK: řádek s neexistující referencí se přeskočí a zapíše do reportu (legacy data takové řádky obsahují).
 - Sekvence `ticket_ticketid_seq` a identity se po importu nastaví na `max + 1`.

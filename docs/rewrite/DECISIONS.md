@@ -32,3 +32,8 @@ Záznam rozhodnutí, která Claude přijal v automatickém režimu bez dotazu na
 - Rozhodnutí: e2e testy ověřuje Claude proti seedovanému `runserver` s předinstalovaným Chromiem (`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`, override je v `tests/e2e/conftest.py`) a drobné opravy lokátorů/fixtur commituje přímo do větve Codexu (rozšíření pravidla „drobnosti opravuje Claude“). Do `AGENTS.md` kap. 4 přidána pravidla pro psaní e2e: session scope pro override fixtur, `role="button"` u akčních odkazů, `.first` u textů opakovaných na tiskových stránkách, popup jen u `target="_blank"`.
 - Dopad: `app/tests/e2e/*`, `AGENTS.md` kap. 4, `CLAUDE.md` (postup review e2e v kontrolním promptu).
 
+## 2026-09-12 – `import_legacy`: explicitní `--date-format` místo autodetekce
+- Kontext: `03-target-architecture.md` kap. 7.3 původně navrhovala autodetekci formátu data z hodnoty (ISO vs. `MM/DD/YYYY`); zadání R14 zvolilo explicitní přepínač `--date-format iso|us`, protože `01/02/2022` je v obou výkladech platné datum a autodetekce by tiše přehodila den a měsíc. Codex v PR #31 implementoval zadání.
+- Rozhodnutí: explicitní přepínač; hodnota mimo zvolený formát je chyba řádku v reportu. `03` kap. 7.3 upraveno. `seed_demo` (JSON `YYYY/MM/DD`) používá dál vlastní parser – není to formát DB2.
+- Dopad: `docs/rewrite/03-target-architecture.md` kap. 7.3; `app/legacy_import/parsers.py: parse_legacy_date(value, fmt)`.
+
