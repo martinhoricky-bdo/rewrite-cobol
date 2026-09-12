@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R16a – Schedule: lety a generování na období
+- PR: #35 (codex/R16a-schedule-flights)
+- Přidáno: správa letů, filtrování a stránkování, generování letů na období a testy formulářů, služby a oprávnění.
+- Změněno: seed používá sdílený generátor z aplikace operations a role Schedule má domovskou stránku a navigaci letů.
+- Odchylky od specifikace: žádné.
+
 ## R15 – HR: zaměstnanci a oddělení
 - PR: #33 (codex/R15-hr)
 - Přidáno: HR seznam, detail a formuláře zaměstnanců a správa názvů a manažerů oddělení s testy oprávnění.
