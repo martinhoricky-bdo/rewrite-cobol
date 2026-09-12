@@ -3,10 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 09:13
+- Poslední aktualizace: 2026-09-12 09:32
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R19 (Codex pracuje)
-- Blokuje: nic
+- Aktuální krok: R19 – **BLOKOVÁNO**: Codex Cloud nemůže pushovat (HTTP 403 pro `chatgpt-codex-connector[bot]` ve dvou fix runech po sobě, 09:05 a 09:20 UTC; `git ls-remote` prochází, zápis ne). Opravy existují jen v sandboxu Codexu (commity `cce65b5`, `be85dba`).
+- Blokuje: token/oprávnění Codex Cloud prostředí pro zápis do repozitáře – vyžaduje zásah uživatele. Claude podle pravidla „2. běh bez pushe → shrnutí a zastavit“ další kroky nezadává a kontroly neplánuje; po opravě tokenu napsat „pokračuj“ → Claude zadá fix run 3 v issue #42.
 
 ## Hotovo
 | Krok | Issue | PR | Merge |
@@ -36,7 +36,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | #42 | #43 | PR 08:44; review 1 (09:05) vráceno: 9 testů padá (chybí `template_name`), limit řádků obejit přes `fmt: off`/`noqa`, chybí testy §6, duplicitní smyčka chyb; Codex neměl PostgreSQL → sada neběžela; fix run 1 (08:55) opravy hotové s PG zelenou sadou, ale push 403 → fix run 2 zadán 09:13 |
+| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | #42 | #43 | PR 08:44; review 1 (09:05) vráceno: 9 testů padá (chybí `template_name`), limit řádků obejit přes `fmt: off`/`noqa`, chybí testy §6, duplicitní smyčka chyb; Codex neměl PostgreSQL → sada neběžela; fix run 1 (08:55) i fix run 2 (09:13) opravy hotové, `pytest -q` zelený proti PG, ale push 403 v obou → zastaveno, čeká na uživatele |
 
 ## Fronta
 R20 (schedule/HR/IT), R21 (sales/reports) – po R19, mohou běžet po sobě; R22 (úklid, matice oprávnění, docs) – po R20 a R21. Zadání v `codex-tasks/R20–R22.md`.
