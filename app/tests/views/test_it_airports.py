@@ -35,6 +35,10 @@ def test_airport_crud_uppercase_and_validation(client):
     assert "already exists" in response.content.decode()
     response = client.post(reverse("it:airport_create"), airport_data("12"))
     assert "letters (A–Z)" in response.content.decode()
+    response = client.post(reverse("it:airport_create"), airport_data("ABCDE"))
+    assert response.status_code == 200
+    assert "at most 4 characters" in response.content.decode()
+    assert not Airport.objects.filter(pk="ABCDE").exists()
 
 
 def test_airport_delete_reference_and_permissions(client):
@@ -52,3 +56,9 @@ def test_airport_delete_reference_and_permissions(client):
     client.logout()
     login_as(client, 7)
     assert client.get(reverse("it:airports")).status_code == 403
+
+
+@pytest.mark.parametrize("deptid", [6, 9])
+def test_it_and_schedule_can_view_airports(client, deptid):
+    login_as(client, deptid)
+    assert client.get(reverse("it:airports")).status_code == 200

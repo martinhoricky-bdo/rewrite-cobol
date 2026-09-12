@@ -55,3 +55,20 @@ def test_airplane_delete_reference_and_permissions(client):
     client.logout()
     login_as(client, 7)
     assert client.get(reverse("it:airplanes")).status_code == 403
+
+
+def test_airplane_without_flights_can_be_deleted(client):
+    login_as(client)
+    airplane = Airplane.objects.create(airplaneid="FREE", type="A320", numseats=100, totalfuel=1000)
+
+    response = client.post(reverse("it:airplane_delete", args=[airplane.pk]), follow=True)
+
+    assert response.status_code == 200
+    assert not Airplane.objects.filter(pk=airplane.pk).exists()
+    assert f"Airplane {airplane.pk} deleted." in response.content.decode()
+
+
+@pytest.mark.parametrize("deptid", [6, 9])
+def test_it_and_schedule_can_view_airplanes(client, deptid):
+    login_as(client, deptid)
+    assert client.get(reverse("it:airplanes")).status_code == 200
