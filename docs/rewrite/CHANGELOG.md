@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R16b – Schedule: posádky a směny
+- PR: #TBD (codex/R16b-schedule-crews)
+- Přidáno: správa posádek a směn, filtrování a stránkování směn, validace rolí členů a překryvů a testy oprávnění.
+- Změněno: navigace role Schedule obsahuje odkazy na posádky a směny.
+- Odchylky od specifikace: žádné.
+
 ## R16a – Schedule: lety a generování na období
 - PR: #35 (codex/R16a-schedule-flights)
 - Přidáno: správa letů, filtrování a stránkování, generování letů na období a testy formulářů, služby a oprávnění.

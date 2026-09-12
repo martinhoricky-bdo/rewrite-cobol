@@ -1,0 +1,89 @@
+from datetime import date
+
+import pytest
+from django.urls import reverse
+
+from core.messages import E_REF_01
+from operations.models import Shift
+from tests.factories import (
+    DepartmentFactory,
+    EmployeeFactory,
+    FlightFactory,
+    ShiftFactory,
+    UserFactory,
+)
+
+pytestmark = pytest.mark.django_db
+
+
+def login_as(client, deptid=9):
+    user = UserFactory()
+    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
+    client.force_login(user)
+
+
+def shift_data(shift, **updates):
+    data = {
+        "shiftdate": "2026-10-01",
+        "begintime": "09:00",
+        "endtime": "17:00",
+        "crew": shift.crew_id,
+    }
+    data.update(updates)
+    return data
+
+
+def test_shift_filters_and_crud(client):
+    login_as(client)
+    matching = ShiftFactory(shiftdate=date(2026, 10, 1))
+    other = ShiftFactory(shiftdate=date(2026, 10, 2))
+    response = client.get(
+        reverse("schedule:shifts"),
+        {"date_from": "2026-10-01", "date_to": "2026-10-02", "crew": matching.crew_id},
+    )
+    content = response.content.decode()
+    assert str(matching.pk) in content
+    assert f">{other.pk}<" not in content
+    assert (
+        client.get(reverse("schedule:shifts"), {"date_from": "bad", "crew": "bad"}).status_code
+        == 200
+    )
+    response = client.post(
+        reverse("schedule:shift_create"), shift_data(matching, begintime="18:00", endtime="20:00")
+    )
+    assert response.status_code == 302
+    created = Shift.objects.exclude(pk__in=[matching.pk, other.pk]).get()
+    response = client.post(
+        reverse("schedule:shift_edit", args=[created.pk]),
+        shift_data(created, begintime="20:00", endtime="22:00"),
+    )
+    assert response.status_code == 302
+    assert client.get(reverse("schedule:shift_delete", args=[created.pk])).status_code == 200
+    client.post(reverse("schedule:shift_delete", args=[created.pk]))
+    assert not Shift.objects.filter(pk=created.pk).exists()
+
+
+def test_shift_with_flights_cannot_be_deleted(client):
+    login_as(client)
+    shift = ShiftFactory()
+    FlightFactory(shift=shift)
+    response = client.post(reverse("schedule:shift_delete", args=[shift.pk]), follow=True)
+    assert E_REF_01.format(Entity="Shift", n=1, related="flights") in response.content.decode()
+    assert Shift.objects.filter(pk=shift.pk).exists()
+
+
+@pytest.mark.parametrize(
+    ("name", "args", "method"),
+    [
+        ("schedule:shifts", [], "get"),
+        ("schedule:shift_create", [], "get"),
+        ("schedule:shift_create", [], "post"),
+        ("schedule:shift_edit", [1], "get"),
+        ("schedule:shift_edit", [1], "post"),
+        ("schedule:shift_delete", [1], "get"),
+        ("schedule:shift_delete", [1], "post"),
+    ],
+)
+def test_sales_role_gets_403_for_every_shift_url(client, name, args, method):
+    login_as(client, 7)
+    assert getattr(client, method)(reverse(name, args=args)).status_code == 403

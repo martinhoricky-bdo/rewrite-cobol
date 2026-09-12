@@ -147,3 +147,20 @@ def schedule_flights(
         .annotate(sold=Coalesce(free_seats_subquery(), Value(0)))
         .order_by("flightdate", "deptime", "flightnum")
     )
+
+
+def schedule_crews() -> QuerySet[Crew]:
+    return Crew.objects.select_related(
+        "commander", "copilote", "fachief", "fliattendant1", "fliattendant2", "fliattendant3"
+    ).annotate(shift_count=Count("shifts"))
+
+
+def schedule_shifts(*, date_from: date, date_to: date, crew_id: int | None) -> QuerySet[Shift]:
+    queryset = Shift.objects.filter(shiftdate__range=(date_from, date_to))
+    if crew_id is not None:
+        queryset = queryset.filter(crew_id=crew_id)
+    return (
+        queryset.select_related("crew")
+        .annotate(flight_count=Count("flights"))
+        .order_by("shiftdate", "begintime", "shiftid")
+    )

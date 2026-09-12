@@ -56,8 +56,16 @@ class Crew(models.Model):
 
     def clean(self) -> None:
         super().clean()
-        member_ids = [member.pk for member in self.members()]
-        if len(set(member_ids)) != len(member_ids):
+        member_ids = [
+            self.commander_id,
+            self.copilote_id,
+            self.fachief_id,
+            self.fliattendant1_id,
+            self.fliattendant2_id,
+            self.fliattendant3_id,
+        ]
+        present_ids = [member_id for member_id in member_ids if member_id is not None]
+        if len(set(present_ids)) != len(present_ids):
             raise ValidationError("Crew members must be unique.")
 
 

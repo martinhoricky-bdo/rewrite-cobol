@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block content %}<h1>Delete shift</h1><p>Delete shift {{ shift.pk }}?</p>
+<form method="post">{% csrf_token %}<button type="submit">Delete</button></form>{% endblock %}
