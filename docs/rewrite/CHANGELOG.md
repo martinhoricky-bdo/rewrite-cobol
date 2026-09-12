@@ -121,7 +121,7 @@ Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější n
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: – (specifikace tímto PR vzniká; rozhodnutí o nejasných místech legacy jsou v `02-functional-spec.md` kap. 8).
 ## R17 – Crew „My shifts“ a CEO dashboard
-- PR: #pending (codex/R17-crew-ceo)
+- PR: #39 (codex/R17-crew-ceo)
 - Přidáno: přehled vlastních směn posádky a agregovaný CEO dashboard s filtrem období.
 - Změněno: domovské stránky a navigace rolí Crew a CEO.
 - Odchylky od specifikace: žádné.
