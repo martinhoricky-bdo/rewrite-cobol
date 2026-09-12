@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R24 – Kontrakt validace formulářů a testy neplatných cest
-- PR: připravuje se (codex/R24-form-validation)
+- PR: #54 (codex/R24-form-validation)
 - Přidáno: konkrétní view testy validačních hlášek a zachování databáze pro všechny formulářové obrazovky, včetně hledání.
 - Změněno: `SearchListView` hlásí chyby přes `report_form_errors` a nedědí nepoužívaný formulářový mixin.
 - Odchylky od specifikace: žádné.
