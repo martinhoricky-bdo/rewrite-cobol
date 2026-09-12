@@ -28,6 +28,9 @@ def test_list_filter_and_pagination(client):
     response = client.get(reverse("hr:employees"))
     assert len(response.context["page_obj"]) == 10
     assert response.context["page_obj"].paginator.num_pages == 2
+    response = client.get(reverse("hr:employees"), {"dept": "abc"})
+    assert response.status_code == 200
+    assert response.context["page_obj"].paginator.count == 12
 
 
 def test_detail_and_edit_preserves_empid(client):

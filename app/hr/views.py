@@ -20,8 +20,8 @@ def employees(request):
     queryset = Employee.objects.select_related("dept", "user").order_by("empid")
     if name:
         queryset = queryset.filter(Q(firstname__istartswith=name) | Q(lastname__istartswith=name))
-    if dept:
-        queryset = queryset.filter(dept_id=dept)
+    if dept.isdigit():
+        queryset = queryset.filter(dept_id=int(dept))
     page_obj = Paginator(queryset, 10).get_page(request.GET.get("page"))
     params = request.GET.copy()
     params.pop("page", None)
