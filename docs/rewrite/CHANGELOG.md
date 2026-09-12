@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R19 – Základ generického jádra
+- PR: #44 (codex/R19-generic-core-v3)
+- Přidáno: generické views a mixiny, filtrovací formulář, renderer, sdílené šablony a template tag stavu účtu.
+- Změněno: aplikace fleet používá class-based views; navigace a oprávnění mají jedinou deklarativní konfiguraci.
+- Odchylky od specifikace: žádné.
+
 ## R18 – Hardening a závěr
 - PR: #41 (codex/R18-hardening)
 - Přidáno: limiter přihlášení, produkční bezpečnostní nastavení, Gunicorn/WhiteNoise image, chybová stránka 500 a testy navigace a chybových stránek.

@@ -9,5 +9,5 @@
 {% for flight in shift.flights.all %}<tr><td>{{ flight.flightnum }}</td><td>{{ flight.airportdep_id }}→{{ flight.airportarr_id }}</td><td>{{ flight.deptime|time:"H:i" }}–{{ flight.arrtime|time:"H:i" }}</td><td>{{ flight.airplane_id }}</td><td>{{ flight.passenger_count }} / {{ flight.airplane.numseats }}</td></tr>{% empty %}<tr><td colspan="5">No flights.</td></tr>{% endfor %}
 </tbody></table></article>
 {% empty %}<p>No shifts found.</p>{% endfor %}
-{% include "partials/pagination.html" %}
+{% include "core/pagination.html" %}
 {% endblock %}

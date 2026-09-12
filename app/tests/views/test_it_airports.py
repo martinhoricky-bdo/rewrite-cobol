@@ -1,17 +1,12 @@
 import pytest
 from django.urls import reverse
 
+from accounts.roles import Role
 from core.messages import E_REF_01
 from fleet.models import Airport
-from tests.factories import DepartmentFactory, EmployeeFactory, FlightFactory, UserFactory
+from tests.factories import FlightFactory
 
 pytestmark = pytest.mark.django_db
-
-
-def login_as(client, deptid=6):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
 
 
 def airport_data(identifier="cdg"):
@@ -25,8 +20,8 @@ def airport_data(identifier="cdg"):
     }
 
 
-def test_airport_crud_uppercase_and_validation(client):
-    login_as(client)
+def test_airport_crud_uppercase_and_validation(role_client):
+    client = role_client(Role.IT)
     response = client.post(reverse("it:airport_create"), airport_data())
     assert response.status_code == 302
     assert Airport.objects.filter(pk="CDG").exists()
@@ -41,8 +36,8 @@ def test_airport_crud_uppercase_and_validation(client):
     assert not Airport.objects.filter(pk="ABCDE").exists()
 
 
-def test_airport_delete_reference_and_permissions(client):
-    login_as(client, 9)
+def test_airport_delete_reference_and_permissions(role_client):
+    client = role_client(Role.SCHEDULE)
     flight = FlightFactory()
     url = reverse("it:airport_delete", args=[flight.airportdep_id])
     response = client.post(url, follow=True)
@@ -54,11 +49,11 @@ def test_airport_delete_reference_and_permissions(client):
     client.post(reverse("it:airport_delete", args=[unused.pk]))
     assert not Airport.objects.filter(pk="ORY").exists()
     client.logout()
-    login_as(client, 7)
+    client = role_client(Role.HR)
     assert client.get(reverse("it:airports")).status_code == 403
 
 
-@pytest.mark.parametrize("deptid", [6, 9])
-def test_it_and_schedule_can_view_airports(client, deptid):
-    login_as(client, deptid)
+@pytest.mark.parametrize("role", [Role.IT, Role.SCHEDULE])
+def test_it_and_schedule_can_view_airports(role_client, role):
+    client = role_client(role)
     assert client.get(reverse("it:airports")).status_code == 200

@@ -18,5 +18,5 @@
   <td><a href="{% url 'schedule:flight_edit' flight.pk %}">Edit</a> <a href="{% url 'schedule:flight_delete' flight.pk %}">Delete</a></td>
 </tr>{% empty %}<tr><td colspan="11">No flights found.</td></tr>{% endfor %}</tbody>
 </table>
-{% include "partials/pagination.html" %}
+{% include "core/pagination.html" %}
 {% endblock %}

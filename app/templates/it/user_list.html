@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load core_tags %}
 {% block title %}Users | COBOL AIRLINES{% endblock %}
 {% block content %}
 <h1>Users</h1>
@@ -7,12 +7,12 @@
   <thead><tr><th>EMPID</th><th>NAME</th><th>DEPT</th><th>ROLE</th><th>STATUS</th><th>LAST LOGIN</th><th>ACTIONS</th></tr></thead>
   <tbody>{% for employee in page_obj %}<tr>
     <td>{{ employee.empid }}</td><td>{{ employee.full_name }}</td><td>{{ employee.dept.name }}</td><td>{{ employee.role }}</td>
-    <td>{% if not employee.user %}no account{% elif not employee.user.is_active %}inactive{% elif not employee.user.has_usable_password %}no password{% else %}active{% endif %}</td>
+    <td>{% account_status employee %}</td>
     <td>{{ employee.user.last_login|default:"—" }}</td><td>
       <form method="post" action="{% url 'it:user_reset_password' employee.empid %}">{% csrf_token %}<button type="submit">{% if employee.user %}Reset password{% else %}Create account{% endif %}</button></form>
       {% if employee.user %}<form method="post" action="{% if employee.user.is_active %}{% url 'it:user_deactivate' employee.empid %}{% else %}{% url 'it:user_activate' employee.empid %}{% endif %}">{% csrf_token %}<button type="submit">{% if employee.user.is_active %}Deactivate{% else %}Activate{% endif %}</button></form>{% endif %}
     </td>
   </tr>{% empty %}<tr><td colspan="7">No employees found.</td></tr>{% endfor %}</tbody>
 </table>
-{% include "partials/pagination.html" with page_obj=page_obj query_params=query_params %}
+{% include "core/pagination.html" with page_obj=page_obj %}
 {% endblock %}

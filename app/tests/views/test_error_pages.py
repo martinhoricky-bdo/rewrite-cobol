@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory
 
 from core.messages import E_AUTH_02
@@ -31,3 +32,28 @@ def test_500_page_renders_without_request_context():
     assert response.status_code == 500
     assert "Server error" in body
     assert 'href="/"' in body
+
+
+def test_not_found_exposes_its_safe_message():
+    from core.exceptions import NotFound
+    from core.views import page_not_found
+
+    request = RequestFactory().get("/missing/")
+    request.user = AnonymousUser()
+    response = page_not_found(request, NotFound("Safe detail"))
+
+    assert response.status_code == 404
+    assert "Safe detail" in response.content.decode()
+
+
+def test_http404_does_not_expose_internal_message():
+    from django.http import Http404
+
+    from core.views import page_not_found
+
+    request = RequestFactory().get("/missing/")
+    request.user = AnonymousUser()
+    response = page_not_found(request, Http404("Internal detail"))
+
+    assert response.status_code == 404
+    assert "Internal detail" not in response.content.decode()
