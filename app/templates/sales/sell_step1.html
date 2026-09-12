@@ -6,9 +6,7 @@
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="research">
-      {% for field in form %}
-        <label>{{ field.label }} {{ field }} {{ field.errors }}</label>
-      {% endfor %}
+      {{ form }}
       <button type="submit">Research</button>
     </form>
     {% if quote %}

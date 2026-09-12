@@ -1,14 +1,13 @@
-{% extends "base.html" %}
+{% extends "core/list.html" %}
 {% block title %}Passengers | COBOL AIRLINES{% endblock %}
-{% block content %}
-  <h1>Passengers</h1>
-  <p><a role="button" href="{% url 'sales:passenger_create' %}">New passenger</a></p>
+{% block actions %}<p><a role="button" href="{% url 'sales:passenger_create' %}">New passenger</a></p>{% endblock %}
+{% block filters %}
   <form method="get">
-    <div class="search-fields">
-      {% for field in form %}<label>{{ field.label }} {{ field }} {{ field.errors }}</label>{% endfor %}
-    </div>
+    <div class="search-fields">{{ form }}</div>
     <button type="submit">Search</button>
   </form>
+{% endblock %}
+{% block table %}
   <div class="table-wrap"><table>
     <thead><tr><th>CLIENT ID</th><th>LAST NAME</th><th>FIRST NAME</th><th>CITY</th><th>COUNTRY</th><th>TELEPHONE</th><th>EMAIL</th><th>ACTIONS</th></tr></thead>
     <tbody>{% for passenger in page_obj %}<tr>
@@ -16,5 +15,4 @@
       <td><a href="{% url 'sales:passenger_detail' passenger.clientid %}">Detail</a> <a href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a></td>
     </tr>{% empty %}<tr><td colspan="8">No passengers found.</td></tr>{% endfor %}</tbody>
   </table></div>
-  {% include "core/pagination.html" %}
 {% endblock %}

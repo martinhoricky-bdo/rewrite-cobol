@@ -23,8 +23,10 @@ from sales.models import Buy, Ticket
 def crew_shifts(employee, *, today: date, include_past: bool = False):
     """Return shifts assigned to an employee, including flight passenger counts."""
     start = today if not include_past else date.fromordinal(today.toordinal() - 90)
-    flights = Flight.objects.select_related("airportdep", "airportarr", "airplane").annotate(
-        passenger_count=Count("tickets")
+    flights = (
+        Flight.objects.select_related("airportdep", "airportarr", "airplane")
+        .annotate(passenger_count=Count("tickets"))
+        .order_by("flightdate", "deptime", "flightnum")
     )
     return (
         Shift.objects.filter(crew__in=Crew.objects.with_member(employee), shiftdate__gte=start)

@@ -1,5 +1,11 @@
 # CHANGELOG přepisu
 
+## R21 – Sales a Reports na generických views
+- PR: #48 (codex/R21-generic-sales)
+- Přidáno: queryset API pro cestující, letenky a nákupy, filtry reportů a testy session a období.
+- Změněno: Sales a Reports používají generické class-based views, sdílené formuláře, detailní a seznamové šablony.
+- Odchylky od specifikace: `FlightSearchForm` zůstává běžný `forms.Form`, protože jeho validace vyžaduje alespoň jedno vyhledávací kritérium a semantika `FilterForm.value()` se nepoužívá.
+
 ## R20 – Schedule, HR a IT na generických views
 - PR: #46 (codex/R20-generic-schedule-hr)
 - Přidáno: doménové querysety, filtrovací formuláře a služby pro účty a založení zaměstnance.

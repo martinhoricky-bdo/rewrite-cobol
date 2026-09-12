@@ -3,10 +3,7 @@
 {% block content %}
   <h1>Search ticket</h1>
   <form method="get">
-    <div class="search-fields">
-      {% for field in form %}<label>{{ field.label }} {{ field }} {{ field.errors }}</label>{% endfor %}
-    </div>
-    {{ form.non_field_errors }}
+    <div class="search-fields">{{ form }}</div>
     <button type="submit">Search</button>
   </form>
   {% if page_obj %}
