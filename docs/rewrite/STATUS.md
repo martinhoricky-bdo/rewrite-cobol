@@ -3,10 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 16:20
+- Poslední aktualizace: 2026-09-12 16:35
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22): hotovo** (zadáno uživatelem 2026-09-12 „není DRY, žádné generic views“, poslední merge 12:13).
-- **Fáze 3 – docstringy a kontrakt validace (R23–R24)**: běží, zadáno uživatelem 2026-09-12 („chybí komentáře“ + otázka na `form_valid`/`form_invalid`).
-- Aktuální krok: R24 (zadáno Codexu)
+- **Fáze 3 – docstringy a kontrakt validace (R23–R24): hotovo** (zadáno uživatelem 2026-09-12 „chybí komentáře“ + otázka na `form_valid`/`form_invalid`, poslední merge 16:33).
+- Aktuální krok: žádný – automatický režim ukončen, další kontroly se neplánují.
 - Blokuje: nic
 
 ## Hotovo
@@ -38,18 +38,17 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R21 Sales a Reports na generických views | #47 | #48 | 2026-09-12 11:32 (1. běh OK; Claude opravil duplicitní `<h1>`/GET formulář v seznamu cestujících, `FlightSearchView.model`, duplicitní konstantu varování, `type="date"` a hodnoty ve filtru dashboardu; e2e 9/9 dvakrát po `seed_demo --flush`) |
 | R22 Závěr refaktoringu: úklid, matice oprávnění, docs | #49 | #50 | 2026-09-12 12:13 (1. běh OK, review čisté: 675 testů (`test_permissions.py` 405 samostatně), matice 50 URL × 7 rolí + anonym, 24 duplicitních testů oprávnění smazáno, `get_absolute_url` na 9 modelech, e2e 9/9 dvakrát; bez oprav) |
 | R23 Docstringy a vazba na legacy | #51 | #52 | 2026-09-12 16:17 (1. běh vrácen: 285 z ~400 docstringů šablonou `Implement <název> behavior for …`; fix run šablonu odstranil, ale 39 docstringů tříd `Serves the … screen …` a 87 metodových `… for <třída> view.` přepsal Claude sám (`5366970`) + merge `3c44aed`; 676 testů, e2e 9/9, rozsah testu 52 modulů / 164 tříd / 184 funkcí) |
+| R24 Kontrakt validace formulářů a testy neplatných cest | #53 | #54 | 2026-09-12 16:33 (1. běh OK, review čisté: `SearchListView` bez `form_invalid` a bez mrtvé báze, 17 nových testů neplatných cest s asercí na hlášku i stav DB, 693 testů, každý změněný soubor projde samostatně, e2e 9/9 dvakrát; Claude doplnil jen číslo PR v CHANGELOG) |
 
 ## Běží
-| Krok | Issue | PR | Stav |
-|---|---|---|---|
-| R24 Kontrakt validace formulářů a testy neplatných cest | #53 | – | zadáno 16:25, zmínka `@codex` odeslána, kontrola každých 15 min |
+nic – fáze 3 dokončena.
 
 ## Fronta
-prázdná – R24 je poslední krok fáze 3.
+prázdná – další krok zadává uživatel.
 
 ## Co zbývá ručně (uživatel)
-- Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (26 větví R01–R22 vč. `codex/R19-generic-core` bez PR a `codex/smoke-test`; mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté nebo nahrazené).
-- Volitelně sjednotit osm lokálních helperů `login_role` v `tests/sales/test_*.py` na fixture `role_client` (mimo rozsah R22, chování testů to nemění).
+- Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (28 větví R01–R24 vč. `codex/R19-generic-core` bez PR a `codex/smoke-test`; mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté nebo nahrazené).
+- Volitelně sjednotit osm lokálních helperů `login_role` v `tests/views/test_*.py` na fixture `role_client` (mimo rozsah R22 a R24, chování testů to nemění).
 - Nasazení: sestavit image (`docker build`), nastavit reálný `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL` (viz `app/README.md`), spustit `migrate` a `import_legacy` z exportu DB2.
 - Rozhodnout otevřené body z `02-functional-spec.md` (platební metoda u účtenky, role legal bez funkcí).
 - Codex Cloud: nepravidelné selhání pushe na 1. běhu (viz poznámky) – zkontrolovat token v nastavení prostředí, pokud se bude Codex používat dál.

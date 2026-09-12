@@ -217,7 +217,7 @@ Společná kritéria fáze 3: chování se nemění (existující testy beze zm�
 - **Akceptace:** skript `python -m tooling.docstring_audit` (nebo test) hlásí 0 modulů/tříd/veřejných funkcí bez docstringu v uvedeném rozsahu; každá obrazovková view a její modul odkazuje na legacy program nebo je označená jako `design` (nemá legacy předlohu); `make check` zelený.
 - **Závislosti:** R22.
 
-## R24 – Kontrakt validace formulářů a testy neplatných cest (S)
+## ✔ R24 (#54) – Kontrakt validace formulářů a testy neplatných cest (S)
 
 - **Cíl:** sjednotit, co se stane při neplatném formuláři, a otestovat to.
 - **Rozsah:** `SearchListView` – přejmenovat vlastní `form_invalid` (vrací `None`) na `report_form_errors(form)` a odebrat z bází `FormErrorsAsMessagesMixin`, jehož metoda je dnes celá přepsaná (mrtvá báze); `FormErrorsAsMessagesMixin` zůstává pro `FormView` (prodej krok 1); doplnit testy neplatných POSTů pro všechny formulářové obrazovky (letiště, letadlo, let, generování letů, posádka, směna, zaměstnanec, oddělení, cestující, prodej krok 1 a 2, změna hesla): každý ověří konkrétní text chyby a že se v DB nic nezměnilo.
