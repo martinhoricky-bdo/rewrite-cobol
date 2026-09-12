@@ -28,6 +28,18 @@ MENU[Role.SCHEDULE] = [
 ROLE_HOME[Role.HR] = "hr:employees"
 MENU[Role.HR] = [("Employees", "hr:employees"), ("Departments", "hr:departments")]
 MENU[Role.CEO].append(("Employees", "hr:employees"))
+ROLE_HOME[Role.CREW] = "crew:my_shifts"
+MENU[Role.CREW] = [
+    ("My shifts", "crew:my_shifts"),
+    ("Search flight", "sales:flight_search"),
+]
+ROLE_HOME[Role.CEO] = "ceo:dashboard"
+MENU[Role.CEO] = [
+    ("Dashboard", "ceo:dashboard"),
+    ("Search flight", "sales:flight_search"),
+    ("Search ticket", "sales:ticket_search"),
+    ("Employees", "hr:employees"),
+]
 COMMON_MENU = [
     ("Change password", "accounts:password_change"),
     ("Logout", "accounts:logout"),

@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R17 – Crew „My shifts“ a CEO dashboard
+- PR: #39 (codex/R17-crew-ceo)
+- Přidáno: přehled vlastních směn posádky a agregovaný CEO dashboard s filtrem období.
+- Změněno: domovské stránky a navigace rolí Crew a CEO.
+- Odchylky od specifikace: žádné.
+
 ## R16b – Schedule: posádky a směny
 - PR: #37 (codex/R16b-schedule-crews)
 - Přidáno: správa posádek a směn, filtrování a stránkování směn, validace rolí členů a překryvů a testy oprávnění.
