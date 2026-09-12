@@ -244,7 +244,7 @@ class PassengerFormView(
     model_label = "Passenger"
 
     def get_cancel_url(self):
-        """Cancel back to the passenger detail when editing, to the list when creating."""
+        """Return to the edited passenger’s detail, or to the list when creating a passenger."""
         if self.object:
             return reverse("sales:passenger_detail", kwargs={"clientid": self.object.pk})
         return super().get_cancel_url()

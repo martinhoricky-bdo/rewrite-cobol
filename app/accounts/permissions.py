@@ -51,12 +51,12 @@ def role_required(*roles: Role | str):
 
 
 class RoleRequiredMixin:
-    """Restricts a view to allowed_roles and sends anonymous users to the login screen."""
+    """Rejects unauthenticated requests and users outside a view’s allowed roles before dispatch."""
 
     allowed_roles: tuple[Role, ...] = ()
 
     def dispatch(self, request, *args, **kwargs):
-        """Reject the request with 403, or with a login redirect, before the view runs."""
+        """Apply the configured role check before dispatching to the protected class-based view."""
         if response := check_role(request, self.allowed_roles):
             return response
         return super().dispatch(request, *args, **kwargs)
