@@ -3,10 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 09:32
+- Poslední aktualizace: 2026-09-12 09:45
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R19 – **BLOKOVÁNO**: Codex Cloud nemůže pushovat (HTTP 403 pro `chatgpt-codex-connector[bot]` ve dvou fix runech po sobě, 09:05 a 09:20 UTC; `git ls-remote` prochází, zápis ne). Opravy existují jen v sandboxu Codexu (commity `cce65b5`, `be85dba`).
-- Blokuje: token/oprávnění Codex Cloud prostředí pro zápis do repozitáře – vyžaduje zásah uživatele. Claude podle pravidla „2. běh bez pushe → shrnutí a zastavit“ další kroky nezadává a kontroly neplánuje; po opravě tokenu napsat „pokračuj“ → Claude zadá fix run 3 v issue #42.
+- Aktuální krok: R19 – fix run 3 (uživatel potvrdil, že nic neměnil; push do existující větve `codex/R19-generic-core` selhal 2× na 403, nová větev v prvním běhu prošla) → obchvat: opravy do nové větve `codex/R19-generic-core-v2` + nový PR, #43 bude uzavřen jako superseded.
+- Blokuje: nic (pokud selže i push nové větve → Codex Cloud GitHub připojení, zásah uživatele)
 
 ## Hotovo
 | Krok | Issue | PR | Merge |
