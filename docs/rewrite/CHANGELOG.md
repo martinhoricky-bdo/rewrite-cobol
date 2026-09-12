@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R23 – Docstringy a vazba na legacy
+- PR: #52 (codex/R23-docstrings)
+- Přidáno: docstringy modulů, tříd a veřejných funkcí s odkazem na legacy program, mapu, tabulku DB2 a use case; test `tests/unit/test_docstrings.py` hlídá pokrytí i šablonové formulace.
+- Změněno: `role_required` má anglický docstring; komentáře `#` u pravidel, která z kódu nejsou zřejmá.
+- Odchylky od specifikace: žádné.
+
 ## R22 – Závěr refaktoringu: úklid, testy, dokumentace
 - PR: #50 (codex/R22-refactor-cleanup)
 - Přidáno: kanonické URL modelů a úplná matice oprávnění pro všechny aplikační URL a role.

@@ -1,3 +1,7 @@
+"""Sales models and query sets map DB2 PASSENGERS, BUY, and TICKET, whose CLIENTID and
+TICKETID are identities.
+"""
+
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.functions import Upper
@@ -8,7 +12,12 @@ from operations.models import Flight
 
 
 class PassengerQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for passenger records used by
+    passenger and ticket sales workflows in UC-S01–S09.
+    """
+
     def filter_by(self, *, clientid=None, lastname=None, firstname=None, email=None):
+        """Filter passengers by the submitted name and identifier criteria."""
         queryset = self
         if clientid is not None:
             queryset = queryset.filter(clientid=clientid)
@@ -22,6 +31,10 @@ class PassengerQuerySet(models.QuerySet):
 
 
 class Passenger(models.Model):
+    """Represents one row from the legacy PASSENGERS table, preserving its identity and
+    relational constraints.
+    """
+
     clientid = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=30)
     lastname = models.CharField(max_length=30)
@@ -44,19 +57,30 @@ class Passenger(models.Model):
         return self.full_name
 
     def get_absolute_url(self) -> str:
+        """Return the sales detail URL of this passenger."""
         return reverse("sales:passenger_detail", kwargs={"clientid": self.pk})
 
     @property
     def full_name(self) -> str:
+        """Join the first name and the surname for lists and printed documents."""
         return f"{self.firstname} {self.lastname}"
 
 
 class BuyQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for buy records used by passenger
+    and ticket sales workflows in UC-S01–S09.
+    """
+
     def with_related(self):
+        """Join the seller, the buyer and the tickets printed on the receipt."""
         return self.select_related("emp", "client").prefetch_related("tickets__client")
 
 
 class Buy(models.Model):
+    """Represents one row from the legacy BUY table, preserving its identity and relational
+    constraints.
+    """
+
     buyid = models.AutoField(primary_key=True)
     buydate = models.DateField()
     buytime = models.TimeField()
@@ -73,25 +97,37 @@ class Buy(models.Model):
         return f"Buy {self.buyid}"
 
     def get_absolute_url(self) -> str:
+        """Return the sales detail URL of this purchase."""
         return reverse("sales:buy_detail", kwargs={"buyid": self.pk})
 
 
 class TicketQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for ticket records used by
+    passenger and ticket sales workflows in UC-S01–S09.
+    """
+
     def with_related(self):
+        """Join the passenger, the flight with its airports and the purchase with its seller."""
         return self.select_related(
             "client", "flight", "flight__airportdep", "flight__airportarr", "buy", "buy__emp"
         )
 
     def for_passenger(self, passenger):
+        """Restrict tickets to one passenger while retaining their sale and flight details."""
         return self.filter(client=passenger).order_by(
             "flight__flightdate", "flight__deptime", "ticketid"
         )
 
     def for_buy(self, buy):
+        """Restrict tickets to one purchase for receipt and purchase-detail rendering."""
         return self.filter(buy=buy).order_by("ticketid")
 
 
 class Ticket(models.Model):
+    """Represents one row from the legacy TICKET table, preserving its identity and relational
+    constraints.
+    """
+
     ticketid = models.CharField(
         max_length=10, primary_key=True, validators=[RegexValidator(r"^CB\d{8}$")]
     )
@@ -114,4 +150,5 @@ class Ticket(models.Model):
         return self.ticketid
 
     def get_absolute_url(self) -> str:
+        """Return the sales detail URL of this ticket."""
         return reverse("sales:ticket_detail", kwargs={"ticketid": self.pk})

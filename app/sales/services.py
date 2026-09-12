@@ -1,3 +1,7 @@
+"""Sales rules reconstruct SRCHTKT, SELLCOB1, missing SELLCOB2, PRINTCI, and PRINTPA use
+cases.
+"""
+
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime, time
@@ -35,6 +39,10 @@ SESSION_KEY = "sale_quote"
 
 
 class SaleError(Exception):
+    """Carries the user-facing validation code and message when passenger and ticket sales
+    workflows in UC-S01–S09 cannot continue.
+    """
+
     def __init__(self, code: str, message: str):
         super().__init__(message)
         self.code = code
@@ -43,6 +51,10 @@ class SaleError(Exception):
 
 @dataclass(frozen=True)
 class SaleQuote:
+    """Groups the immutable values produced while processing passenger and ticket sales
+    workflows in UC-S01–S09 so callers can pass them without mutation.
+    """
+
     flight_id: int
     flightnum: str
     flightdate: date
@@ -58,6 +70,7 @@ class SaleQuote:
     free_seats: int
 
     def to_session(self) -> dict:
+        """Serialize the quoted flight and passengers into JSON-safe session values."""
         return {
             "flight_id": self.flight_id,
             "flightnum": self.flightnum,
@@ -76,6 +89,9 @@ class SaleQuote:
 
     @classmethod
     def from_session(cls, data) -> "SaleQuote":
+        """Rebuild a sale quote from session values, returning nothing when referenced data is
+        stale.
+        """
         return cls(
             flight_id=int(data["flight_id"]),
             flightnum=str(data["flightnum"]),
@@ -96,6 +112,12 @@ class SaleQuote:
 def quote_sale(
     *, clientid: int, flightnum: str, flightdate: date, count: int, today: date
 ) -> SaleQuote:
+    """Reconstruct SELLCOB1 (SELL1-COB), map SELLMS/SELLMP, for UC-S06.
+
+    Checks E-SEL-01 through E-SEL-08 retain the ordering specified in functional section
+    6.
+    """
+    # Preserve legacy validation order so callers receive the specified E-SEL message first.
     try:
         passenger = Passenger.objects.get(pk=clientid)
     except Passenger.DoesNotExist as exc:
@@ -136,10 +158,12 @@ def quote_sale(
 
 
 def seat_layout(numseats: int) -> list[str]:
+    """Calculate the aircraft row and letter labels used to assign and print seats."""
     return [f"{'ABCDEF'[index % 6]}{index // 6 + 1:02d}" for index in range(numseats)]
 
 
 def assign_seats(flight: Flight, count: int) -> list[str]:
+    """Choose the first available seats while excluding tickets already sold on the flight."""
     occupied = set(flight.tickets.values_list("seat", flat=True))
     available = [seat for seat in seat_layout(flight.airplane.numseats) if seat not in occupied]
     if len(available) < count:
@@ -148,6 +172,9 @@ def assign_seats(flight: Flight, count: int) -> list[str]:
 
 
 def resolve_passengers(client_ids: list[int], flight: Flight) -> list[Passenger]:
+    """Resolve submitted passenger identifiers in order and reject missing or duplicate
+    travellers.
+    """
     seen = set()
     for client_id in client_ids:
         if client_id in seen:
@@ -166,9 +193,16 @@ def resolve_passengers(client_ids: list[int], flight: Flight) -> list[Passenger]
 def confirm_sale(
     *, quote: SaleQuote, client_ids: list[int], seller: Employee, now: datetime
 ) -> Buy:
+    """Reconstruct missing SELLCOB2 from SELL2-MAP and screenshots for UC-S07.
+
+    Locks the flight with ``select_for_update`` before assigning seats and enforcing
+    E-SEL-10 and E-SEL-11, preventing concurrent sales from allocating the same
+    capacity.
+    """
     if len(client_ids) != quote.count:
         raise ValueError("Passenger count does not match the sale quote.")
     with transaction.atomic():
+        # Serialize capacity checks and seat assignment for concurrent sales of one flight.
         flight = (
             Flight.objects.select_for_update().select_related("airplane").get(pk=quote.flight_id)
         )
@@ -216,10 +250,12 @@ def duplicate_email_warning(email: str, exclude_pk: int | None = None) -> str | 
 
 
 def legacy_date(d: date) -> str:
+    """Format a date as PRINTCI and PRINTPA expect from the DB2-derived records."""
     return f"{d.day:02d}{LEGACY_MONTHS[d.month - 1]}{d.year:04d}"
 
 
 def boarding_pass_context(ticket: Ticket) -> dict[str, str]:
+    """Assemble ticket, passenger, flight, and formatting values for the PRINTCI boarding pass."""
     flight = ticket.flight
     passenger = ticket.client
     dep_code = flight.airportdep_id
@@ -248,6 +284,7 @@ def search_tickets(
     flightnum: str | None = None,
     flightdate: date | None = None,
 ) -> QuerySet[Ticket]:
+    """Filter SRCHTKT results by ticket number, passenger identity, and flight criteria."""
     tickets = Ticket.objects.with_related()
     if ticketid:
         tickets = tickets.filter(ticketid=ticketid.upper())
@@ -271,6 +308,7 @@ def search_tickets(
 
 
 def next_ticket_id() -> str:
+    """Read the next PostgreSQL identity value for legacy-compatible ticket creation."""
     with connection.cursor() as cursor:
         cursor.execute("SELECT nextval('ticket_ticketid_seq')")
         number = cursor.fetchone()[0]
@@ -278,6 +316,7 @@ def next_ticket_id() -> str:
 
 
 def reset_ticket_sequence() -> None:
+    """Move the ticket identity sequence past imported identifiers after legacy loading."""
     with connection.cursor() as cursor:
         cursor.execute(
             """

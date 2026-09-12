@@ -1,3 +1,5 @@
+"""Role-aware navigation maps the reconstructed use cases to each legacy department menu."""
+
 from typing import NamedTuple
 
 from accounts.permissions import current_role
@@ -5,6 +7,10 @@ from accounts.roles import Role
 
 
 class MenuItem(NamedTuple):
+    """Encapsulates menu item responsibilities required by the shared CICS-inspired web
+    interface, with constraints declared on its fields.
+    """
+
     label: str
     url_name: str
 
@@ -59,6 +65,7 @@ COMMON_MENU = (
 
 
 def menu_for(user) -> list[MenuItem]:
+    """Build the navigation entries authorized for the current application role."""
     if not user.is_authenticated:
         return []
     return [*MENU.get(current_role(user), ()), *COMMON_MENU]

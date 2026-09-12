@@ -1,3 +1,7 @@
+"""Parsers read EMPINSRT/SUINSRT EMPLOYEE-LIST.json and PASSENG/SUXML PASSENGER1..8.xml
+exports.
+"""
+
 import json
 from datetime import date, datetime, time
 from decimal import Decimal
@@ -27,6 +31,7 @@ def parse_legacy_time(value: str) -> time:
 
 
 def parse_employee_json(path: Path) -> list[dict]:
+    """Parse EMPLOYEE-LIST.json rows and convert DB2 dates and numeric fields to Python values."""
     rows = json.loads(path.read_text(encoding="utf-8"))["ws-emplist"]["ws-emplist-table"]
     result = []
     for source in rows:
@@ -43,6 +48,7 @@ def parse_employee_json(path: Path) -> list[dict]:
 
 
 def parse_passenger_xml(path: Path) -> list[dict]:
+    """Parse PASSENGER1..8.xml elements into normalized passenger records."""
     names = {
         "FIRSTNAME": "firstname",
         "LASTNAME": "lastname",

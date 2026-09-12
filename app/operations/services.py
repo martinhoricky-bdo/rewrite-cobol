@@ -1,3 +1,7 @@
+"""Flight generation reconstructs CBFLIGHT (COB-PROG/FLIGHT-DUPLICATE/FLIGHT-DUPLICATE-COB)
+for UC-P02.
+"""
+
 from dataclasses import dataclass
 from datetime import date, time, timedelta
 
@@ -13,6 +17,10 @@ from .models import Crew, Flight, Shift
 
 @dataclass(frozen=True)
 class GenerateResult:
+    """Groups the immutable values produced while processing Design scheduling workflows in
+    UC-P01–P04 so callers can pass them without mutation.
+    """
+
     created: int
     skipped: int
 
@@ -94,6 +102,7 @@ def generate_seed_flights(start: date, days: int, crews: dict[int, Crew]) -> Non
 
 
 def free_seats_subquery() -> Subquery:
+    """Build the correlated capacity-minus-sales expression used by flight search."""
     ticket_counts = (
         Ticket.objects.filter(flight_id=OuterRef("pk"))
         .values("flight_id")
@@ -111,6 +120,7 @@ def search_flights(
     airportarr: str | None,
     today: date,
 ) -> QuerySet[Flight]:
+    """Apply SRCHFLY route, date, and capacity criteria and return display-ready flights."""
     filters = {}
     if flightnum and (flightnum := flightnum.strip()):
         filters["flightnum__iexact"] = flightnum

@@ -1,3 +1,7 @@
+"""Sales forms reconstruct SRCHFLY, SRCHTKT, SELLCOB1, and the missing SELLCOB2 workflows
+for UC-S01 through UC-S07.
+"""
+
 import re
 
 from django import forms
@@ -25,6 +29,8 @@ INVALID_TICKET_ID = "__invalid__"
 
 
 class SellStep1Form(forms.Form):
+    """Validates SELLCOB1 inputs with E-SEL-01 through E-SEL-04."""
+
     clientid = forms.IntegerField(
         min_value=1,
         label="CLIENT ID",
@@ -60,6 +66,8 @@ class SellStep1Form(forms.Form):
 
 
 class SellStep2Form(forms.Form):
+    """Validates SELLCOB2 IDs with E-SEL-01 and duplicates with E-SEL-11."""
+
     def __init__(self, count, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for number in range(1, count + 1):
@@ -81,6 +89,7 @@ class SellStep2Form(forms.Form):
             )
 
     def clean(self):
+        """Reject duplicate passenger identifiers with E-SEL-11 before sale confirmation."""
         cleaned_data = super().clean()
         seen = set()
         for client_id in cleaned_data.values():
@@ -90,6 +99,7 @@ class SellStep2Form(forms.Form):
         return cleaned_data
 
     def rows(self, names):
+        """Pair passenger identifiers with travel classes for validation."""
         return [
             {"field": self[f"client_{number}"], "name": names.get(number, "")}
             for number in range(1, len(self.fields) + 1)
@@ -97,6 +107,10 @@ class SellStep2Form(forms.Form):
 
 
 class PassengerFilterForm(FilterForm):
+    """Validates and normalizes passenger filter input for passenger and ticket sales workflows
+    in UC-S01–S09, using the field-specific messages declared below.
+    """
+
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
     lastname = forms.CharField(max_length=30, required=False, label="LAST NAME")
     firstname = forms.CharField(max_length=30, required=False, label="FIRST NAME")
@@ -104,6 +118,10 @@ class PassengerFilterForm(FilterForm):
 
 
 class PassengerForm(forms.ModelForm):
+    """Validates and normalizes passenger input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
+    """
+
     telephone = forms.CharField(
         max_length=18,
         validators=[RegexValidator(r"^[0-9 +\-]{1,18}$", TELEPHONE_ERROR)],
@@ -125,6 +143,7 @@ class PassengerForm(forms.ModelForm):
         )
 
     def clean(self):
+        """Trim the whitespace around every text field before saving."""
         cleaned_data = super().clean()
         for field_name in self.Meta.fields:
             value = cleaned_data.get(field_name)
@@ -134,6 +153,10 @@ class PassengerForm(forms.ModelForm):
 
 
 class FlightSearchForm(forms.Form):
+    """Validates and normalizes flight search input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
+    """
+
     flightnum = forms.CharField(max_length=6, required=False, label="FLIGHT NUM")
     flightdate = forms.DateField(
         required=False,
@@ -146,6 +169,7 @@ class FlightSearchForm(forms.Form):
     airportarr = forms.CharField(min_length=3, max_length=4, required=False, label="LAND AIRPORT")
 
     def clean(self):
+        """Require at least one search field, otherwise report E-FLT-01."""
         cleaned_data = super().clean()
         field_names = ("flightnum", "flightdate", "airportdep", "airportarr")
         if not any(str(self.data.get(name, "")).strip() for name in field_names):
@@ -154,6 +178,10 @@ class FlightSearchForm(forms.Form):
 
 
 class TicketSearchForm(forms.Form):
+    """Validates and normalizes ticket search input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
+    """
+
     ticketid = forms.CharField(max_length=10, required=False, label="TICKET ID")
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
     firstname = forms.CharField(max_length=30, required=False, label="FIRST NAME")
@@ -168,12 +196,14 @@ class TicketSearchForm(forms.Form):
     )
 
     def clean_ticketid(self):
+        """Reject a ticket search identifier unless it is a numeric value."""
         ticketid = self.cleaned_data["ticketid"]
         if ticketid and not re.fullmatch(r"CB\d{8}", ticketid, re.IGNORECASE):
             return INVALID_TICKET_ID
         return ticketid
 
     def clean(self):
+        """Require a ticket id, a client id or both names, otherwise report E-TKT-01."""
         cleaned_data = super().clean()
         if not (
             cleaned_data.get("ticketid")

@@ -1,3 +1,7 @@
+"""Design: schedule forms for UC-P01, UC-P03, and UC-P04 plus CBFLIGHT generation under
+UC-P02.
+"""
+
 from datetime import timedelta
 from decimal import Decimal
 
@@ -10,6 +14,10 @@ from .models import Crew, Flight, Shift
 
 
 class FlightFilterForm(FilterForm):
+    """Validates and normalizes flight filter input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
+    """
+
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     flightnum = forms.CharField(required=False, label="Flight number")
@@ -17,6 +25,10 @@ class FlightFilterForm(FilterForm):
 
 
 class ShiftFilterForm(FilterForm):
+    """Validates and normalizes shift filter input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
+    """
+
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     crew = forms.ModelChoiceField(
@@ -25,11 +37,20 @@ class ShiftFilterForm(FilterForm):
 
 
 class EmployeeChoiceField(forms.ModelChoiceField):
+    """Validates and normalizes employee input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
+    """
+
     def label_from_instance(self, employee: Employee) -> str:
+        """Label an employee with EMPID and full name."""
         return f"{employee.pk} – {employee.full_name}"
 
 
 class CrewForm(forms.ModelForm):
+    """Validates and normalizes crew input for Design scheduling workflows in UC-P01–P04, using
+    the field-specific messages declared below.
+    """
+
     commander = EmployeeChoiceField(queryset=Employee.objects.none())
     copilote = EmployeeChoiceField(queryset=Employee.objects.none())
     fachief = EmployeeChoiceField(queryset=Employee.objects.none())
@@ -57,6 +78,7 @@ class CrewForm(forms.ModelForm):
             self.fields[field].queryset = attendants
 
     def clean(self):
+        """Refuse a crew in which one employee holds two positions."""
         cleaned = super().clean()
         members = [cleaned.get(field) for field in self._meta.fields]
         members = [member for member in members if member is not None]
@@ -66,6 +88,10 @@ class CrewForm(forms.ModelForm):
 
 
 class ShiftForm(forms.ModelForm):
+    """Validates and normalizes shift input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
+    """
+
     class Meta:
         model = Shift
         fields = ["shiftdate", "begintime", "endtime", "crew"]
@@ -76,6 +102,7 @@ class ShiftForm(forms.ModelForm):
         }
 
     def clean(self):
+        """Refuse reversed times and a shift overlapping another shift of the same crew."""
         cleaned = super().clean()
         day = cleaned.get("shiftdate")
         begin = cleaned.get("begintime")
@@ -97,13 +124,20 @@ class ShiftForm(forms.ModelForm):
 
 
 class ShiftChoiceField(forms.ModelChoiceField):
+    """Labels shift choices with date, crew, and period for clear scheduling."""
+
     def label_from_instance(self, shift: Shift) -> str:
+        """Label a shift with its date, its times and its crew."""
         return (
             f"{shift.shiftdate} {shift.begintime:%H:%M}–{shift.endtime:%H:%M} crew {shift.crew_id}"
         )
 
 
 class FlightForm(forms.ModelForm):
+    """Validates and normalizes flight input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
+    """
+
     shift = ShiftChoiceField(queryset=Shift.objects.none())
 
     class Meta:
@@ -135,15 +169,18 @@ class FlightForm(forms.ModelForm):
         self._old_airplane_id = self.instance.airplane_id if self.instance.pk else None
 
     def clean_flightnum(self) -> str:
+        """Normalize the flight number and reject values that violate its required format."""
         return self.cleaned_data["flightnum"].strip().upper()
 
     def clean_price(self) -> Decimal:
+        """Reject a non-positive fare with the flight form’s validation message."""
         price = self.cleaned_data["price"]
         if price <= 0:
             raise forms.ValidationError("Price must be greater than zero.")
         return price
 
     def clean(self):
+        """Refuse identical airports and a duplicate flight number on the same date."""
         cleaned = super().clean()
         dep, arr = cleaned.get("airportdep"), cleaned.get("airportarr")
         if dep and arr and dep == arr:
@@ -158,6 +195,7 @@ class FlightForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
+        """Persist the form record together with its normalized many-to-many assignments."""
         flight = super().save(commit=False)
         if not flight.pk or flight.airplane_id != self._old_airplane_id:
             flight.totpass = flight.airplane.numseats
@@ -170,6 +208,10 @@ class FlightForm(forms.ModelForm):
 
 
 class FlightGenerateForm(forms.Form):
+    """Validates and normalizes flight generate input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
+    """
+
     WEEKDAYS = tuple(
         (index, name)
         for index, name in enumerate(("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
@@ -194,6 +236,7 @@ class FlightGenerateForm(forms.Form):
         )
 
     def clean(self):
+        """Refuse a reversed period and one longer than 91 days."""
         cleaned = super().clean()
         start, end = cleaned.get("date_from"), cleaned.get("date_to")
         if start and end:
@@ -204,4 +247,5 @@ class FlightGenerateForm(forms.Form):
         return cleaned
 
     def selected_weekdays(self) -> set[int]:
+        """Return weekday numbers selected for recurring CBFLIGHT generation."""
         return {int(day) for day in self.cleaned_data["weekdays"]}

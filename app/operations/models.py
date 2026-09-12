@@ -1,3 +1,5 @@
+"""Operational models and query sets map the legacy DB2 FLIGHT, CREW, and SHIFT tables."""
+
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -11,7 +13,12 @@ from fleet.models import Airplane, Airport
 
 
 class CrewQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for crew records used by Design
+    scheduling workflows in UC-P01–P04.
+    """
+
     def with_member(self, employee):
+        """Filter crews containing the selected employee in any crew position."""
         return self.filter(
             Q(commander=employee)
             | Q(copilote=employee)
@@ -22,15 +29,21 @@ class CrewQuerySet(models.QuerySet):
         ).distinct()
 
     def with_shift_count(self):
+        """Annotate each crew with its assigned shift count and restore deterministic ordering."""
         return self.annotate(shift_count=Count("shifts"))
 
     def with_members(self):
+        """Select all employee relations required to display a crew without repeated queries."""
         return self.select_related(
             "commander", "copilote", "fachief", "fliattendant1", "fliattendant2", "fliattendant3"
         )
 
 
 class Crew(models.Model):
+    """Represents one row from the legacy CREW table, including the scheduling relationships
+    and constraints declared below.
+    """
+
     crewid = models.AutoField(primary_key=True)
     commander = models.ForeignKey(
         Employee, models.PROTECT, db_column="commander", related_name="crews_as_commander"
@@ -68,9 +81,11 @@ class Crew(models.Model):
         return f"Crew {self.crewid}"
 
     def get_absolute_url(self) -> str:
+        """Return the schedule edit URL of this crew."""
         return reverse("schedule:crew_edit", kwargs={"crewid": self.pk})
 
     def members(self) -> list[Employee]:
+        """List the captain and attendants in the operational display order."""
         return [
             self.commander,
             self.copilote,
@@ -81,6 +96,7 @@ class Crew(models.Model):
         ]
 
     def clean(self) -> None:
+        """Refuse a crew whose six positions are not held by six different employees."""
         super().clean()
         member_ids = [
             self.commander_id,
@@ -96,17 +112,28 @@ class Crew(models.Model):
 
 
 class ShiftQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for shift records used by Design
+    scheduling workflows in UC-P01–P04.
+    """
+
     def in_period(self, date_from, date_to):
+        """Restrict the shifts to the inclusive date range."""
         return self.filter(shiftdate__range=(date_from, date_to))
 
     def with_flight_count(self):
+        """Annotate shifts with their flight totals and restore deterministic ordering."""
         return self.annotate(flight_count=Count("flights"))
 
     def for_crew(self, crew_id):
+        """Restrict shifts to those assigned to the selected crew."""
         return self.filter(crew_id=crew_id) if crew_id is not None else self
 
 
 class Shift(models.Model):
+    """Represents one row from the legacy SHIFT table, including the scheduling relationships
+    and constraints declared below.
+    """
+
     shiftid = models.AutoField(primary_key=True)
     shiftdate = models.DateField()
     begintime = models.TimeField()
@@ -128,21 +155,33 @@ class Shift(models.Model):
         return f"Shift {self.shiftid} ({self.shiftdate})"
 
     def get_absolute_url(self) -> str:
+        """Return the schedule edit URL of this shift."""
         return reverse("schedule:shift_edit", kwargs={"shiftid": self.pk})
 
 
 class FlightQuerySet(models.QuerySet):
+    """Provides composable database filters and annotations for flight records used by Design
+    scheduling workflows in UC-P01–P04.
+    """
+
     def with_sold(self):
+        """Annotate flights with sold-ticket totals and restore deterministic ordering."""
         return self.annotate(sold=Count("tickets"))
 
     def in_period(self, date_from, date_to):
+        """Restrict the flights to the inclusive date range."""
         return self.filter(flightdate__range=(date_from, date_to))
 
     def with_related(self):
+        """Join the airports, the airplane and the shift shown in the flight lists."""
         return self.select_related("airportdep", "airportarr", "airplane", "shift")
 
 
 class Flight(models.Model):
+    """Represents one row from the legacy FLIGHT table, including the scheduling relationships
+    and constraints declared below.
+    """
+
     flightid = models.AutoField(primary_key=True)
     flightdate = models.DateField()
     deptime = models.TimeField()
@@ -185,4 +224,5 @@ class Flight(models.Model):
         return f"{self.flightnum} {self.flightdate}"
 
     def get_absolute_url(self) -> str:
+        """Return the schedule edit URL of this flight."""
         return reverse("schedule:flight_edit", kwargs={"flightid": self.pk})

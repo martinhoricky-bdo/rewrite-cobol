@@ -1,3 +1,7 @@
+"""Management command importing DB2 DEL/CSV exports according to target architecture
+section 7.3.
+"""
+
 import csv
 import json
 from collections.abc import Callable
@@ -74,15 +78,21 @@ COLUMNS = {
 
 
 class Command(BaseCommand):
+    """Runs the management command for legacy DB2, EMPLOYEE-LIST.json, and passenger XML
+    imports, validating its options before changing stored records.
+    """
+
     help = "Import a DB2 EXPORT OF DEL directory."
 
     def add_arguments(self, parser) -> None:
+        """Accept the export directory, the date format and the dry-run and report options."""
         parser.add_argument("--dir", required=True, type=Path)
         parser.add_argument("--dry-run", action="store_true")
         parser.add_argument("--report", type=Path)
         parser.add_argument("--date-format", choices=("iso", "us"), default="iso")
 
     def handle(self, *args, **options) -> None:
+        """Import every table in dependency order and write the row counts into the report."""
         directory = options["dir"]
         if not directory.is_dir():
             raise CommandError(f"Import directory not found: {directory}")

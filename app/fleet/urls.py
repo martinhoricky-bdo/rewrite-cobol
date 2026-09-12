@@ -1,3 +1,7 @@
+"""Design: URL routes for UC-I02 and UC-I03 fleet reference maintenance, which had no
+legacy screens.
+"""
+
 from django.urls import path
 
 from . import views

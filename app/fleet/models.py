@@ -1,8 +1,16 @@
+"""Fleet reference models map the legacy DB2 AIRPORT and AIRPLANE tables documented by
+DB2/DCLGEN.
+"""
+
 from django.db import models
 from django.urls import reverse
 
 
 class Airport(models.Model):
+    """Represents one row from the legacy AIRPORT catalogue table maintained by Design use
+    cases UC-I02/UC-I03.
+    """
+
     airportid = models.CharField(max_length=4, primary_key=True)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=250)
@@ -18,10 +26,15 @@ class Airport(models.Model):
         return f"{self.airportid} — {self.name}"
 
     def get_absolute_url(self) -> str:
+        """Return the IT edit URL of this airport."""
         return reverse("it:airport_edit", kwargs={"airportid": self.pk})
 
 
 class Airplane(models.Model):
+    """Represents one row from the legacy AIRPLANE catalogue table maintained by Design use
+    cases UC-I02/UC-I03.
+    """
+
     airplaneid = models.CharField(max_length=8, primary_key=True)
     type = models.CharField(max_length=8)
     numseats = models.PositiveIntegerField()
@@ -39,4 +52,5 @@ class Airplane(models.Model):
         return self.airplaneid
 
     def get_absolute_url(self) -> str:
+        """Return the IT edit URL of this airplane."""
         return reverse("it:airplane_edit", kwargs={"airplaneid": self.pk})

@@ -1,3 +1,7 @@
+"""Design: HR routes implement UC-H01 and UC-H02; employee deletion remains forbidden by FK
+RESTRICT.
+"""
+
 from django.urls import path
 
 from . import views

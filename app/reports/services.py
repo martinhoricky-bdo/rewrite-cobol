@@ -1,3 +1,5 @@
+"""Design: reporting queries calculate crew UC-C01 and CEO overview UC-E01 results."""
+
 from datetime import date
 from decimal import Decimal
 

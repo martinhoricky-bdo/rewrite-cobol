@@ -1,3 +1,7 @@
+"""Root URL configuration connects all reconstructed legacy workflows and Design-based
+administration routes.
+"""
+
 from django.contrib import admin
 from django.urls import include, path
 

@@ -1,3 +1,7 @@
+"""Account services implement the UC-A01 login limiter and CRYPTPGM-compatible password-
+management policies.
+"""
+
 import math
 import secrets
 from datetime import timedelta
@@ -18,6 +22,7 @@ def login_failure_key(username: str, ip_address: str) -> str:
 
 
 def login_block_minutes(username: str, ip_address: str) -> int | None:
+    """Calculate how many whole minutes remain in the UC-A01 login lockout window."""
     state = cache.get(login_failure_key(username, ip_address))
     if not state or state["count"] < LOGIN_FAILURE_LIMIT:
         return None
@@ -26,6 +31,7 @@ def login_block_minutes(username: str, ip_address: str) -> int | None:
 
 
 def record_login_failure(username: str, ip_address: str) -> None:
+    """Record a failed password attempt and start the timed lockout at the configured limit."""
     key = login_failure_key(username, ip_address)
     state = cache.get(key)
     if state is None:
@@ -36,6 +42,7 @@ def record_login_failure(username: str, ip_address: str) -> None:
 
 
 def clear_login_failures(username: str, ip_address: str) -> None:
+    """Clear failure counters and lockout timestamps after successful authentication."""
     cache.delete(login_failure_key(username, ip_address))
 
 
@@ -67,10 +74,15 @@ def reset_employee_password(employee: Employee) -> str:
 
 
 class AccountError(Exception):
+    """Carries the user-facing validation code and message when authentication and IT account
+    workflows in UC-A01–A03 and UC-I01 cannot continue.
+    """
+
     pass
 
 
 def activate_account(employee: Employee, actor: User) -> str:
+    """Enable an employee account and issue the temporary password required by UC-I01."""
     if employee.user is None:
         raise AccountError("This employee has no account.")
     employee.user.is_active = True
@@ -79,6 +91,7 @@ def activate_account(employee: Employee, actor: User) -> str:
 
 
 def deactivate_account(employee: Employee, actor: User) -> str:
+    """Disable an employee account while preserving its employee record and audit history."""
     if employee.user_id == actor.pk:
         raise AccountError("You cannot deactivate your own account.")
     if employee.user is None:

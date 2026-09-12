@@ -1,3 +1,5 @@
+"""Template tags render shared account and CICS-inspired presentation values in base.html."""
+
 from django import template
 
 register = template.Library()

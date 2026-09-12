@@ -1,3 +1,7 @@
+"""Design: schedule routes for UC-P01, UC-P03, and UC-P04, including CBFLIGHT generation
+for UC-P02.
+"""
+
 from django.urls import path
 
 from . import views

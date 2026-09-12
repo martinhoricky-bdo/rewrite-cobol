@@ -1,3 +1,7 @@
+"""Sales routes expose the reconstructed SRCHFLY, SRCHTKT, PRINTCI, SELLCOB1, SELLCOB2, and
+PRINTPA workflows.
+"""
+
 from django.urls import path
 
 from . import views

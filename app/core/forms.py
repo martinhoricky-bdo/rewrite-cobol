@@ -1,3 +1,7 @@
+"""Shared form infrastructure renders reconstructed CICS fields consistently across
+application use cases.
+"""
+
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.renderers import TemplatesSetting
@@ -13,6 +17,7 @@ class FilterForm(forms.Form):
             raise ImproperlyConfigured(f"Filter fields must not be required: {', '.join(required)}")
 
     def value(self, name: str, default=None):
+        """Return a bound filter value, falling back safely when the form is unbound or invalid."""
         if not self.is_bound:
             return default
         errors = self.errors
@@ -20,6 +25,9 @@ class FilterForm(forms.Form):
         return default if name in errors or value in self.fields[name].empty_values else value
 
     def is_empty(self) -> bool:
+        """Report whether every filter field is blank so list views can suppress unfiltered
+        results.
+        """
         return not any(
             self[name].value() not in field.empty_values for name, field in self.fields.items()
         )

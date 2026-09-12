@@ -1,3 +1,7 @@
+"""Legacy seed reference data transcribes DB2 exports and supports the Design-based
+seed_demo command.
+"""
+
 from decimal import Decimal
 
 DEPARTMENTS = [

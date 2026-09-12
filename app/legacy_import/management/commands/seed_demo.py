@@ -1,3 +1,7 @@
+"""Design: management command seeds demo data from EMPLOYEE-LIST.json, PASSENGER1..8.xml,
+and reference fixtures.
+"""
+
 from datetime import date
 from pathlib import Path
 
@@ -22,15 +26,21 @@ from sales.models import Buy, Passenger, Ticket
 
 
 class Command(BaseCommand):
+    """Runs the management command for legacy DB2, EMPLOYEE-LIST.json, and passenger XML
+    imports, validating its options before changing stored records.
+    """
+
     help = "Seed development data from the read-only legacy files."
 
     def add_arguments(self, parser) -> None:
+        """Accept the flush switch and the period the generated flights cover."""
         parser.add_argument("--flush", action="store_true")
         parser.add_argument("--from-date", type=date.fromisoformat, default=None)
         parser.add_argument("--days", type=int, default=60)
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
+        """Load the legacy fixtures and generate the demo flights for the chosen period."""
         if options["days"] < 1:
             raise CommandError("--days must be a positive integer")
         start = options["from_date"] or timezone.localdate()
