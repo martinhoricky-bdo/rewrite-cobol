@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from accounts.models import User
+from accounts.models import Employee, User
 from accounts.roles import Role
 from tests.factories import DepartmentFactory, EmployeeFactory
 from tests.unit.test_employee_form import employee_data
@@ -49,3 +49,20 @@ def test_create_makes_inactive_unusable_account(role_client):
     assert not user.is_active
     assert not user.has_usable_password()
     assert user.employee.empid == "10000040"
+
+
+def test_invalid_employee_create_reports_errors_without_writing(role_client):
+    client = role_client(Role.HR)
+    department = DepartmentFactory(deptid=4)
+    before = Employee.objects.count()
+
+    response = client.post(
+        reverse("hr:employee_create"),
+        employee_data(department, firstname="", salary="abc"),
+    )
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert "This field is required." in content
+    assert "Enter a number." in content
+    assert Employee.objects.count() == before

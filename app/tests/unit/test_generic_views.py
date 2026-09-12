@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from accounts.roles import Role
 from core.forms import FilterForm
-from core.views.generic import FilteredListView, SearchListView
+from core.views.generic import FilteredListView, FormErrorsAsMessagesMixin, SearchListView
 from fleet.models import Airport
 from tests.factories import FlightFactory, UserFactory
 
@@ -108,6 +108,11 @@ def test_invalid_search_adds_errors_to_messages():
     AirportSearchView.as_view()(result)
 
     assert "Enter a whole number." in message_texts(result)
+
+
+def test_search_list_does_not_override_form_invalid_contract():
+    assert FormErrorsAsMessagesMixin not in SearchListView.__mro__
+    assert not hasattr(SearchListView, "form_invalid")
 
 
 def test_empty_search_adds_info_message():

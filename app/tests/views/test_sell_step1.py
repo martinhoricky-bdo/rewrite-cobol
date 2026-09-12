@@ -3,7 +3,9 @@ from datetime import date
 import pytest
 from freezegun import freeze_time
 
-from core.messages import E_SEL_05, E_SEL_09
+from accounts.roles import Role
+from core.messages import E_SEL_01, E_SEL_02, E_SEL_03, E_SEL_04, E_SEL_05, E_SEL_09
+from sales.models import Buy
 from tests.factories import DepartmentFactory, EmployeeFactory, FlightFactory, PassengerFactory
 
 pytestmark = pytest.mark.django_db
@@ -73,3 +75,25 @@ def test_step_two_without_quote_redirects_with_message(client):
     response = client.get("/sales/sell/passengers/", follow=True)
     assert response.redirect_chain == [("/sales/sell/", 302)]
     assert E_SEL_09 in response.content.decode()
+
+
+def test_invalid_step_one_reports_all_field_errors_without_writing(role_client):
+    client = role_client(Role.SALES)
+    before = Buy.objects.count()
+
+    response = client.post(
+        "/sales/sell/",
+        {
+            "action": "research",
+            "clientid": "abc",
+            "flightnum": "",
+            "flightdate": "bad",
+            "count": "x",
+        },
+    )
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    for message in (E_SEL_01, E_SEL_02, E_SEL_03, E_SEL_04):
+        assert message in content
+    assert Buy.objects.count() == before

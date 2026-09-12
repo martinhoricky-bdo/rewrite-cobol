@@ -3,6 +3,7 @@ from datetime import date, timedelta
 import pytest
 from freezegun import freeze_time
 
+from accounts.roles import Role
 from core.messages import E_FLT_01, E_FLT_02, E_FLT_03
 from tests.factories import DepartmentFactory, EmployeeFactory, FlightFactory
 
@@ -33,6 +34,16 @@ def test_bad_date_shows_custom_message(client):
     response = client.get("/sales/flights/?flightdate=11-09-2026")
     assert E_FLT_02 in response.content.decode()
     assert response.context["page_obj"] is None
+
+
+def test_invalid_date_reports_message_and_empty_result_list(role_client):
+    client = role_client(Role.SALES)
+    FlightFactory()
+
+    response = client.get("/sales/flights/?flightdate=bad")
+
+    assert E_FLT_02 in [str(message) for message in response.context["messages"]]
+    assert list(response.context["object_list"]) == []
 
 
 @freeze_time("2026-09-11")

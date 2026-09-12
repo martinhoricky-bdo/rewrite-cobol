@@ -1,6 +1,9 @@
 import pytest
 from django.contrib.messages import get_messages
+from django.urls import reverse
 
+from accounts.roles import Role
+from sales.models import Passenger
 from sales.services import PASSENGER_EMAIL_WARNING
 from tests.factories import DepartmentFactory, EmployeeFactory, PassengerFactory, TicketFactory
 
@@ -88,6 +91,22 @@ def test_duplicate_email_warns_but_saves(client):
     assert PASSENGER_EMAIL_WARNING in [
         str(message) for message in get_messages(response.wsgi_request)
     ]
+
+
+def test_invalid_passenger_create_reports_errors_without_writing(role_client):
+    client = role_client(Role.SALES)
+    before = Passenger.objects.count()
+
+    response = client.post(
+        reverse("sales:passenger_create"),
+        passenger_data(firstname="", email="not-an-email"),
+    )
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert "This field is required." in content
+    assert "Enter a valid email address." in content
+    assert Passenger.objects.count() == before
 
 
 @pytest.mark.parametrize("url", ["/sales/passengers/999999/", "/sales/passengers/999999/edit/"])

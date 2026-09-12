@@ -2,6 +2,7 @@ from html import escape
 
 import pytest
 
+from accounts.roles import Role
 from core.messages import E_TKT_01, E_TKT_02, E_TKT_03
 from tests.factories import DepartmentFactory, EmployeeFactory, TicketFactory
 
@@ -18,6 +19,15 @@ def test_initial_page_does_not_validate(client):
     response = client.get("/sales/tickets/")
     assert response.status_code == 200
     assert E_TKT_01 not in response.content.decode()
+
+
+def test_ticket_search_without_criteria_has_no_error(role_client):
+    client = role_client(Role.SALES)
+
+    response = client.get("/sales/tickets/")
+
+    assert response.status_code == 200
+    assert list(response.context["messages"]) == []
 
 
 def test_invalid_search_and_empty_results_show_messages(client):

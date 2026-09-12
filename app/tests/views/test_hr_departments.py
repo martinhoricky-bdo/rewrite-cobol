@@ -34,3 +34,21 @@ def test_manager_from_another_department_is_rejected(role_client):
     )
     assert response.status_code == 200
     assert MANAGER_DEPARTMENT_ERROR in response.content.decode()
+
+
+def test_invalid_department_edit_does_not_change_department(role_client):
+    client = role_client(Role.HR)
+    department = DepartmentFactory(deptid=7, name="Sales")
+    outsider = EmployeeFactory(dept=DepartmentFactory(deptid=8))
+    original_manager = department.manager
+
+    response = client.post(
+        reverse("hr:department_edit", args=[department.pk]),
+        {"name": "Changed", "manager": outsider.pk},
+    )
+
+    department.refresh_from_db()
+    assert response.status_code == 200
+    assert MANAGER_DEPARTMENT_ERROR in response.content.decode()
+    assert department.name == "Sales"
+    assert department.manager == original_manager
