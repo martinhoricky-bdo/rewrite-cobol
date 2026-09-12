@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.messages import get_messages
 
-from sales.views import PASSENGER_EMAIL_WARNING
+from sales.services import PASSENGER_EMAIL_WARNING
 from tests.factories import DepartmentFactory, EmployeeFactory, PassengerFactory, TicketFactory
 
 pytestmark = pytest.mark.django_db

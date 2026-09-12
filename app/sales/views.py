@@ -13,6 +13,7 @@ from accounts.roles import Role
 from core.exceptions import NotFound
 from core.messages import E_FLT_03, E_SEL_05_ID, E_SEL_09, E_TKT_02, E_TKT_03
 from core.views import generic
+from operations.models import Flight
 from operations.services import search_flights
 
 from .forms import (
@@ -34,8 +35,6 @@ from .services import (
     quote_sale,
     search_tickets,
 )
-
-PASSENGER_EMAIL_WARNING = "Another passenger with this email already exists."
 
 
 class SalesView(RoleRequiredMixin):
@@ -233,7 +232,7 @@ class PassengerUpdateView(PassengerFormView, UpdateView):
 
 class FlightSearchView(RoleRequiredMixin, generic.SearchListView):
     allowed_roles = (Role.SALES, Role.CEO, Role.SCHEDULE, Role.CREW)
-    model = Ticket
+    model = Flight
     template_name = "sales/flight_search.html"
     filter_form_class = FlightSearchForm
     empty_message = E_FLT_03

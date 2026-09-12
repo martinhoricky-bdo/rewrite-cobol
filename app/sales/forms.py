@@ -19,6 +19,9 @@ from core.messages import (
 from .models import Passenger
 
 TELEPHONE_ERROR = "Telephone may contain digits, spaces, + and - only."
+# Sentinel that can never match a real TICKETID; keeps the legacy behaviour
+# (wrong format = empty result with E_TKT_02, not a validation error).
+INVALID_TICKET_ID = "__invalid__"
 
 
 class SellStep1Form(forms.Form):
@@ -167,7 +170,7 @@ class TicketSearchForm(forms.Form):
     def clean_ticketid(self):
         ticketid = self.cleaned_data["ticketid"]
         if ticketid and not re.fullmatch(r"CB\d{8}", ticketid, re.IGNORECASE):
-            return "__invalid__"
+            return INVALID_TICKET_ID
         return ticketid
 
     def clean(self):

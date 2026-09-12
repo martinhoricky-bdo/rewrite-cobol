@@ -202,12 +202,16 @@ def confirm_sale(
         return buy
 
 
+PASSENGER_EMAIL_WARNING = "Another passenger with this email already exists."
+
+
 def duplicate_email_warning(email: str, exclude_pk: int | None = None) -> str | None:
+    """Return the duplicate e-mail warning when another passenger uses the address."""
     duplicates = Passenger.objects.filter(email__iexact=email)
     if exclude_pk is not None:
         duplicates = duplicates.exclude(pk=exclude_pk)
     if duplicates.exists():
-        return "Another passenger with this email already exists."
+        return PASSENGER_EMAIL_WARNING
     return None
 
 

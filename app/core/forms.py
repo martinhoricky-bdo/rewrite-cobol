@@ -13,6 +13,8 @@ class FilterForm(forms.Form):
             raise ImproperlyConfigured(f"Filter fields must not be required: {', '.join(required)}")
 
     def value(self, name: str, default=None):
+        if not self.is_bound:
+            return default
         errors = self.errors
         value = self.cleaned_data.get(name)
         return default if name in errors or value in self.fields[name].empty_values else value

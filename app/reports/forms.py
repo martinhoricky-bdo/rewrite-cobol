@@ -10,5 +10,6 @@ class ShiftPeriodFilterForm(FilterForm):
 class PeriodFilterForm(FilterForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["from"] = forms.DateField(required=False, label="From")
-        self.fields["to"] = forms.DateField(required=False, label="To")
+        widget = forms.DateInput(attrs={"type": "date"})
+        self.fields["from"] = forms.DateField(required=False, label="From", widget=widget)
+        self.fields["to"] = forms.DateField(required=False, label="To", widget=widget)

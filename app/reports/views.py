@@ -44,8 +44,9 @@ class DashboardView(RoleRequiredMixin, TemplateView):
         if date_from > date_to:
             date_from = first_day
             date_to = today
+        shown = PeriodFilterForm({"from": date_from.isoformat(), "to": date_to.isoformat()})
         return super().get_context_data(
-            form=form,
+            form=shown,
             date_from=date_from,
             date_to=date_to,
             **dashboard_report(date_from, date_to),
