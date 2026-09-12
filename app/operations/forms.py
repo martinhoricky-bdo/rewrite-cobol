@@ -3,7 +3,81 @@ from decimal import Decimal
 
 from django import forms
 
-from .models import Flight, Shift
+from accounts.models import Employee
+
+from .models import Crew, Flight, Shift
+
+
+class EmployeeChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, employee: Employee) -> str:
+        return f"{employee.pk} – {employee.full_name}"
+
+
+class CrewForm(forms.ModelForm):
+    commander = EmployeeChoiceField(queryset=Employee.objects.none())
+    copilote = EmployeeChoiceField(queryset=Employee.objects.none())
+    fachief = EmployeeChoiceField(queryset=Employee.objects.none())
+    fliattendant1 = EmployeeChoiceField(queryset=Employee.objects.none())
+    fliattendant2 = EmployeeChoiceField(queryset=Employee.objects.none())
+    fliattendant3 = EmployeeChoiceField(queryset=Employee.objects.none())
+
+    class Meta:
+        model = Crew
+        fields = [
+            "commander",
+            "copilote",
+            "fachief",
+            "fliattendant1",
+            "fliattendant2",
+            "fliattendant3",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["commander"].queryset = Employee.objects.filter(dept_id=2)
+        self.fields["copilote"].queryset = Employee.objects.filter(dept_id=3)
+        attendants = Employee.objects.filter(dept_id=4)
+        for field in ("fachief", "fliattendant1", "fliattendant2", "fliattendant3"):
+            self.fields[field].queryset = attendants
+
+    def clean(self):
+        cleaned = super().clean()
+        members = [cleaned.get(field) for field in self._meta.fields]
+        members = [member for member in members if member is not None]
+        if len(members) != len(set(members)):
+            raise forms.ValidationError("Crew members must be different employees.")
+        return cleaned
+
+
+class ShiftForm(forms.ModelForm):
+    class Meta:
+        model = Shift
+        fields = ["shiftdate", "begintime", "endtime", "crew"]
+        widgets = {
+            "shiftdate": forms.DateInput(attrs={"type": "date"}),
+            "begintime": forms.TimeInput(attrs={"type": "time"}),
+            "endtime": forms.TimeInput(attrs={"type": "time"}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        day = cleaned.get("shiftdate")
+        begin = cleaned.get("begintime")
+        end = cleaned.get("endtime")
+        crew = cleaned.get("crew")
+        if begin and end and begin >= end:
+            raise forms.ValidationError("Begin time must be before end time.")
+        if day and begin and end and crew and begin < end:
+            overlaps = Shift.objects.filter(
+                shiftdate=day, crew=crew, begintime__lt=end, endtime__gt=begin
+            )
+            if self.instance.pk:
+                overlaps = overlaps.exclude(pk=self.instance.pk)
+            if overlaps.exists():
+                raise forms.ValidationError(
+                    f"Crew {crew.pk} already has a shift on {day} overlapping this time."
+                )
+        return cleaned
 
 
 class ShiftChoiceField(forms.ModelChoiceField):

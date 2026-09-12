@@ -21,6 +21,8 @@ ROLE_HOME[Role.SCHEDULE] = "schedule:flights"
 MENU[Role.SCHEDULE] = [
     ("Flights", "schedule:flights"),
     ("Generate flights", "schedule:flights_generate"),
+    ("Crews", "schedule:crews"),
+    ("Shifts", "schedule:shifts"),
     *MENU[Role.SCHEDULE],
 ]
 ROLE_HOME[Role.HR] = "hr:employees"
