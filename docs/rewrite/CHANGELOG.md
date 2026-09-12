@@ -1,3 +1,9 @@
+## R14 – Import z exportu DB2
+- PR: #TBD (codex/R14-import-legacy)
+- Přidáno: atomický a idempotentní import DB2 DEL souborů, JSON report, dry-run, normalizace a testovací exporty.
+- Změněno: sdílené legacy parsery nově zpracovávají explicitní formáty data a času; README popisuje export a obnovu účtů.
+- Odchylky od specifikace: žádné.
+
 # CHANGELOG přepisu
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.

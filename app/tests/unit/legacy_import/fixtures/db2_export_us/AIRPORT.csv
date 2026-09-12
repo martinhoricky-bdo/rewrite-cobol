@@ -1,0 +1,4 @@
+airportid,name,address,city,country,zipcode
+" cdg ","Charles de Gaulle","1 Airport","Paris","France","75000"
+"lhr","Heathrow","2 Airport","London","UK","10000"
+"jfk","John F Kennedy","3 Airport","New York","USA","20000"

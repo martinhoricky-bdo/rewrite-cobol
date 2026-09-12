@@ -1,8 +1,29 @@
 import json
-from datetime import datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 from pathlib import Path
 from xml.etree import ElementTree
+
+
+def parse_legacy_date(value: str, fmt: str = "iso") -> date:
+    """Parse a DB2 DEL date using the explicitly selected export format."""
+    formats = {"iso": "%Y-%m-%d", "us": "%m/%d/%Y"}
+    try:
+        pattern = formats[fmt]
+    except KeyError as exc:
+        raise ValueError(f"unsupported date format: {fmt}") from exc
+    return datetime.strptime(value.strip(), pattern).date()
+
+
+def parse_legacy_time(value: str) -> time:
+    """Parse DB2 times with or without seconds."""
+    value = value.strip()
+    for pattern in ("%H:%M:%S", "%H:%M"):
+        try:
+            return datetime.strptime(value, pattern).time()
+        except ValueError:
+            pass
+    raise ValueError(f"invalid time: {value}")
 
 
 def parse_employee_json(path: Path) -> list[dict]:
