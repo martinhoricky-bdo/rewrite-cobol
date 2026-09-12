@@ -3,7 +3,7 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 15:25
+- Poslední aktualizace: 2026-09-12 15:50
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22): hotovo** (zadáno uživatelem 2026-09-12 „není DRY, žádné generic views“, poslední merge 12:13).
 - **Fáze 3 – docstringy a kontrakt validace (R23–R24)**: běží, zadáno uživatelem 2026-09-12 („chybí komentáře“ + otázka na `form_valid`/`form_invalid`).
 - Aktuální krok: R23 (zadáno Codexu)
@@ -41,7 +41,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R23 Docstringy a vazba na legacy | #51 | – | zadáno 15:22, zmínka `@codex` odeslána, kontrola každých 15 min |
+| R23 Docstringy a vazba na legacy | #51 | #52 | 1. běh vrácen 15:48: 285 z ~400 docstringů vygenerovaných šablonou `Implement <název> behavior for …`; mechanické kontroly prošly (676 testů). Fix run zadán, čeká se na push do stejné větve |
 
 ## Fronta
 R24 – kontrakt validace formulářů a testy neplatných cest (zadání hotové v `codex-tasks/R24.md`, čeká na merge R23).
