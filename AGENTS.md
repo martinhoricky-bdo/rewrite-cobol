@@ -67,6 +67,8 @@ Pravidla:
 - Před otevřením PR musí `make check` projít; posledních ~10 řádků výstupu vlož do popisu PR. Pokud něco neprochází a nedokážeš to opravit, PR neotvírej jako hotový – označ ho jako draft a popiš problém.
 - Testy nesmí záviset na síti ani na aktuálním datu bez fixace (`freezegun` nebo parametr `today`).
 - Fixtures pro testy jsou malé (několik řádků), ne kopie celých legacy souborů.
+- Každý testovací soubor musí projít i samostatně (`pytest tests/views/test_x.py`), ne jen v celé sadě (žádná závislost na pořadí, na čítačích factory ani na stavu sekvencí v DB).
+- E2E (Playwright, `tests/e2e`, marker `e2e`): tvůj sandbox nemá Chromium, testy tedy piš tak, aby prošly napoprvé při spuštění reviewerem: override fixtur `base_url` / `browser_type_launch_args` musí být `scope="session"`; akční odkazy aplikace jsou `<a role="button">` → `get_by_role("button", name=…)`, běžné odkazy v menu a tabulkách `get_by_role("link", …)`; nový panel (`expect_popup`) jen u odkazů s `target="_blank"`, jinak klikni a vrať se přes `Back`; texty opakované na tiskových stránkách (jméno a sedadlo na vstupence) ověřuj přes `.first`; data v testu musí být unikátní a scénář opakovatelný bez `--flush`.
 
 ## 5. Co musí obsahovat každý PR
 
