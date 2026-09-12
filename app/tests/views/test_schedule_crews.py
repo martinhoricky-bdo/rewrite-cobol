@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from accounts.roles import Role
 from core.messages import E_REF_01
 from operations.models import Crew
 from tests.factories import (
@@ -8,16 +9,9 @@ from tests.factories import (
     DepartmentFactory,
     EmployeeFactory,
     ShiftFactory,
-    UserFactory,
 )
 
 pytestmark = pytest.mark.django_db
-
-
-def login_as(client, deptid=9):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
 
 
 def crew_data():
@@ -34,8 +28,8 @@ def crew_data():
     }
 
 
-def test_crew_crud(client):
-    login_as(client)
+def test_crew_crud(role_client):
+    client = role_client(Role.SCHEDULE)
     response = client.get(reverse("schedule:crews"))
     assert response.status_code == 200
     response = client.post(reverse("schedule:crew_create"), crew_data())
@@ -52,8 +46,8 @@ def test_crew_crud(client):
     assert not Crew.objects.filter(pk=crew.pk).exists()
 
 
-def test_crew_with_shifts_cannot_be_deleted(client):
-    login_as(client)
+def test_crew_with_shifts_cannot_be_deleted(role_client):
+    client = role_client(Role.SCHEDULE)
     crew = CrewFactory()
     ShiftFactory(crew=crew)
     response = client.post(reverse("schedule:crew_delete", args=[crew.pk]), follow=True)
@@ -73,6 +67,6 @@ def test_crew_with_shifts_cannot_be_deleted(client):
         ("schedule:crew_delete", [1], "post"),
     ],
 )
-def test_sales_role_gets_403_for_every_crew_url(client, name, args, method):
-    login_as(client, 7)
+def test_sales_role_gets_403_for_every_crew_url(role_client, name, args, method):
+    client = role_client(Role.SALES)
     assert getattr(client, method)(reverse(name, args=args)).status_code == 403

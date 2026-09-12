@@ -16,7 +16,10 @@ MANAGER_DEPARTMENT_ERROR = "Manager must belong to this department."
 class EmployeeFilterForm(FilterForm):
     name = forms.CharField(required=False, label="Name starts with")
     dept = forms.ModelChoiceField(
-        required=False, queryset=Department.objects.order_by("deptid"), label="Department"
+        required=False,
+        queryset=Department.objects.order_by("deptid"),
+        label="Department",
+        empty_label="All",
     )
 
 

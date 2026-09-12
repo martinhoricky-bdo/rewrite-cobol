@@ -37,6 +37,8 @@ class CancelUrlMixin:
 
 
 class EditableByMixin:
+    """Expose whether the current user's role permits editing the object."""
+
     edit_roles = ()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

@@ -19,7 +19,9 @@ class FlightFilterForm(FilterForm):
 class ShiftFilterForm(FilterForm):
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
-    crew = forms.ModelChoiceField(required=False, queryset=Crew.objects.order_by("crewid"))
+    crew = forms.ModelChoiceField(
+        required=False, queryset=Crew.objects.order_by("crewid"), empty_label="All"
+    )
 
 
 class EmployeeChoiceField(forms.ModelChoiceField):

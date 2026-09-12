@@ -2,20 +2,15 @@ import pytest
 from django.urls import reverse
 
 from accounts.models import User
-from tests.factories import DepartmentFactory, EmployeeFactory, UserFactory
+from accounts.roles import Role
+from tests.factories import DepartmentFactory, EmployeeFactory
 from tests.unit.test_employee_form import employee_data
 
 pytestmark = pytest.mark.django_db
 
 
-def login_as(client, deptid):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
-
-
-def test_list_filter_and_pagination(client):
-    login_as(client, 5)
+def test_list_filter_and_pagination(role_client):
+    client = role_client(Role.HR)
     sales = DepartmentFactory(deptid=7, name="Sales")
     EmployeeFactory(firstname="Alice", dept=sales)
     EmployeeFactory(firstname="Bob", dept=sales)
@@ -33,8 +28,8 @@ def test_list_filter_and_pagination(client):
     assert response.context["page_obj"].paginator.count == 12
 
 
-def test_detail_and_edit_preserves_empid(client):
-    login_as(client, 5)
+def test_detail_and_edit_preserves_empid(role_client):
+    client = role_client(Role.HR)
     employee = EmployeeFactory(empid="10000040", dept=DepartmentFactory(deptid=4))
     assert client.get(reverse("hr:employee_detail", args=[employee.pk])).status_code == 200
     data = employee_data(employee.dept, empid="99999999", firstname="Grace")
@@ -45,8 +40,8 @@ def test_detail_and_edit_preserves_empid(client):
     assert employee.firstname == "Grace"
 
 
-def test_create_makes_inactive_unusable_account(client):
-    login_as(client, 5)
+def test_create_makes_inactive_unusable_account(role_client):
+    client = role_client(Role.HR)
     department = DepartmentFactory(deptid=4)
     response = client.post(reverse("hr:employee_create"), employee_data(department))
     user = User.objects.get(username="10000040")
@@ -56,9 +51,9 @@ def test_create_makes_inactive_unusable_account(client):
     assert user.employee.empid == "10000040"
 
 
-def test_ceo_read_only_and_sales_forbidden(client):
+def test_ceo_read_only_and_sales_forbidden(role_client):
     employee = EmployeeFactory(dept=DepartmentFactory(deptid=4))
-    login_as(client, 1)
+    client = role_client(Role.CEO)
     assert client.get(reverse("hr:employees")).status_code == 200
     assert client.get(reverse("hr:employee_detail", args=[employee.pk])).status_code == 200
     assert client.get(reverse("hr:employee_create")).status_code == 403
@@ -66,6 +61,6 @@ def test_ceo_read_only_and_sales_forbidden(client):
     assert client.get(reverse("hr:employee_edit", args=[employee.pk])).status_code == 403
     assert client.post(reverse("hr:employee_edit", args=[employee.pk]), {}).status_code == 403
     client.logout()
-    login_as(client, 7)
+    client = role_client(Role.SALES)
     assert client.get(reverse("hr:employees")).status_code == 403
     assert client.get(reverse("hr:employee_detail", args=[employee.pk])).status_code == 403

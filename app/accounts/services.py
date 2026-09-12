@@ -70,7 +70,7 @@ class AccountError(Exception):
     pass
 
 
-def activate_account(employee: Employee) -> str:
+def activate_account(employee: Employee, actor: User) -> str:
     if employee.user is None:
         raise AccountError("This employee has no account.")
     employee.user.is_active = True

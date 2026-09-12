@@ -1,20 +1,15 @@
 import pytest
 from django.urls import reverse
 
+from accounts.roles import Role
 from hr.forms import MANAGER_DEPARTMENT_ERROR
-from tests.factories import DepartmentFactory, EmployeeFactory, UserFactory
+from tests.factories import DepartmentFactory, EmployeeFactory
 
 pytestmark = pytest.mark.django_db
 
 
-def login_as(client, deptid):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
-
-
-def test_department_list_and_valid_manager_edit(client):
-    login_as(client, 5)
+def test_department_list_and_valid_manager_edit(role_client):
+    client = role_client(Role.HR)
     department = DepartmentFactory(deptid=7, name="Sales")
     manager = EmployeeFactory(dept=department)
     response = client.get(reverse("hr:departments"))
@@ -29,8 +24,8 @@ def test_department_list_and_valid_manager_edit(client):
     assert department.manager == manager
 
 
-def test_manager_from_another_department_is_rejected(client):
-    login_as(client, 5)
+def test_manager_from_another_department_is_rejected(role_client):
+    client = role_client(Role.HR)
     department = DepartmentFactory(deptid=7)
     outsider = EmployeeFactory(dept=DepartmentFactory(deptid=8))
     response = client.post(
@@ -41,9 +36,9 @@ def test_manager_from_another_department_is_rejected(client):
     assert MANAGER_DEPARTMENT_ERROR in response.content.decode()
 
 
-def test_foreign_role_forbidden_for_every_department_url(client):
+def test_foreign_role_forbidden_for_every_department_url(role_client):
     department = DepartmentFactory(deptid=7)
-    login_as(client, 7)
+    client = role_client(Role.SALES)
     assert client.get(reverse("hr:departments")).status_code == 403
     url = reverse("hr:department_edit", args=[department.pk])
     assert client.get(url).status_code == 403
