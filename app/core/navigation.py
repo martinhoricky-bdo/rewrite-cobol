@@ -10,6 +10,13 @@ for role in (Role.SALES, Role.CEO):
 MENU[Role.SALES].append(("Passengers", "sales:passenger_list"))
 MENU[Role.SALES].append(("Sell", "sales:sell_step1"))
 ROLE_HOME[Role.SALES] = "sales:flight_search"
+ROLE_HOME[Role.IT] = "it:users"
+MENU[Role.IT] = [
+    ("Users", "it:users"),
+    ("Airports", "it:airports"),
+    ("Airplanes", "it:airplanes"),
+]
+MENU[Role.SCHEDULE].extend([("Airports", "it:airports"), ("Airplanes", "it:airplanes")])
 COMMON_MENU = [
     ("Change password", "accounts:password_change"),
     ("Logout", "accounts:logout"),

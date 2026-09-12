@@ -8,6 +8,7 @@ urlpatterns = [
     path("healthz/", healthz, name="healthz"),
     path("", include("accounts.urls")),
     path("sales/", include("sales.urls")),
+    path("it/", include("core.urls_it", namespace="it")),
     path("", include("core.urls")),
 ]
 

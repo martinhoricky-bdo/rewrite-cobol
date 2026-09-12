@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<h1>Delete {{ kind }}</h1><p>Delete {{ kind }} {{ object.pk }}?</p><form method="post">{% csrf_token %}<button type="submit">Delete</button></form>{% endblock %}

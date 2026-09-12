@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R13 – IT Support: uživatelské účty, letiště, letadla
+- PR: #29 (codex/R13-it-support)
+- Přidáno: správa účtů zaměstnanců a CRUD letišť a letadel včetně validací, oprávnění a testů.
+- Změněno: navigace rolí IT a Schedule o nové administrační obrazovky.
+- Odchylky od specifikace: žádné.
+
 ## R12 – E2E testy toku Sales
 - PR: #27 (codex/R12-e2e-sales)
 - Přidáno: Playwright testy přihlášení rolí, kompletního prodeje, tisku, hledání letenky a správy cestujícího.
