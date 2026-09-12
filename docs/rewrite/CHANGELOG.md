@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R24 – Kontrakt validace formulářů a testy neplatných cest
+- PR: připravuje se (codex/R24-form-validation)
+- Přidáno: konkrétní view testy validačních hlášek a zachování databáze pro všechny formulářové obrazovky, včetně hledání.
+- Změněno: `SearchListView` hlásí chyby přes `report_form_errors` a nedědí nepoužívaný formulářový mixin.
+- Odchylky od specifikace: žádné.
+
 ## R23 – Docstringy a vazba na legacy
 - PR: #52 (codex/R23-docstrings)
 - Přidáno: docstringy modulů, tříd a veřejných funkcí s odkazem na legacy program, mapu, tabulku DB2 a use case; test `tests/unit/test_docstrings.py` hlídá pokrytí i šablonové formulace.

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time
 
 import pytest
 from django.urls import reverse
@@ -62,3 +62,27 @@ def test_shift_with_flights_cannot_be_deleted(role_client):
     response = client.post(reverse("schedule:shift_delete", args=[shift.pk]), follow=True)
     assert E_REF_01.format(Entity="Shift", n=1, related="flights") in response.content.decode()
     assert Shift.objects.filter(pk=shift.pk).exists()
+
+
+@pytest.mark.parametrize(
+    ("begin", "end", "message"),
+    [
+        ("17:00", "09:00", "Begin time must be before end time."),
+        ("11:00", "15:00", None),
+    ],
+)
+def test_invalid_shift_create_reports_error_without_writing(role_client, begin, end, message):
+    client = role_client(Role.SCHEDULE)
+    existing = ShiftFactory(shiftdate=date(2026, 10, 1), begintime=time(8), endtime=time(12))
+    before = Shift.objects.count()
+    expected = message or (
+        f"Crew {existing.crew_id} already has a shift on 2026-10-01 overlapping this time."
+    )
+
+    response = client.post(
+        reverse("schedule:shift_create"), shift_data(existing, begintime=begin, endtime=end)
+    )
+
+    assert response.status_code == 200
+    assert expected in response.content.decode()
+    assert Shift.objects.count() == before

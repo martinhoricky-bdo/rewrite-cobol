@@ -2,7 +2,9 @@ from datetime import date
 
 import pytest
 
-from core.messages import E_SEL_05_ID, E_SEL_09
+from accounts.roles import Role
+from core.messages import E_SEL_01, E_SEL_05_ID, E_SEL_09
+from sales.models import Buy, Ticket
 from sales.services import SESSION_KEY, quote_sale
 from tests.factories import DepartmentFactory, EmployeeFactory, FlightFactory, PassengerFactory
 
@@ -83,3 +85,19 @@ def test_name_endpoint_return(client):
     flight = FlightFactory(flightdate=date.today())
     set_quote(client, flight, first, 1)
     assert client.post("/sales/sell/passengers/", {"action": "return"}).url == "/sales/sell/"
+
+
+def test_invalid_step_two_reports_row_error_without_writing(role_client):
+    client = role_client(Role.SALES)
+    passenger = PassengerFactory()
+    flight = FlightFactory(flightdate=date.today())
+    set_quote(client, flight, passenger, count=1)
+    buys_before = Buy.objects.count()
+    tickets_before = Ticket.objects.count()
+
+    response = client.post("/sales/sell/passengers/", {"action": "confirm", "client_1": "abc"})
+
+    assert response.status_code == 200
+    assert E_SEL_01 in response.content.decode()
+    assert Buy.objects.count() == buys_before
+    assert Ticket.objects.count() == tickets_before

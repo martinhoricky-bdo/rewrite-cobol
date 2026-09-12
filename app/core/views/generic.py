@@ -120,7 +120,7 @@ class FilteredListView(ListView):
         return paginator, page, page.object_list, page.has_other_pages()
 
 
-class SearchListView(FormErrorsAsMessagesMixin, FilteredListView):
+class SearchListView(FilteredListView):
     """Display search results only after a valid bound search form."""
 
     empty_message = "No results found."
@@ -138,15 +138,15 @@ class SearchListView(FormErrorsAsMessagesMixin, FilteredListView):
         if not form.is_bound:
             return queryset.none()
         if not form.is_valid():
-            self.form_invalid(form)
+            self.report_form_errors(form)
             return queryset.none()
         results = self.search_queryset(form)
         if not results.exists():
             messages.info(self.request, self.empty_message)
         return results
 
-    def form_invalid(self, form: BaseForm) -> None:
-        """Copy the validation errors into messages; the result list stays empty."""
+    def report_form_errors(self, form: BaseForm) -> None:
+        """Copy search validation errors into messages while the result list stays empty."""
         form_errors_as_messages(self.request, form)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

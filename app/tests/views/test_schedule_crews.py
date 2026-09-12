@@ -53,3 +53,16 @@ def test_crew_with_shifts_cannot_be_deleted(role_client):
     response = client.post(reverse("schedule:crew_delete", args=[crew.pk]), follow=True)
     assert E_REF_01.format(Entity="Crew", n=1, related="shifts") in response.content.decode()
     assert Crew.objects.filter(pk=crew.pk).exists()
+
+
+def test_invalid_crew_create_reports_error_without_writing(role_client):
+    client = role_client(Role.SCHEDULE)
+    data = crew_data()
+    data["commander"] = ""
+    before = Crew.objects.count()
+
+    response = client.post(reverse("schedule:crew_create"), data)
+
+    assert response.status_code == 200
+    assert "This field is required." in response.content.decode()
+    assert Crew.objects.count() == before

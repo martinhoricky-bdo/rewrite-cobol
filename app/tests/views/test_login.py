@@ -1,7 +1,7 @@
 import pytest
 from django.contrib.auth import authenticate
 
-from accounts.roles import ROLE_BY_DEPT
+from accounts.roles import ROLE_BY_DEPT, Role
 from core.messages import E_AUTH_01
 from tests.factories import DepartmentFactory, EmployeeFactory, UserFactory
 
@@ -80,6 +80,27 @@ def test_password_change(client):
     assert response.status_code == 302
     assert authenticate(username=user.username, password=old_password) is None
     assert authenticate(username=user.username, password="new-password-42") is not None
+
+
+def test_password_change_mismatch_reports_error_without_changing_password(role_client):
+    client = role_client(Role.SALES)
+    user = client.session.get("_auth_user_id")
+    authenticated_user = UserFactory._meta.model.objects.get(pk=user)
+    old_password = f"pw-{authenticated_user.username}"
+
+    response = client.post(
+        "/password/",
+        {
+            "old_password": old_password,
+            "new_password1": "new-password-42",
+            "new_password2": "different-password-42",
+        },
+    )
+
+    authenticated_user.refresh_from_db()
+    assert response.status_code == 200
+    assert "The two password fields didn’t match." in response.content.decode()
+    assert authenticated_user.check_password(old_password)
 
 
 def test_must_change_password(client):

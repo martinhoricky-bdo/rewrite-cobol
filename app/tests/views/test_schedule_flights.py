@@ -74,3 +74,40 @@ def test_delete_and_generate(role_client):
         follow=True,
     )
     assert "Generated 7 flights, skipped 0 existing." in response.content.decode()
+
+
+def test_invalid_flight_create_reports_errors_without_writing(role_client):
+    client = role_client(Role.SCHEDULE)
+    template = FlightFactory()
+    before = Flight.objects.count()
+
+    response = client.post(
+        reverse("schedule:flight_create"),
+        flight_data(template, flightdate="bad", price="abc"),
+    )
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert "Enter a valid date." in content
+    assert "Enter a number." in content
+    assert Flight.objects.count() == before
+
+
+def test_invalid_generation_period_reports_error_without_writing(role_client):
+    client = role_client(Role.SCHEDULE)
+    template = FlightFactory()
+    before = Flight.objects.count()
+
+    response = client.post(
+        reverse("schedule:flights_generate"),
+        {
+            "template": template.pk,
+            "date_from": "2026-05-07",
+            "date_to": "2026-05-01",
+            "weekdays": ["0"],
+        },
+    )
+
+    assert response.status_code == 200
+    assert "End date must not be before start date." in response.content.decode()
+    assert Flight.objects.count() == before

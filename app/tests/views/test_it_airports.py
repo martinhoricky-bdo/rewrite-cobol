@@ -36,6 +36,17 @@ def test_airport_crud_uppercase_and_validation(role_client):
     assert not Airport.objects.filter(pk="ABCDE").exists()
 
 
+def test_invalid_airport_create_reports_error_without_writing(role_client):
+    client = role_client(Role.IT)
+    before = Airport.objects.count()
+
+    response = client.post(reverse("it:airport_create"), airport_data("ABCDE"))
+
+    assert response.status_code == 200
+    assert "Ensure this value has at most 4 characters" in response.content.decode()
+    assert Airport.objects.count() == before
+
+
 def test_airport_delete_reference(role_client):
     client = role_client(Role.SCHEDULE)
     flight = FlightFactory()

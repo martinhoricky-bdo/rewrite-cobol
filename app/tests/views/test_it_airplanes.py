@@ -24,6 +24,17 @@ def test_airplane_crud_uppercase_and_limits(role_client):
     assert "between 1 and 999" in response.content.decode()
 
 
+def test_invalid_airplane_create_reports_error_without_writing(role_client):
+    client = role_client(Role.IT)
+    before = Airplane.objects.count()
+
+    response = client.post(reverse("it:airplane_create"), airplane_data("OK", 1000))
+
+    assert response.status_code == 200
+    assert "Ensure this value is between 1 and 999" in response.content.decode()
+    assert Airplane.objects.count() == before
+
+
 def test_airplane_cannot_shrink_below_sold_tickets(role_client):
     client = role_client(Role.IT)
     flight = FlightFactory()
@@ -33,6 +44,23 @@ def test_airplane_cannot_shrink_below_sold_tickets(role_client):
         reverse("it:airplane_edit", args=[flight.airplane_id]), airplane_data(flight.airplane_id, 1)
     )
     assert f"2 tickets are already sold on flight {flight.flightnum}." in response.content.decode()
+
+
+def test_invalid_airplane_edit_does_not_change_capacity(role_client):
+    client = role_client(Role.IT)
+    flight = FlightFactory()
+    TicketFactory.create_batch(2, flight=flight)
+    original_capacity = flight.airplane.numseats
+
+    response = client.post(
+        reverse("it:airplane_edit", args=[flight.airplane_id]),
+        airplane_data(flight.airplane_id, 1),
+    )
+
+    flight.airplane.refresh_from_db()
+    assert response.status_code == 200
+    assert f"2 tickets are already sold on flight {flight.flightnum}." in response.content.decode()
+    assert flight.airplane.numseats == original_capacity
 
 
 def test_airplane_delete_reference(role_client):
