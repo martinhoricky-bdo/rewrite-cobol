@@ -1,0 +1,18 @@
+<article class="boarding-pass" aria-label="Boarding pass for {{ pass.passenger_name }}">
+  <div class="main-pass">
+    <h1>BOARDING PASS – COBOL AIRLINES</h1>
+    <div class="passenger-seat">
+      <p><span class="label">PASSENGER NAME</span><strong>{{ pass.passenger_name }}</strong></p>
+      <p><span class="label">SEAT</span><strong>{{ pass.seat }}</strong></p>
+    </div>
+    <p>FROM: {{ pass.dep_city }}&nbsp;&nbsp;&nbsp;TO: {{ pass.arr_city }}</p>
+    <p>FLIGHT: {{ pass.flightnum }} / DATE: {{ pass.flightdate_legacy }} / DEPARTURE: {{ pass.deptime }}</p>
+  </div>
+  <aside class="stub">
+    <strong>{{ pass.passenger_name }}</strong>
+    <p>FROM: {{ pass.dep_code }} TO: {{ pass.arr_code }}</p>
+    <p>FLIGHT: {{ pass.flightnum }}</p>
+    <p>DATE: {{ pass.flightdate_iso }}</p>
+    <p>SEAT: {{ pass.seat }}</p>
+  </aside>
+</article>

@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Receipt {{ buy.buyid }} | COBOL AIRLINES</title>
+    <link rel="stylesheet" href="{% static 'print.css' %}">
+  </head>
+  <body>
+    <main class="receipt-page">
+      <section class="receipt" aria-label="Receipt for sale {{ buy.buyid }}">
+        <h1>RECEIPT</h1>
+        <p>BUYID: {{ buy.buyid }}</p>
+        <p>CB/CS/CH<br>Payment: not recorded</p>
+        <p>Le {{ buy.buydate|date:"d/m/Y" }} a {{ buy.buytime|time:"H:i:s" }}</p>
+        <p>COBOL AIRLINES<br>PARIS<br>75000</p>
+        <p>**********</p>
+        <p>------------------------------</p>
+        <p>MONTANT = {{ buy.price|floatformat:2 }} EUR</p>
+        <p>DEBIT/CREDIT</p>
+        <p>TICKET CLIENT<br>TO KEEP</p>
+      </section>
+      <nav class="print-controls" aria-label="Receipt actions">
+        <button type="button" onclick="window.print()">Print</button>
+        <a href="{% url 'sales:buy_detail' buy.buyid %}">Back</a>
+      </nav>
+    </main>
+  </body>
+</html>

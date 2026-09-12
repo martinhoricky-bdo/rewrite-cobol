@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R11 – Sales: účtenka a hromadný tisk palubních vstupenek
+- PR: #25 (codex/R11-receipt)
+- Přidáno: tisková stránka účtenky a hromadný tisk všech palubních vstupenek nákupu s testy.
+- Změněno: palubní vstupenka používá sdílenou šablonu a detail nákupu odkazuje na pojmenované tiskové URL.
+- Odchylky od specifikace: žádné.
+
 ## R10 – Sales: prodej – krok 2 a potvrzení
 - PR: #23 (codex/R10-sell-confirm)
 - Přidáno: výběr a kontrola cestujících, bezpečné přidělení sedadel, atomické potvrzení prodeje a detail nákupu včetně testů.
