@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R11 – Sales: účtenka a hromadný tisk palubních vstupenek
-- PR: #TBD (codex/R11-receipt)
+- PR: #25 (codex/R11-receipt)
 - Přidáno: tisková stránka účtenky a hromadný tisk všech palubních vstupenek nákupu s testy.
 - Změněno: palubní vstupenka používá sdílenou šablonu a detail nákupu odkazuje na pojmenované tiskové URL.
 - Odchylky od specifikace: žádné.
