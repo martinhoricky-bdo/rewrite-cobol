@@ -3,10 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 09:45
+- Poslední aktualizace: 2026-09-12 09:56
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R19 – fix run 3 (uživatel potvrdil, že nic neměnil; push do existující větve `codex/R19-generic-core` selhal 2× na 403, nová větev v prvním běhu prošla) → obchvat: opravy do nové větve `codex/R19-generic-core-v2` + nový PR, #43 bude uzavřen jako superseded.
-- Blokuje: nic (pokud selže i push nové větve → Codex Cloud GitHub připojení, zásah uživatele)
+- Aktuální krok: R19 – **BLOKOVÁNO na straně Codex Cloud**: tři fix runy po sobě (09:05, 09:20, 09:48 UTC) opravy dokončily a `pytest -q` proti PostgreSQL prošel, ale push selhal vždy – naposledy i u NOVÉ větve `codex/R19-generic-core-v2` s chybou `remote: Permission to martinhoricky-bdo/rewrite-cobol.git denied to chatgpt-codex-connector[bot]` (HTTP 403). Poslední úspěšný push konektoru: 08:44 UTC (PR #43). Konektor tedy ztratil zápis do repozitáře.
+- Blokuje: oprávnění GitHub App `chatgpt-codex-connector` (Contents: Read and write) / GitHub připojení Codex Cloud prostředí – zásah uživatele. Claude kontroly neplánuje; po opravě napsat „pokračuj“ → fix run 4 (nová větev `-v3`).
 
 ## Hotovo
 | Krok | Issue | PR | Merge |
