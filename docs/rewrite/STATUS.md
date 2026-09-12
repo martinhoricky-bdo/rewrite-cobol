@@ -3,7 +3,7 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 00:58
+- Poslední aktualizace: 2026-09-12 01:12
 - Aktuální krok: R13 (Codex pracuje)
 - Blokuje: nic
 
@@ -28,7 +28,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R13 IT Support (účty, letiště, letadla) | #28 | – | zadáno 00:58, čeká se na PR |
+| R13 IT Support (účty, letiště, letadla) | #28 | #29 | PR 00:51; review 01:12: chování OK (214 testů, ruční průchod), vráceno jen kvůli chybějícím testům ze zadání §5 – fix run zadán, čeká se na „fixes pushed“ |
 
 ## Fronta
 R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
