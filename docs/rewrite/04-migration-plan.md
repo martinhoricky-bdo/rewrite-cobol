@@ -204,6 +204,26 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 
 ---
 
+## Fáze 3 – Dokumentace kódu a kontrakt validace (R23–R24)
+
+Zadáno uživatelem 2026-09-12 po dokončení fáze 2: v `app/` chybí komentáře (0 z 52 modulů má docstring, 11 ze 164 tříd, 15 ze 197 veřejných funkcí, 3 řádkové komentáře v celé aplikaci) a nikde v kódu není vazba na legacy program, ze kterého obrazovka vznikla. Druhá otázka – zda je `form_valid`/`form_invalid` ošetřeno všude, kde je potřeba – byla ověřena průchodem všech formulářových obrazovek (viz `DECISIONS.md`, 2026-09-12): chyby se zobrazí všude, ale `SearchListView.form_invalid` porušuje kontrakt `FormMixin` a testy neplatných cest jen ověřují návratový kód.
+
+Společná kritéria fáze 3: chování se nemění (existující testy beze změn asercí, `tests/e2e/` nedotčené, URL a texty UI stejné, žádné migrace); pravidla stylu z `AGENTS.md` kap. 3 platí dál.
+
+## R23 – Docstringy a vazba na legacy (M)
+
+- **Cíl:** čtenář kódu ví, co modul dělá a ze kterého legacy programu a use casu pochází.
+- **Rozsah:** docstring každého modulu v `app/` (mimo `__init__.py`, `migrations/`, `config/settings/`), každé view, formuláře, modelu, `QuerySet`u a veřejné funkce ve `services.py` podle `03-target-architecture.md` kap. 3.1 (řádek „Docstringy“); u modelů odkaz na tabulku DB2 (`DB2/DCLGEN`), u obrazovek na program, mapu a UC (`01-inventory.md` kap. 2.1 a 3, `02-functional-spec.md` kap. 5), u služeb pravidla ze specifikace (pořadí validací, `select_for_update`, přidělení sedadla); komentáře `#` jen tam, kde je potřeba vysvětlit *proč*.
+- **Akceptace:** skript `python -m tooling.docstring_audit` (nebo test) hlásí 0 modulů/tříd/veřejných funkcí bez docstringu v uvedeném rozsahu; každá obrazovková view a její modul odkazuje na legacy program nebo je označená jako `design` (nemá legacy předlohu); `make check` zelený.
+- **Závislosti:** R22.
+
+## R24 – Kontrakt validace formulářů a testy neplatných cest (S)
+
+- **Cíl:** sjednotit, co se stane při neplatném formuláři, a otestovat to.
+- **Rozsah:** `SearchListView` – přejmenovat vlastní `form_invalid` (vrací `None`) na `report_form_errors(form)` a odebrat z bází `FormErrorsAsMessagesMixin`, jehož metoda je dnes celá přepsaná (mrtvá báze); `FormErrorsAsMessagesMixin` zůstává pro `FormView` (prodej krok 1); doplnit testy neplatných POSTů pro všechny formulářové obrazovky (letiště, letadlo, let, generování letů, posádka, směna, zaměstnanec, oddělení, cestující, prodej krok 1 a 2, změna hesla): každý ověří konkrétní text chyby a že se v DB nic nezměnilo.
+- **Akceptace:** `SearchListView.form_invalid` neexistuje, `FormErrorsAsMessagesMixin` není v bázích `SearchListView`; hledání letů a letenek se chová stejně jako dnes (existující testy); každá formulářová URL má test neplatného POSTu s asercí na text hlášky a na `Model.objects.count()`; `make check` zelený.
+- **Závislosti:** R23.
+
 ## Přehled závislostí
 
 ```mermaid
@@ -223,6 +243,7 @@ flowchart TD
     R17 --> R18
     R18 --> R19 --> R20 --> R22
     R19 --> R21 --> R22
+    R22 --> R23 --> R24
 ```
 
 Kritická cesta (první funkční oblast Sales): R01 → R02 → R03 → R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12. Po R12 je Sales role v paritě s originálem a nad ním (registrace cestujících, kontrola kapacity, účtenka).

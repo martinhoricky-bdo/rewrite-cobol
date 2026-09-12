@@ -3,9 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 12:20
+- Poslední aktualizace: 2026-09-12 12:40
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22): hotovo** (zadáno uživatelem 2026-09-12 „není DRY, žádné generic views“, poslední merge 12:13).
-- Aktuální krok: žádný – automatický režim ukončen, další kontroly se neplánují.
+- **Fáze 3 – docstringy a kontrakt validace (R23–R24)**: běží, zadáno uživatelem 2026-09-12 („chybí komentáře“ + otázka na `form_valid`/`form_invalid`).
+- Aktuální krok: R23 (zadáno Codexu)
 - Blokuje: nic
 
 ## Hotovo
@@ -37,8 +38,13 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R21 Sales a Reports na generických views | #47 | #48 | 2026-09-12 11:32 (1. běh OK; Claude opravil duplicitní `<h1>`/GET formulář v seznamu cestujících, `FlightSearchView.model`, duplicitní konstantu varování, `type="date"` a hodnoty ve filtru dashboardu; e2e 9/9 dvakrát po `seed_demo --flush`) |
 | R22 Závěr refaktoringu: úklid, matice oprávnění, docs | #49 | #50 | 2026-09-12 12:13 (1. běh OK, review čisté: 675 testů (`test_permissions.py` 405 samostatně), matice 50 URL × 7 rolí + anonym, 24 duplicitních testů oprávnění smazáno, `get_absolute_url` na 9 modelech, e2e 9/9 dvakrát; bez oprav) |
 
+## Běží
+| Krok | Issue | PR | Stav |
+|---|---|---|---|
+| R23 Docstringy a vazba na legacy | – | – | zadání připravené, issue se zakládá |
+
 ## Fronta
-prázdná – fáze 2 dokončena. Automatický režim je zastaven; další krok zadává uživatel.
+R24 – kontrakt validace formulářů a testy neplatných cest (zadání hotové v `codex-tasks/R24.md`, čeká na merge R23).
 
 ## Co zbývá ručně (uživatel)
 - Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (26 větví R01–R22 vč. `codex/R19-generic-core` bez PR a `codex/smoke-test`; mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté nebo nahrazené).
