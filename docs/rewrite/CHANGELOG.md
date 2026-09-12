@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R15 – HR: zaměstnanci a oddělení
-- PR: #TBD (codex/R15-hr)
+- PR: #33 (codex/R15-hr)
 - Přidáno: HR seznam, detail a formuláře zaměstnanců a správa názvů a manažerů oddělení s testy oprávnění.
 - Změněno: navigace rolí HR a CEO a sdílené automatické vytváření uživatelského účtu zaměstnance.
 - Odchylky od specifikace: žádné.
