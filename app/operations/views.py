@@ -28,8 +28,8 @@ from .services import generate_flights
 
 
 class ScheduleView(RoleRequiredMixin):
-    """Provide ScheduleView behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Serves the schedule screen for Design scheduling workflows in UC-P01–P04, applying the
+    access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = (Role.SCHEDULE,)
@@ -38,15 +38,15 @@ class ScheduleView(RoleRequiredMixin):
 class ScheduleFormView(
     ScheduleView, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
 ):
-    """Provide ScheduleFormView behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Serves the schedule form screen for Design scheduling workflows in UC-P01–P04, applying
+    the access, query, form, and redirect rules configured below.
     """
 
     template_name = "core/form.html"
 
     def get_page_title(self):
-        """Implement get_page_title behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Process get page title for Design scheduling workflows in UC-P01–P04 according to the
+        rules in this callable.
         """
         if self.object:
             return f"Edit {self.model._meta.verbose_name} {self.object.pk}"
@@ -54,15 +54,15 @@ class ScheduleFormView(
 
 
 class ScheduleListView(ScheduleView, generic.PageTitleMixin, generic.FilteredListView):
-    """Provide ScheduleListView behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Serves the schedule list screen for Design scheduling workflows in UC-P01–P04, applying
+    the access, query, form, and redirect rules configured below.
     """
 
     pass
 
 
 class FlightView:
-    """Design: implement UC-P01 maintenance over the legacy FLIGHT data model."""
+    """Restricts flight maintenance screens for Design UC-P01 over the legacy FLIGHT data model."""
 
     model = Flight
     pk_url_kwarg = "flightid"
@@ -71,7 +71,7 @@ class FlightView:
 
 
 class FlightListView(FlightView, ScheduleListView):
-    """Design: implement UC-P01 maintenance over the legacy FLIGHT data model."""
+    """Lists and filters flights with the counts required by Design UC-P01."""
 
     page_title = "Flights"
     template_name = "schedule/flight_list.html"
@@ -79,8 +79,8 @@ class FlightListView(FlightView, ScheduleListView):
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Apply validated filter fields to the records displayed by this list screen for flight
+        list view.
         """
         today = timezone.localdate()
         queryset = (
@@ -104,20 +104,20 @@ class FlightListView(FlightView, ScheduleListView):
 
 
 class FlightCreateView(FlightView, ScheduleFormView, CreateView):
-    """Design: implement UC-P01 maintenance over the legacy FLIGHT data model."""
+    """Creates a flight record through the validated Design UC-P01 maintenance form."""
 
     form_class = FlightForm
     page_title = "New flight"
 
 
 class FlightUpdateView(FlightView, ScheduleFormView, UpdateView):
-    """Design: implement UC-P01 maintenance over the legacy FLIGHT data model."""
+    """Updates a flight record through the validated Design UC-P01 maintenance form."""
 
     form_class = FlightForm
 
 
 class FlightDeleteView(FlightView, ScheduleView, generic.ProtectedDeleteView):
-    """Design: implement UC-P01 maintenance over the legacy FLIGHT data model."""
+    """Deletes a flight record for Design UC-P01, subject to protected relationship constraints."""
 
     page_title = "Delete flight"
 
@@ -133,8 +133,8 @@ class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrl
     cancel_url_name = "schedule:flights"
 
     def form_valid(self, form):
-        """Implement form_valid behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
+        """Persist validated input and continue with the workflow’s success response for flight
+        generate view.
         """
         result = generate_flights(
             form.cleaned_data["template"],
@@ -153,7 +153,7 @@ class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrl
 
 
 class CrewView:
-    """Design: implement UC-P03 maintenance over the legacy CREW data model."""
+    """Restricts crew maintenance screens for Design UC-P03 over the legacy CREW data model."""
 
     model = Crew
     pk_url_kwarg = "crewid"
@@ -162,39 +162,39 @@ class CrewView:
 
 
 class CrewListView(CrewView, ScheduleListView):
-    """Design: implement UC-P03 maintenance over the legacy CREW data model."""
+    """Lists and filters crews with the relations required by Design UC-P03."""
 
     page_title = "Crews"
     template_name = "schedule/crew_list.html"
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Apply validated filter fields to the records displayed by this list screen for crew list
+        view.
         """
         return queryset.with_members().with_shift_count()
 
 
 class CrewCreateView(CrewView, ScheduleFormView, CreateView):
-    """Design: implement UC-P03 maintenance over the legacy CREW data model."""
+    """Creates a crew record through the validated Design UC-P03 maintenance form."""
 
     form_class = CrewForm
     page_title = "New crew"
 
 
 class CrewUpdateView(CrewView, ScheduleFormView, UpdateView):
-    """Design: implement UC-P03 maintenance over the legacy CREW data model."""
+    """Updates a crew record through the validated Design UC-P03 maintenance form."""
 
     form_class = CrewForm
 
 
 class CrewDeleteView(CrewView, ScheduleView, generic.ProtectedDeleteView):
-    """Design: implement UC-P03 maintenance over the legacy CREW data model."""
+    """Deletes a crew record for Design UC-P03, subject to protected relationship constraints."""
 
     page_title = "Delete crew"
 
 
 class ShiftView:
-    """Design: implement UC-P04 maintenance over the legacy SHIFT data model."""
+    """Restricts shift maintenance screens for Design UC-P04 over the legacy SHIFT data model."""
 
     model = Shift
     pk_url_kwarg = "shiftid"
@@ -203,7 +203,7 @@ class ShiftView:
 
 
 class ShiftListView(ShiftView, ScheduleListView):
-    """Design: implement UC-P04 maintenance over the legacy SHIFT data model."""
+    """Lists and filters shifts with the counts required by Design UC-P04."""
 
     page_title = "Shifts"
     template_name = "schedule/shift_list.html"
@@ -211,8 +211,8 @@ class ShiftListView(ShiftView, ScheduleListView):
     paginate_by = 20
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Apply validated filter fields to the records displayed by this list screen for shift
+        list view.
         """
         today = timezone.localdate()
         return (
@@ -227,19 +227,19 @@ class ShiftListView(ShiftView, ScheduleListView):
 
 
 class ShiftCreateView(ShiftView, ScheduleFormView, CreateView):
-    """Design: implement UC-P04 maintenance over the legacy SHIFT data model."""
+    """Creates a shift record through the validated Design UC-P04 maintenance form."""
 
     form_class = ShiftForm
     page_title = "New shift"
 
 
 class ShiftUpdateView(ShiftView, ScheduleFormView, UpdateView):
-    """Design: implement UC-P04 maintenance over the legacy SHIFT data model."""
+    """Updates a shift record through the validated Design UC-P04 maintenance form."""
 
     form_class = ShiftForm
 
 
 class ShiftDeleteView(ShiftView, ScheduleView, generic.ProtectedDeleteView):
-    """Design: implement UC-P04 maintenance over the legacy SHIFT data model."""
+    """Deletes a shift record for Design UC-P04, subject to protected relationship constraints."""
 
     page_title = "Delete shift"

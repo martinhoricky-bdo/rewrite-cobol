@@ -42,28 +42,28 @@ from .services import (
 
 
 class SalesView(RoleRequiredMixin):
-    """Provide SalesView behavior for the sales legacy programs and UC-S01 through UC-S09."""
+    """Serves the sales screen for passenger and ticket sales workflows in UC-S01–S09, applying
+    the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.SALES,)
 
 
 class SalesAndCeoView(RoleRequiredMixin):
-    """Provide SalesAndCeoView behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Serves the sales and ceo screen for passenger and ticket sales workflows in UC-S01–S09,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = (Role.SALES, Role.CEO)
 
 
 class SaleSessionMixin:
-    """Provide SaleSessionMixin behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Serves the sale session screen for passenger and ticket sales workflows in UC-S01–S09,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     def get_quote(self):
-        """Implement get_quote behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Restore the pending sale quote from the current browser session."""
         data = self.request.session.get(SESSION_KEY)
         if data is None:
             return None
@@ -74,15 +74,11 @@ class SaleSessionMixin:
             return None
 
     def store_quote(self, quote):
-        """Implement store_quote behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Persist the validated sale quote in the session between the two selling steps."""
         self.request.session[SESSION_KEY] = quote.to_session()
 
     def clear_quote(self):
-        """Implement clear_quote behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Remove the pending quote once a sale completes or can no longer continue."""
         self.request.session.pop(SESSION_KEY, None)
 
 
@@ -95,9 +91,7 @@ class SellStep1View(SalesView, SaleSessionMixin, generic.FormErrorsAsMessagesMix
     template_name = "sales/sell_step1.html"
 
     def get_initial(self):
-        """Implement get_initial behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Prefill the first selling step from its query string and pending quote."""
         return {
             "clientid": self.request.GET.get("clientid", ""),
             "flightnum": self.request.GET.get("flightnum", ""),
@@ -105,15 +99,15 @@ class SellStep1View(SalesView, SaleSessionMixin, generic.FormErrorsAsMessagesMix
         }
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Add the screen-specific display values to the generic template context for sell step1
+        view.
         """
         kwargs.setdefault("quote", self.get_quote())
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
-        """Implement form_valid behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Persist validated input and continue with the workflow’s success response for sell step1
+        view.
         """
         try:
             quote = quote_sale(**form.cleaned_data, today=timezone.localdate())
@@ -125,8 +119,8 @@ class SellStep1View(SalesView, SaleSessionMixin, generic.FormErrorsAsMessagesMix
         return self.render_to_response(self.get_context_data(form=form, quote=quote))
 
     def form_invalid(self, form):
-        """Implement form_invalid behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Redisplay invalid input while exposing its validation messages to the user for sell
+        step1 view.
         """
         self.clear_quote()
         return super().form_invalid(form)
@@ -139,8 +133,8 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
     template_name = "sales/sell_step2.html"
 
     def dispatch(self, request, *args, **kwargs):
-        """Implement dispatch behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Enforce the prerequisite workflow state before delegating the HTTP request for sell
+        step2 view.
         """
         if response := check_role(request, self.allowed_roles):
             return response
@@ -153,22 +147,18 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        """Implement get_form_kwargs behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
+        """Pass the quoted passengers and flight into second-step validation."""
         kwargs = super().get_form_kwargs()
         kwargs["count"] = self.quote.count
         return kwargs
 
     def get_initial(self):
-        """Implement get_initial behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Prefill the second selling step with the quoted lead passenger."""
         return {"client_1": self.quote.client_id}
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Add the screen-specific display values to the generic template context for sell step2
+        view.
         """
         form = kwargs.pop("form", None) or self.get_form()
         names = kwargs.pop(
@@ -179,8 +169,8 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
         )
 
     def form_valid(self, form):
-        """Implement form_valid behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Persist validated input and continue with the workflow’s success response for sell step2
+        view.
         """
         client_ids = [
             form.cleaned_data[f"client_{number}"] for number in range(1, self.quote.count + 1)
@@ -207,9 +197,7 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
 
 @role_required(Role.SALES)
 def passenger_name(request):
-    """Implement passenger_name behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
-    """
+    """Format the selected passenger’s name for the SELLMS confirmation screen."""
     raw_client_id = request.GET.get("clientid")
     if raw_client_id is None:
         raw_client_id = next(
@@ -228,9 +216,7 @@ def passenger_name(request):
 
 
 class PassengerView(SalesView):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Restricts Design UC-S04/UC-S05 passenger screens to sales staff and executives."""
 
     model = Passenger
     pk_url_kwarg = "clientid"
@@ -238,9 +224,7 @@ class PassengerView(SalesView):
 
 
 class PassengerListView(PassengerView, generic.PageTitleMixin, generic.FilteredListView):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Lists passengers and filters by name, identifier, or e-mail for Design UC-S04."""
 
     page_title = "Passengers"
     template_name = "sales/passenger_list.html"
@@ -248,29 +232,24 @@ class PassengerListView(PassengerView, generic.PageTitleMixin, generic.FilteredL
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Apply validated filter fields to the records displayed by this list screen for passenger
+        list view.
         """
         return queryset.filter_by(**form.cleaned_data) if form.is_valid() else queryset.none()
 
 
 class PassengerDetailView(PassengerView, generic.PageTitleMixin, DetailView):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Shows a passenger and their tickets, replacing the unimplemented F7 PASS REG. function."""
 
     template_name = "sales/passenger_detail.html"
     context_object_name = "passenger"
 
     def get_page_title(self):
-        """Implement get_page_title behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
         return f"Passenger {self.object.pk}"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Add the screen-specific display values to the generic template context for passenger
+        detail view.
         """
         tickets = Ticket.objects.with_related().for_passenger(self.object)
         return super().get_context_data(tickets=tickets, **kwargs)
@@ -279,30 +258,25 @@ class PassengerDetailView(PassengerView, generic.PageTitleMixin, DetailView):
 class PassengerFormView(
     PassengerView, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
 ):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Adds save, duplicate-e-mail warning, title, and cancellation rules to passenger forms."""
 
     template_name = "core/form.html"
     model_label = "Passenger"
 
     def get_cancel_url(self):
-        """Implement get_cancel_url behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Process get cancel url for passenger and ticket sales workflows in UC-S01–S09 according
+        to the rules in this callable.
         """
         if self.object:
             return reverse("sales:passenger_detail", kwargs={"clientid": self.object.pk})
         return super().get_cancel_url()
 
     def get_page_title(self):
-        """Implement get_page_title behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
         return f"Edit passenger {self.object.pk}" if self.object else "New passenger"
 
     def form_valid(self, form):
-        """Implement form_valid behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Persist validated input and continue with the workflow’s success response for passenger
+        form view.
         """
         warning = duplicate_email_warning(
             form.cleaned_data["email"], getattr(self.object, "pk", None)
@@ -313,17 +287,13 @@ class PassengerFormView(
 
 
 class PassengerCreateView(PassengerFormView, CreateView):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Creates a passenger registration through the validated Design UC-S04 form."""
 
     form_class = PassengerForm
 
 
 class PassengerUpdateView(PassengerFormView, UpdateView):
-    """Design: implement UC-S04 and UC-S05, replacing the unimplemented F7 PASS REG.
-    function.
-    """
+    """Updates a passenger registration through the validated Design UC-S05 form."""
 
     form_class = PassengerForm
 
@@ -339,9 +309,7 @@ class FlightSearchView(RoleRequiredMixin, generic.SearchListView):
     paginate_by = 10
 
     def search_queryset(self, form):
-        """Implement search_queryset behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
+        """Apply the screen’s validated search terms to its base queryset for flight search view."""
         return search_flights(**form.cleaned_data, today=timezone.localdate())
 
 
@@ -357,22 +325,20 @@ class TicketSearchView(SalesAndCeoView, generic.SearchListView):
     paginate_by = 10
 
     def search_queryset(self, form):
-        """Implement search_queryset behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
+        """Apply the screen’s validated search terms to its base queryset for ticket search view."""
         return search_tickets(**form.cleaned_data)
 
 
 class TicketView(SalesAndCeoView, DetailView):
-    """Provide TicketView behavior for the sales legacy programs and UC-S01 through UC-S09."""
+    """Serves the ticket screen for passenger and ticket sales workflows in UC-S01–S09,
+    applying the access, query, form, and redirect rules configured below.
+    """
 
     model = Ticket
     pk_url_kwarg = "ticketid"
 
     def get_object(self, queryset=None):
-        """Implement get_object behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Load the requested ticket together with the records needed for printing."""
         ticket = (
             Ticket.objects.with_related().filter(ticketid=self.kwargs["ticketid"].upper()).first()
         )
@@ -393,8 +359,8 @@ class BoardingPassView(TicketView):
     template_name = "sales/boarding_pass.html"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Add the screen-specific display values to the generic template context for boarding pass
+        view.
         """
         return super().get_context_data(
             boarding_pass=boarding_pass_context(self.object),
@@ -404,15 +370,15 @@ class BoardingPassView(TicketView):
 
 
 class BuyView(SalesAndCeoView, DetailView):
-    """Provide BuyView behavior for the sales legacy programs and UC-S01 through UC-S09."""
+    """Serves the buy screen for passenger and ticket sales workflows in UC-S01–S09, applying
+    the access, query, form, and redirect rules configured below.
+    """
 
     model = Buy
     pk_url_kwarg = "buyid"
 
     def get_queryset(self):
-        """Implement get_queryset behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Build the ordered or related queryset required by this screen for buy view."""
         return Buy.objects.with_related()
 
 
@@ -438,8 +404,8 @@ class BoardingPassesView(BuyView):
     template_name = "sales/boarding_passes.html"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the sales legacy programs and UC-S01
-        through UC-S09.
+        """Add the screen-specific display values to the generic template context for boarding
+        passes view.
         """
         tickets = Ticket.objects.with_related().for_buy(self.object)
         passes = [boarding_pass_context(ticket) for ticket in tickets]

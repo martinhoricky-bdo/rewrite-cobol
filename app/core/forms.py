@@ -17,7 +17,7 @@ class FilterForm(forms.Form):
             raise ImproperlyConfigured(f"Filter fields must not be required: {', '.join(required)}")
 
     def value(self, name: str, default=None):
-        """Implement value behavior for the shared CICS-inspired application design."""
+        """Return a bound filter value, falling back safely when the form is unbound or invalid."""
         if not self.is_bound:
             return default
         errors = self.errors
@@ -25,7 +25,9 @@ class FilterForm(forms.Form):
         return default if name in errors or value in self.fields[name].empty_values else value
 
     def is_empty(self) -> bool:
-        """Implement is_empty behavior for the shared CICS-inspired application design."""
+        """Report whether every filter field is blank so list views can suppress unfiltered
+        results.
+        """
         return not any(
             self[name].value() not in field.empty_values for name, field in self.fields.items()
         )

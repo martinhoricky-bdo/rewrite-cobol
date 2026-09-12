@@ -10,7 +10,9 @@ from .navigation import menu_for
 
 
 def header(request):
-    """Implement header behavior for the shared CICS-inspired application design."""
+    """Supply the authenticated user and CICS-style date, time, terminal, and message header
+    values.
+    """
     role = current_role(request.user)
     employee = getattr(request.user, "employee", None) if request.user.is_authenticated else None
     return {

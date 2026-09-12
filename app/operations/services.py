@@ -17,8 +17,8 @@ from .models import Crew, Flight, Shift
 
 @dataclass(frozen=True)
 class GenerateResult:
-    """Provide GenerateResult behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Groups the immutable values produced while processing Design scheduling workflows in
+    UC-P01–P04 so callers can pass them without mutation.
     """
 
     created: int
@@ -102,9 +102,7 @@ def generate_seed_flights(start: date, days: int, crews: dict[int, Crew]) -> Non
 
 
 def free_seats_subquery() -> Subquery:
-    """Implement free_seats_subquery behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-    legacy lineage.
-    """
+    """Build the correlated capacity-minus-sales expression used by flight search."""
     ticket_counts = (
         Ticket.objects.filter(flight_id=OuterRef("pk"))
         .values("flight_id")
@@ -122,9 +120,7 @@ def search_flights(
     airportarr: str | None,
     today: date,
 ) -> QuerySet[Flight]:
-    """Implement search_flights behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
-    """
+    """Apply SRCHFLY route, date, and capacity criteria and return display-ready flights."""
     filters = {}
     if flightnum and (flightnum := flightnum.strip()):
         filters["flightnum__iexact"] = flightnum

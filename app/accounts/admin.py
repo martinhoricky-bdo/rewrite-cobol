@@ -12,7 +12,9 @@ admin.site.register(User, UserAdmin)
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    """Provide DepartmentAdmin behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Configures the Django administration list, search, and edit controls for department
+    records.
+    """
 
     list_display = ("deptid", "name", "manager")
     search_fields = ("deptid", "name", "manager__empid", "manager__lastname")
@@ -20,7 +22,7 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    """Provide EmployeeAdmin behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Configures the Django administration list, search, and edit controls for employee records."""
 
     list_display = ("empid", "firstname", "lastname", "dept", "email")
     search_fields = ("empid", "firstname", "lastname", "email")

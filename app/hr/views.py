@@ -19,7 +19,9 @@ from .services import create_employee
 
 
 class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
-    """Provide EmployeeView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee screen for Design employee and department maintenance in UC-H01 and
+    UC-H02, applying the access, query, form, and redirect rules configured below.
+    """
 
     model = Employee
     pk_url_kwarg = "empid"
@@ -28,7 +30,9 @@ class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
 
 
 class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredListView):
-    """Provide EmployeeListView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee list screen for Design employee and department maintenance in UC-H01
+    and UC-H02, applying the access, query, form, and redirect rules configured below.
+    """
 
     page_title = "Employees"
     template_name = "hr/employee_list.html"
@@ -36,7 +40,9 @@ class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredLis
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for Design use cases UC-H01 and UC-H02."""
+        """Apply validated filter fields to the records displayed by this list screen for employee
+        list view.
+        """
         return (
             queryset.select_related("dept", "user")
             .name_starts_with(form.value("name", ""))
@@ -45,21 +51,25 @@ class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredLis
 
 
 class EmployeeDetailView(EmployeeView, generic.PageTitleMixin, DetailView):
-    """Provide EmployeeDetailView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee detail screen for Design employee and department maintenance in
+    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     template_name = "hr/employee_detail.html"
     context_object_name = "employee_record"
 
     def get_queryset(self):
-        """Implement get_queryset behavior for Design use cases UC-H01 and UC-H02."""
+        """Load the employee relations required by the detail screen."""
         return Employee.objects.select_related("dept", "user")
 
     def get_page_title(self):
-        """Implement get_page_title behavior for Design use cases UC-H01 and UC-H02."""
         return f"Employee {self.object.empid}"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for Design use cases UC-H01 and UC-H02."""
+        """Add the screen-specific display values to the generic template context for employee
+        detail view.
+        """
         return super().get_context_data(crews=Crew.objects.with_member(self.object), **kwargs)
 
 
@@ -69,7 +79,9 @@ class EmployeeFormView(
     generic.CancelUrlMixin,
     generic.SavedMessageMixin,
 ):
-    """Provide EmployeeFormView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee form screen for Design employee and department maintenance in UC-H01
+    and UC-H02, applying the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.HR,)
     form_class = EmployeeForm
@@ -77,40 +89,52 @@ class EmployeeFormView(
 
 
 class EmployeeCreateView(EmployeeFormView, CreateView):
-    """Provide EmployeeCreateView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee create screen for Design employee and department maintenance in
+    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     page_title = "New employee"
 
     def form_valid(self, form):
-        """Implement form_valid behavior for Design use cases UC-H01 and UC-H02."""
+        """Persist validated input and continue with the workflow’s success response for employee
+        create view.
+        """
         self.object = create_employee(form)
         messages.success(self.request, self.get_saved_message())
         return HttpResponseRedirect(self.get_success_url())
 
 
 class EmployeeUpdateView(EmployeeFormView, UpdateView):
-    """Provide EmployeeUpdateView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the employee update screen for Design employee and department maintenance in
+    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     def get_page_title(self):
-        """Implement get_page_title behavior for Design use cases UC-H01 and UC-H02."""
         return f"Edit employee {self.object.empid}"
 
 
 class DepartmentView(RoleRequiredMixin):
-    """Provide DepartmentView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the department screen for Design employee and department maintenance in UC-H01
+    and UC-H02, applying the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.HR,)
     model = Department
 
 
 class DepartmentListView(DepartmentView, generic.PageTitleMixin, ListView):
-    """Provide DepartmentListView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the department list screen for Design employee and department maintenance in
+    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     page_title = "Departments"
     template_name = "hr/department_list.html"
 
     def get_queryset(self):
-        """Implement get_queryset behavior for Design use cases UC-H01 and UC-H02."""
+        """Load managers and employee totals for the department list."""
         return self.model.objects.select_related("manager").annotate(
             employee_count=Count("employees")
         )
@@ -123,7 +147,10 @@ class DepartmentUpdateView(
     generic.SavedMessageMixin,
     UpdateView,
 ):
-    """Provide DepartmentUpdateView behavior for Design use cases UC-H01 and UC-H02."""
+    """Serves the department update screen for Design employee and department maintenance in
+    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     form_class = DepartmentForm
     pk_url_kwarg = "deptid"
@@ -132,5 +159,4 @@ class DepartmentUpdateView(
     success_url = reverse_lazy("hr:departments")
 
     def get_page_title(self):
-        """Implement get_page_title behavior for Design use cases UC-H01 and UC-H02."""
         return f"Edit department {self.object.pk}"

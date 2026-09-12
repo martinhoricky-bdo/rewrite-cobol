@@ -29,8 +29,8 @@ INVALID_TICKET_ID = "__invalid__"
 
 
 class SellStep1Form(forms.Form):
-    """Provide SellStep1Form behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Validates and normalizes sell step1 input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
     """
 
     clientid = forms.IntegerField(
@@ -68,8 +68,8 @@ class SellStep1Form(forms.Form):
 
 
 class SellStep2Form(forms.Form):
-    """Provide SellStep2Form behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Validates and normalizes sell step2 input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
     """
 
     def __init__(self, count, *args, **kwargs):
@@ -93,8 +93,8 @@ class SellStep2Form(forms.Form):
             )
 
     def clean(self):
-        """Implement clean behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Validate related fields together and attach the applicable domain error messages for
+        sell step2 form.
         """
         cleaned_data = super().clean()
         seen = set()
@@ -105,7 +105,7 @@ class SellStep2Form(forms.Form):
         return cleaned_data
 
     def rows(self, names):
-        """Implement rows behavior for the sales legacy programs and UC-S01 through UC-S09."""
+        """Pair passenger identifiers with travel classes for validation."""
         return [
             {"field": self[f"client_{number}"], "name": names.get(number, "")}
             for number in range(1, len(self.fields) + 1)
@@ -113,8 +113,8 @@ class SellStep2Form(forms.Form):
 
 
 class PassengerFilterForm(FilterForm):
-    """Provide PassengerFilterForm behavior for the sales legacy programs and UC-S01
-    through UC-S09.
+    """Validates and normalizes passenger filter input for passenger and ticket sales workflows
+    in UC-S01–S09, using the field-specific messages declared below.
     """
 
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
@@ -124,8 +124,8 @@ class PassengerFilterForm(FilterForm):
 
 
 class PassengerForm(forms.ModelForm):
-    """Provide PassengerForm behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Validates and normalizes passenger input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
     """
 
     telephone = forms.CharField(
@@ -136,8 +136,6 @@ class PassengerForm(forms.ModelForm):
     email = forms.EmailField(max_length=100, label="EMAIL")
 
     class Meta:
-        """Provide Meta behavior for the sales legacy programs and UC-S01 through UC-S09."""
-
         model = Passenger
         fields = (
             "firstname",
@@ -151,8 +149,8 @@ class PassengerForm(forms.ModelForm):
         )
 
     def clean(self):
-        """Implement clean behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Validate related fields together and attach the applicable domain error messages for
+        passenger form.
         """
         cleaned_data = super().clean()
         for field_name in self.Meta.fields:
@@ -163,8 +161,8 @@ class PassengerForm(forms.ModelForm):
 
 
 class FlightSearchForm(forms.Form):
-    """Provide FlightSearchForm behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Validates and normalizes flight search input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
     """
 
     flightnum = forms.CharField(max_length=6, required=False, label="FLIGHT NUM")
@@ -179,8 +177,8 @@ class FlightSearchForm(forms.Form):
     airportarr = forms.CharField(min_length=3, max_length=4, required=False, label="LAND AIRPORT")
 
     def clean(self):
-        """Implement clean behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Validate related fields together and attach the applicable domain error messages for
+        flight search form.
         """
         cleaned_data = super().clean()
         field_names = ("flightnum", "flightdate", "airportdep", "airportarr")
@@ -190,8 +188,8 @@ class FlightSearchForm(forms.Form):
 
 
 class TicketSearchForm(forms.Form):
-    """Provide TicketSearchForm behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
+    """Validates and normalizes ticket search input for passenger and ticket sales workflows in
+    UC-S01–S09, using the field-specific messages declared below.
     """
 
     ticketid = forms.CharField(max_length=10, required=False, label="TICKET ID")
@@ -208,17 +206,15 @@ class TicketSearchForm(forms.Form):
     )
 
     def clean_ticketid(self):
-        """Implement clean_ticketid behavior for the sales legacy programs and UC-S01
-        through UC-S09.
-        """
+        """Reject a ticket search identifier unless it is a numeric value."""
         ticketid = self.cleaned_data["ticketid"]
         if ticketid and not re.fullmatch(r"CB\d{8}", ticketid, re.IGNORECASE):
             return INVALID_TICKET_ID
         return ticketid
 
     def clean(self):
-        """Implement clean behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Validate related fields together and attach the applicable domain error messages for
+        ticket search form.
         """
         cleaned_data = super().clean()
         if not (

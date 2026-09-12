@@ -12,7 +12,9 @@ from .services import crew_shifts, dashboard_report
 
 
 class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
-    """Provide MyShiftsView behavior for Design use cases UC-C01 and UC-E01."""
+    """Serves the my shifts screen for Design shift and executive reporting in UC-C01 and
+    UC-E01, applying the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.CREW,)
     page_title = "My shifts"
@@ -21,7 +23,7 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
     paginate_by = 20
 
     def get_queryset(self):
-        """Implement get_queryset behavior for Design use cases UC-C01 and UC-E01."""
+        """Build the ordered or related queryset required by this screen for my shifts view."""
         self.filter_form = self.get_filter_form()
         include_past = self.filter_form.value("past", False)
         return crew_shifts(
@@ -31,20 +33,26 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
         )
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for Design use cases UC-C01 and UC-E01."""
+        """Add the screen-specific display values to the generic template context for my shifts
+        view.
+        """
         return super().get_context_data(
             include_past=self.filter_form.value("past", False), **kwargs
         )
 
 
 class DashboardView(RoleRequiredMixin, TemplateView):
-    """Provide DashboardView behavior for Design use cases UC-C01 and UC-E01."""
+    """Serves the dashboard screen for Design shift and executive reporting in UC-C01 and
+    UC-E01, applying the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.CEO,)
     template_name = "reports/dashboard.html"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for Design use cases UC-C01 and UC-E01."""
+        """Add the screen-specific display values to the generic template context for dashboard
+        view.
+        """
         today = timezone.localdate()
         first_day = today.replace(day=1)
         form = PeriodFilterForm(self.request.GET)

@@ -18,7 +18,9 @@ MANAGER_DEPARTMENT_ERROR = "Manager must belong to this department."
 
 
 class EmployeeFilterForm(FilterForm):
-    """Provide EmployeeFilterForm behavior for Design use cases UC-H01 and UC-H02."""
+    """Validates and normalizes employee filter input for Design employee and department
+    maintenance in UC-H01 and UC-H02, using the field-specific messages declared below.
+    """
 
     name = forms.CharField(required=False, label="Name starts with")
     dept = forms.ModelChoiceField(
@@ -36,7 +38,9 @@ def next_employee_id() -> str:
 
 
 class EmployeeForm(forms.ModelForm):
-    """Provide EmployeeForm behavior for Design use cases UC-H01 and UC-H02."""
+    """Validates and normalizes employee input for Design employee and department maintenance
+    in UC-H01 and UC-H02, using the field-specific messages declared below.
+    """
 
     empid = forms.CharField(
         max_length=8,
@@ -44,8 +48,6 @@ class EmployeeForm(forms.ModelForm):
     )
 
     class Meta:
-        """Provide Meta behavior for Design use cases UC-H01 and UC-H02."""
-
         model = Employee
         fields = (
             "empid",
@@ -70,7 +72,7 @@ class EmployeeForm(forms.ModelForm):
             self.initial.setdefault("empid", next_employee_id())
 
     def clean_telephone(self):
-        """Implement clean_telephone behavior for Design use cases UC-H01 and UC-H02."""
+        """Reject telephone values that do not satisfy the employee contact format."""
         telephone = self.cleaned_data["telephone"]
         if not 10 <= len(telephone) <= 20 or not re.fullmatch(r"[\d +\-]+", telephone):
             raise forms.ValidationError(
@@ -79,14 +81,14 @@ class EmployeeForm(forms.ModelForm):
         return telephone
 
     def clean_admidate(self):
-        """Implement clean_admidate behavior for Design use cases UC-H01 and UC-H02."""
+        """Reject an admission date in the future with the employee form’s validation message."""
         admidate = self.cleaned_data["admidate"]
         if admidate > timezone.localdate():
             raise forms.ValidationError(FUTURE_ADMISSION_ERROR)
         return admidate
 
     def clean_salary(self):
-        """Implement clean_salary behavior for Design use cases UC-H01 and UC-H02."""
+        """Reject a negative salary with the employee form’s validation message."""
         salary = self.cleaned_data["salary"]
         if salary < Decimal("0") or salary > Decimal("999999.99"):
             raise forms.ValidationError("Salary must be between 0 and 999999.99.")
@@ -94,11 +96,11 @@ class EmployeeForm(forms.ModelForm):
 
 
 class DepartmentForm(forms.ModelForm):
-    """Provide DepartmentForm behavior for Design use cases UC-H01 and UC-H02."""
+    """Validates and normalizes department input for Design employee and department maintenance
+    in UC-H01 and UC-H02, using the field-specific messages declared below.
+    """
 
     class Meta:
-        """Provide Meta behavior for Design use cases UC-H01 and UC-H02."""
-
         model = Department
         fields = ("name", "manager")
 
@@ -108,7 +110,7 @@ class DepartmentForm(forms.ModelForm):
         self.fields["manager"].error_messages["invalid_choice"] = MANAGER_DEPARTMENT_ERROR
 
     def clean_manager(self):
-        """Implement clean_manager behavior for Design use cases UC-H01 and UC-H02."""
+        """Reject a department manager who does not belong to the same department."""
         manager = self.cleaned_data.get("manager")
         if manager and manager.dept_id != self.instance.deptid:
             raise forms.ValidationError(MANAGER_DEPARTMENT_ERROR)

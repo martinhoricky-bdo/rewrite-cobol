@@ -42,9 +42,7 @@ CREW_FIELDS = (
 
 
 def seed_reference_data() -> None:
-    """Implement seed_reference_data behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML,
-    and DB2 export formats.
-    """
+    """Create or update the Design reference airports, aircraft, departments, and users."""
     for pk, name in DEPARTMENTS:
         Department.objects.update_or_create(deptid=pk, defaults={"name": name})
     for values in AIRPORTS:
@@ -79,8 +77,8 @@ def _employee(values: dict, password: str | None) -> Employee:
 
 
 def seed_employees(path: Path) -> None:
-    """Implement seed_employees behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2
-    export formats.
+    """Import EMPINSRT/SUINSRT employee rows while translating EMPID values to application
+    identities.
     """
     for row in parse_employee_json(path):
         password = row.pop("passw")
@@ -129,9 +127,7 @@ def _reset_passenger_sequence() -> None:
 
 
 def seed_passengers(paths: list[Path]) -> Passenger:
-    """Implement seed_passengers behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and
-    DB2 export formats.
-    """
+    """Import PASSENG/SUXML passenger records without duplicating existing client identifiers."""
     rows = [row for path in paths for row in parse_passenger_xml(path)]
     for clientid, row in enumerate(rows, 1):
         row.update(firstname=row["firstname"].upper(), lastname=row["lastname"].upper())
@@ -155,9 +151,7 @@ def seed_passengers(paths: list[Path]) -> Passenger:
 
 
 def seed_crews() -> dict[int, Crew]:
-    """Implement seed_crews behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2
-    export formats.
-    """
+    """Create deterministic Design crews and shifts needed by the demonstration schedule."""
     result = {}
     for index, member_ids in enumerate(CREWS):
         members = {
@@ -196,9 +190,7 @@ def generate_flights(start: date, days: int, crews: dict[int, Crew] | None = Non
 
 
 def seed_reference_purchase(client: Passenger) -> None:
-    """Implement seed_reference_purchase behavior for the EMPINSRT, SUINSRT, PASSENG,
-    SUXML, and DB2 export formats.
-    """
+    """Create the reference BUY and TICKET records used to demonstrate printed sales documents."""
     flight = Flight.objects.filter(flightnum="CB2204", flightdate=date(2022, 9, 1)).first()
     employee = Employee.objects.filter(pk="10000006").first()
     if not flight or not employee:
@@ -220,9 +212,7 @@ def seed_reference_purchase(client: Passenger) -> None:
 
 
 def flush_seed_data() -> None:
-    """Implement flush_seed_data behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and
-    DB2 export formats.
-    """
+    """Delete seeded transactional and catalogue data in dependency-safe order."""
     for model in (Ticket, Buy, Flight, Shift, Crew, Passenger):
         model.objects.all().delete()
     user_ids = list(Employee.objects.exclude(user=None).values_list("user_id", flat=True))

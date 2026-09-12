@@ -14,8 +14,8 @@ from .models import Crew, Flight, Shift
 
 
 class FlightFilterForm(FilterForm):
-    """Provide FlightFilterForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Validates and normalizes flight filter input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
     """
 
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
@@ -25,8 +25,8 @@ class FlightFilterForm(FilterForm):
 
 
 class ShiftFilterForm(FilterForm):
-    """Provide ShiftFilterForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Validates and normalizes shift filter input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
     """
 
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
@@ -37,19 +37,21 @@ class ShiftFilterForm(FilterForm):
 
 
 class EmployeeChoiceField(forms.ModelChoiceField):
-    """Provide EmployeeChoiceField behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-    legacy lineage.
+    """Validates and normalizes employee input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
     """
 
     def label_from_instance(self, employee: Employee) -> str:
-        """Implement label_from_instance behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Render a choice label containing the operational identifiers users need to distinguish
+        records for employee choice field.
         """
         return f"{employee.pk} – {employee.full_name}"
 
 
 class CrewForm(forms.ModelForm):
-    """Provide CrewForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+    """Validates and normalizes crew input for Design scheduling workflows in UC-P01–P04, using
+    the field-specific messages declared below.
+    """
 
     commander = EmployeeChoiceField(queryset=Employee.objects.none())
     copilote = EmployeeChoiceField(queryset=Employee.objects.none())
@@ -59,8 +61,6 @@ class CrewForm(forms.ModelForm):
     fliattendant3 = EmployeeChoiceField(queryset=Employee.objects.none())
 
     class Meta:
-        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
-
         model = Crew
         fields = [
             "commander",
@@ -80,8 +80,8 @@ class CrewForm(forms.ModelForm):
             self.fields[field].queryset = attendants
 
     def clean(self):
-        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
+        """Validate related fields together and attach the applicable domain error messages for
+        crew form.
         """
         cleaned = super().clean()
         members = [cleaned.get(field) for field in self._meta.fields]
@@ -92,11 +92,11 @@ class CrewForm(forms.ModelForm):
 
 
 class ShiftForm(forms.ModelForm):
-    """Provide ShiftForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+    """Validates and normalizes shift input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
+    """
 
     class Meta:
-        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
-
         model = Shift
         fields = ["shiftdate", "begintime", "endtime", "crew"]
         widgets = {
@@ -106,8 +106,8 @@ class ShiftForm(forms.ModelForm):
         }
 
     def clean(self):
-        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
+        """Validate related fields together and attach the applicable domain error messages for
+        shift form.
         """
         cleaned = super().clean()
         day = cleaned.get("shiftdate")
@@ -130,13 +130,11 @@ class ShiftForm(forms.ModelForm):
 
 
 class ShiftChoiceField(forms.ModelChoiceField):
-    """Provide ShiftChoiceField behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
-    """
+    """Labels shift choices with date, crew, and period for clear scheduling."""
 
     def label_from_instance(self, shift: Shift) -> str:
-        """Implement label_from_instance behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
+        """Render a choice label containing the operational identifiers users need to distinguish
+        records for shift choice field.
         """
         return (
             f"{shift.shiftdate} {shift.begintime:%H:%M}–{shift.endtime:%H:%M} crew {shift.crew_id}"
@@ -144,15 +142,13 @@ class ShiftChoiceField(forms.ModelChoiceField):
 
 
 class FlightForm(forms.ModelForm):
-    """Provide FlightForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Validates and normalizes flight input for Design scheduling workflows in UC-P01–P04,
+    using the field-specific messages declared below.
     """
 
     shift = ShiftChoiceField(queryset=Shift.objects.none())
 
     class Meta:
-        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
-
         model = Flight
         fields = [
             "flightnum",
@@ -181,23 +177,19 @@ class FlightForm(forms.ModelForm):
         self._old_airplane_id = self.instance.airplane_id if self.instance.pk else None
 
     def clean_flightnum(self) -> str:
-        """Implement clean_flightnum behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
-        """
+        """Normalize the flight number and reject values that violate its required format."""
         return self.cleaned_data["flightnum"].strip().upper()
 
     def clean_price(self) -> Decimal:
-        """Implement clean_price behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
-        """
+        """Reject a non-positive fare with the flight form’s validation message."""
         price = self.cleaned_data["price"]
         if price <= 0:
             raise forms.ValidationError("Price must be greater than zero.")
         return price
 
     def clean(self):
-        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
+        """Validate related fields together and attach the applicable domain error messages for
+        flight form.
         """
         cleaned = super().clean()
         dep, arr = cleaned.get("airportdep"), cleaned.get("airportarr")
@@ -213,9 +205,7 @@ class FlightForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
-        """Implement save behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
-        """
+        """Persist the form record together with its normalized many-to-many assignments."""
         flight = super().save(commit=False)
         if not flight.pk or flight.airplane_id != self._old_airplane_id:
             flight.totpass = flight.airplane.numseats
@@ -228,8 +218,8 @@ class FlightForm(forms.ModelForm):
 
 
 class FlightGenerateForm(forms.Form):
-    """Provide FlightGenerateForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
+    """Validates and normalizes flight generate input for Design scheduling workflows in
+    UC-P01–P04, using the field-specific messages declared below.
     """
 
     WEEKDAYS = tuple(
@@ -256,8 +246,8 @@ class FlightGenerateForm(forms.Form):
         )
 
     def clean(self):
-        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-        lineage.
+        """Validate related fields together and attach the applicable domain error messages for
+        flight generate form.
         """
         cleaned = super().clean()
         start, end = cleaned.get("date_from"), cleaned.get("date_to")
@@ -269,7 +259,5 @@ class FlightGenerateForm(forms.Form):
         return cleaned
 
     def selected_weekdays(self) -> set[int]:
-        """Implement selected_weekdays behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
-        legacy lineage.
-        """
+        """Return weekday numbers selected for recurring CBFLIGHT generation."""
         return {int(day) for day in self.cleaned_data["weekdays"]}

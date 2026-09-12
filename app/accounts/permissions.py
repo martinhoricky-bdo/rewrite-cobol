@@ -14,7 +14,7 @@ from .roles import Role
 
 
 def current_role(user) -> Role | None:
-    """Implement current_role behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Read the authenticated user’s application role, defaulting safely for anonymous users."""
     if not user.is_authenticated:
         return None
     try:
@@ -24,7 +24,7 @@ def current_role(user) -> Role | None:
 
 
 def check_role(request: HttpRequest, allowed: tuple[Role, ...]) -> HttpResponse | None:
-    """Implement check_role behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Raise the standard permission error when the user lacks every allowed role."""
     if not request.user.is_authenticated:
         return redirect_to_login(request.get_full_path(), settings.LOGIN_URL)
     if not request.user.is_superuser and current_role(request.user) not in allowed:
@@ -38,11 +38,9 @@ def role_required(*roles: Role | str):
     allowed = tuple(Role(role) for role in roles)
 
     def decorator(view: Callable) -> Callable:
-        """Implement decorator behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
 
         @wraps(view)
         def wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
-            """Implement wrapped behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
             if response := check_role(request, allowed):
                 return response
             return view(request, *args, **kwargs)
@@ -53,12 +51,17 @@ def role_required(*roles: Role | str):
 
 
 class RoleRequiredMixin:
-    """Provide RoleRequiredMixin behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the role required screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     allowed_roles: tuple[Role, ...] = ()
 
     def dispatch(self, request, *args, **kwargs):
-        """Implement dispatch behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+        """Enforce the prerequisite workflow state before delegating the HTTP request for role
+        required mixin.
+        """
         if response := check_role(request, self.allowed_roles):
             return response
         return super().dispatch(request, *args, **kwargs)

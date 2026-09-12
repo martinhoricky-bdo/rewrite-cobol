@@ -39,7 +39,9 @@ SESSION_KEY = "sale_quote"
 
 
 class SaleError(Exception):
-    """Provide SaleError behavior for the sales legacy programs and UC-S01 through UC-S09."""
+    """Carries the user-facing validation code and message when passenger and ticket sales
+    workflows in UC-S01–S09 cannot continue.
+    """
 
     def __init__(self, code: str, message: str):
         super().__init__(message)
@@ -49,7 +51,9 @@ class SaleError(Exception):
 
 @dataclass(frozen=True)
 class SaleQuote:
-    """Provide SaleQuote behavior for the sales legacy programs and UC-S01 through UC-S09."""
+    """Groups the immutable values produced while processing passenger and ticket sales
+    workflows in UC-S01–S09 so callers can pass them without mutation.
+    """
 
     flight_id: int
     flightnum: str
@@ -66,9 +70,7 @@ class SaleQuote:
     free_seats: int
 
     def to_session(self) -> dict:
-        """Implement to_session behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
-        """
+        """Serialize the quoted flight and passengers into JSON-safe session values."""
         return {
             "flight_id": self.flight_id,
             "flightnum": self.flightnum,
@@ -87,8 +89,8 @@ class SaleQuote:
 
     @classmethod
     def from_session(cls, data) -> "SaleQuote":
-        """Implement from_session behavior for the sales legacy programs and UC-S01 through
-        UC-S09.
+        """Rebuild a sale quote from session values, returning nothing when referenced data is
+        stale.
         """
         return cls(
             flight_id=int(data["flight_id"]),
@@ -156,16 +158,12 @@ def quote_sale(
 
 
 def seat_layout(numseats: int) -> list[str]:
-    """Implement seat_layout behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
-    """
+    """Calculate the aircraft row and letter labels used to assign and print seats."""
     return [f"{'ABCDEF'[index % 6]}{index // 6 + 1:02d}" for index in range(numseats)]
 
 
 def assign_seats(flight: Flight, count: int) -> list[str]:
-    """Implement assign_seats behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
-    """
+    """Choose the first available seats while excluding tickets already sold on the flight."""
     occupied = set(flight.tickets.values_list("seat", flat=True))
     available = [seat for seat in seat_layout(flight.airplane.numseats) if seat not in occupied]
     if len(available) < count:
@@ -174,8 +172,8 @@ def assign_seats(flight: Flight, count: int) -> list[str]:
 
 
 def resolve_passengers(client_ids: list[int], flight: Flight) -> list[Passenger]:
-    """Implement resolve_passengers behavior for the sales legacy programs and UC-S01
-    through UC-S09.
+    """Resolve submitted passenger identifiers in order and reject missing or duplicate
+    travellers.
     """
     seen = set()
     for client_id in client_ids:
@@ -257,9 +255,7 @@ def legacy_date(d: date) -> str:
 
 
 def boarding_pass_context(ticket: Ticket) -> dict[str, str]:
-    """Implement boarding_pass_context behavior for the sales legacy programs and UC-S01
-    through UC-S09.
-    """
+    """Assemble ticket, passenger, flight, and formatting values for the PRINTCI boarding pass."""
     flight = ticket.flight
     passenger = ticket.client
     dep_code = flight.airportdep_id
@@ -288,9 +284,7 @@ def search_tickets(
     flightnum: str | None = None,
     flightdate: date | None = None,
 ) -> QuerySet[Ticket]:
-    """Implement search_tickets behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
-    """
+    """Filter SRCHTKT results by ticket number, passenger identity, and flight criteria."""
     tickets = Ticket.objects.with_related()
     if ticketid:
         tickets = tickets.filter(ticketid=ticketid.upper())
@@ -314,9 +308,7 @@ def search_tickets(
 
 
 def next_ticket_id() -> str:
-    """Implement next_ticket_id behavior for the sales legacy programs and UC-S01 through
-    UC-S09.
-    """
+    """Read the next PostgreSQL identity value for legacy-compatible ticket creation."""
     with connection.cursor() as cursor:
         cursor.execute("SELECT nextval('ticket_ticketid_seq')")
         number = cursor.fetchone()[0]
@@ -324,9 +316,7 @@ def next_ticket_id() -> str:
 
 
 def reset_ticket_sequence() -> None:
-    """Implement reset_ticket_sequence behavior for the sales legacy programs and UC-S01
-    through UC-S09.
-    """
+    """Move the ticket identity sequence past imported identifiers after legacy loading."""
     with connection.cursor() as cursor:
         cursor.execute(
             """

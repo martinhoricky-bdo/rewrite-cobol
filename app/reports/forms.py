@@ -6,13 +6,17 @@ from core.forms import FilterForm
 
 
 class ShiftPeriodFilterForm(FilterForm):
-    """Provide ShiftPeriodFilterForm behavior for Design use cases UC-C01 and UC-E01."""
+    """Validates and normalizes shift period filter input for Design shift and executive
+    reporting in UC-C01 and UC-E01, using the field-specific messages declared below.
+    """
 
     past = forms.BooleanField(required=False, label="Show past shifts")
 
 
 class PeriodFilterForm(FilterForm):
-    """Provide PeriodFilterForm behavior for Design use cases UC-C01 and UC-E01."""
+    """Validates and normalizes period filter input for Design shift and executive reporting in
+    UC-C01 and UC-E01, using the field-specific messages declared below.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

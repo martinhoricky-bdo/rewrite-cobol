@@ -7,7 +7,9 @@ from accounts.roles import Role
 
 
 class MenuItem(NamedTuple):
-    """Provide MenuItem behavior for the shared CICS-inspired application design."""
+    """Encapsulates menu item responsibilities required by the shared CICS-inspired web
+    interface, with constraints declared on its fields.
+    """
 
     label: str
     url_name: str
@@ -63,7 +65,7 @@ COMMON_MENU = (
 
 
 def menu_for(user) -> list[MenuItem]:
-    """Implement menu_for behavior for the shared CICS-inspired application design."""
+    """Build the navigation entries authorized for the current application role."""
     if not user.is_authenticated:
         return []
     return [*MENU.get(current_role(user), ()), *COMMON_MENU]

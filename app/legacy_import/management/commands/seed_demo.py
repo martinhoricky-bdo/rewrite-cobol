@@ -26,15 +26,15 @@ from sales.models import Buy, Passenger, Ticket
 
 
 class Command(BaseCommand):
-    """Provide Command behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2 export
-    formats.
+    """Runs the management command for legacy DB2, EMPLOYEE-LIST.json, and passenger XML
+    imports, validating its options before changing stored records.
     """
 
     help = "Seed development data from the read-only legacy files."
 
     def add_arguments(self, parser) -> None:
-        """Implement add_arguments behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and
-        DB2 export formats.
+        """Register the command-line paths and reset options accepted by this management command
+        for command.
         """
         parser.add_argument("--flush", action="store_true")
         parser.add_argument("--from-date", type=date.fromisoformat, default=None)
@@ -42,8 +42,8 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
-        """Implement handle behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2
-        export formats.
+        """Validate command options, run the requested import operation, and report its totals for
+        command.
         """
         if options["days"] < 1:
             raise CommandError("--days must be a positive integer")

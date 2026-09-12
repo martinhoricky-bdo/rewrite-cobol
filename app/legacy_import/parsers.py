@@ -31,9 +31,7 @@ def parse_legacy_time(value: str) -> time:
 
 
 def parse_employee_json(path: Path) -> list[dict]:
-    """Implement parse_employee_json behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML,
-    and DB2 export formats.
-    """
+    """Parse EMPLOYEE-LIST.json rows and convert DB2 dates and numeric fields to Python values."""
     rows = json.loads(path.read_text(encoding="utf-8"))["ws-emplist"]["ws-emplist-table"]
     result = []
     for source in rows:
@@ -50,9 +48,7 @@ def parse_employee_json(path: Path) -> list[dict]:
 
 
 def parse_passenger_xml(path: Path) -> list[dict]:
-    """Implement parse_passenger_xml behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML,
-    and DB2 export formats.
-    """
+    """Parse PASSENGER1..8.xml elements into normalized passenger records."""
     names = {
         "FIRSTNAME": "firstname",
         "LASTNAME": "lastname",

@@ -22,14 +22,11 @@ class PageTitleMixin:
     page_title: str = ""
 
     def get_page_title(self) -> str:
-        """Implement get_page_title behavior for the shared CICS-inspired application
-        design.
-        """
         return self.page_title
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for page title
+        mixin.
         """
         return super().get_context_data(page_title=self.get_page_title(), **kwargs)
 
@@ -40,14 +37,11 @@ class CancelUrlMixin:
     cancel_url_name: str | None = None
 
     def get_cancel_url(self) -> str | None:
-        """Implement get_cancel_url behavior for the shared CICS-inspired application
-        design.
-        """
         return reverse(self.cancel_url_name) if self.cancel_url_name else None
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for cancel url
+        mixin.
         """
         return super().get_context_data(cancel_url=self.get_cancel_url(), **kwargs)
 
@@ -58,8 +52,8 @@ class EditableByMixin:
     edit_roles = ()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for editable by
+        mixin.
         """
         can_edit = current_role(self.request.user) in self.edit_roles
         return super().get_context_data(can_edit=can_edit, **kwargs)
@@ -72,14 +66,16 @@ class SavedMessageMixin:
     model_label: str | None = None
 
     def get_saved_message(self) -> str:
-        """Implement get_saved_message behavior for the shared CICS-inspired application
-        design.
+        """Process get saved message for the shared CICS-inspired web interface according to the
+        rules in this callable.
         """
         model = self.model_label or self.object._meta.verbose_name.capitalize()
         return self.saved_message.format(model=model, pk=self.object.pk)
 
     def form_valid(self, form: BaseForm) -> HttpResponse:
-        """Implement form_valid behavior for the shared CICS-inspired application design."""
+        """Persist validated input and continue with the workflow’s success response for saved
+        message mixin.
+        """
         response = super().form_valid(form)
         messages.success(self.request, self.get_saved_message())
         return response
@@ -89,7 +85,9 @@ class FormErrorsAsMessagesMixin:
     """Copy all form validation errors into Django messages."""
 
     def form_invalid(self, form: BaseForm) -> HttpResponse:
-        """Implement form_invalid behavior for the shared CICS-inspired application design."""
+        """Redisplay invalid input while exposing its validation messages to the user for form
+        errors as messages mixin.
+        """
         form_errors_as_messages(self.request, form)
         return super().form_invalid(form)
 
@@ -109,33 +107,33 @@ class FilteredListView(ListView):
     filter_form_class = None
 
     def get_filter_form(self) -> BaseForm | None:
-        """Implement get_filter_form behavior for the shared CICS-inspired application
-        design.
+        """Process get filter form for the shared CICS-inspired web interface according to the
+        rules in this callable.
         """
         if self.filter_form_class is None:
             return None
         return self.filter_form_class(self.request.GET)
 
     def filter_queryset(self, queryset, form: BaseForm | None):
-        """Implement filter_queryset behavior for the shared CICS-inspired application
-        design.
+        """Apply validated filter fields to the records displayed by this list screen for filtered
+        list view.
         """
         return queryset
 
     def get_queryset(self):
-        """Implement get_queryset behavior for the shared CICS-inspired application design."""
+        """Build the ordered or related queryset required by this screen for filtered list view."""
         self.filter_form = self.get_filter_form()
         return self.filter_queryset(super().get_queryset(), self.filter_form)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for filtered list
+        view.
         """
         return super().get_context_data(form=self.filter_form, **kwargs)
 
     def paginate_queryset(self, queryset, page_size: int):
-        """Implement paginate_queryset behavior for the shared CICS-inspired application
-        design.
+        """Process paginate queryset for the shared CICS-inspired web interface according to the
+        rules in this callable.
         """
         paginator = self.get_paginator(queryset, page_size)
         page = paginator.get_page(self.request.GET.get(self.page_kwarg))
@@ -148,20 +146,16 @@ class SearchListView(FormErrorsAsMessagesMixin, FilteredListView):
     empty_message = "No results found."
 
     def get_filter_form(self) -> BaseForm:
-        """Implement get_filter_form behavior for the shared CICS-inspired application
-        design.
-        """
+        """Bind the search form after the user submits a query parameter."""
         return self.filter_form_class(self.request.GET or None)
 
     def search_queryset(self, form: BaseForm):
-        """Implement search_queryset behavior for the shared CICS-inspired application
-        design.
-        """
+        """Apply the screen’s validated search terms to its base queryset for search list view."""
         return self.model._default_manager.all()
 
     def filter_queryset(self, queryset, form: BaseForm):
-        """Implement filter_queryset behavior for the shared CICS-inspired application
-        design.
+        """Apply validated filter fields to the records displayed by this list screen for search
+        list view.
         """
         if not form.is_bound:
             return queryset.none()
@@ -174,12 +168,14 @@ class SearchListView(FormErrorsAsMessagesMixin, FilteredListView):
         return results
 
     def form_invalid(self, form: BaseForm) -> None:
-        """Implement form_invalid behavior for the shared CICS-inspired application design."""
+        """Redisplay invalid input while exposing its validation messages to the user for search
+        list view.
+        """
         form_errors_as_messages(self.request, form)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for search list
+        view.
         """
         context = super().get_context_data(**kwargs)
         if not self.filter_form.is_bound or not self.filter_form.is_valid():
@@ -198,13 +194,15 @@ class ProtectedDeleteView(PageTitleMixin, DeleteView):
         return self.model_label or self.object._meta.verbose_name.capitalize()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        """Implement get_context_data behavior for the shared CICS-inspired application
-        design.
+        """Add the screen-specific display values to the generic template context for protected
+        delete view.
         """
         return super().get_context_data(object_label=self.object._meta.verbose_name, **kwargs)
 
     def form_valid(self, form: BaseForm) -> HttpResponse:
-        """Implement form_valid behavior for the shared CICS-inspired application design."""
+        """Persist validated input and continue with the workflow’s success response for protected
+        delete view.
+        """
         pk = self.object.pk
         try:
             self.object.delete()

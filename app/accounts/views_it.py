@@ -20,7 +20,9 @@ PASSWORD_SESSION_KEY = "it_temporary_password"
 
 
 class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
-    """Provide UserListView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the user list screen for authentication and IT account workflows in UC-A01–A03
+    and UC-I01, applying the access, query, form, and redirect rules configured below.
+    """
 
     allowed_roles = (Role.IT,)
     model = Employee
@@ -30,29 +32,37 @@ class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Implement filter_queryset behavior for the LOGIN, EMPLO, and DEPT legacy
-        lineage.
+        """Apply validated filter fields to the records displayed by this list screen for user list
+        view.
         """
         return queryset.select_related("dept", "user").search(form.value("q", "")).order_by("empid")
 
 
 class AccountActionView(RoleRequiredMixin, SingleObjectMixin, View):
-    """Provide AccountActionView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the account action screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     allowed_roles = (Role.IT,)
     model = Employee
     pk_url_kwarg = "empid"
 
     def get_queryset(self):
-        """Implement get_queryset behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+        """Build the ordered or related queryset required by this screen for account action view."""
         return Employee.objects.select_related("user")
 
 
 class ResetPasswordView(AccountActionView):
-    """Provide ResetPasswordView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the reset password screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     def post(self, request, *args, **kwargs):
-        """Implement post behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+        """Process the submitted account action and redirect with its resulting status message for
+        reset password view.
+        """
         employee = self.get_object()
         password = reset_employee_password(employee)
         request.session[PASSWORD_SESSION_KEY] = {"empid": employee.empid, "password": password}
@@ -61,12 +71,17 @@ class ResetPasswordView(AccountActionView):
 
 
 class AccountStateView(AccountActionView):
-    """Provide AccountStateView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the account state screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     service = None
 
     def post(self, request, *args, **kwargs):
-        """Implement post behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+        """Process the submitted account action and redirect with its resulting status message for
+        account state view.
+        """
         try:
             message = self.service(self.get_object(), request.user)
         except AccountError as error:
@@ -77,26 +92,35 @@ class AccountStateView(AccountActionView):
 
 
 class ActivateUserView(AccountStateView):
-    """Provide ActivateUserView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the activate user screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     service = staticmethod(activate_account)
 
 
 class DeactivateUserView(AccountStateView):
-    """Provide DeactivateUserView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the deactivate user screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     service = staticmethod(deactivate_account)
 
 
 class PasswordShownView(RoleRequiredMixin, TemplateView):
-    """Provide PasswordShownView behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Serves the password shown screen for authentication and IT account workflows in
+    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
+    below.
+    """
 
     allowed_roles = (Role.IT,)
     template_name = "it/user_password_shown.html"
 
     def get_context_data(self, **kwargs):
-        """Implement get_context_data behavior for the LOGIN, EMPLO, and DEPT legacy
-        lineage.
+        """Add the screen-specific display values to the generic template context for password
+        shown view.
         """
         return super().get_context_data(
             temporary=self.request.session.pop(PASSWORD_SESSION_KEY, None), **kwargs

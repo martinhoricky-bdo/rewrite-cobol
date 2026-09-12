@@ -6,7 +6,7 @@ from django.db import models
 
 
 class Role(models.TextChoices):
-    """Provide Role behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+    """Enumerates the authorization roles used to select menus and protect application views."""
 
     CEO = "ceo", "CEO"
     CREW = "crew", "Crew"

@@ -78,15 +78,15 @@ COLUMNS = {
 
 
 class Command(BaseCommand):
-    """Provide Command behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2 export
-    formats.
+    """Runs the management command for legacy DB2, EMPLOYEE-LIST.json, and passenger XML
+    imports, validating its options before changing stored records.
     """
 
     help = "Import a DB2 EXPORT OF DEL directory."
 
     def add_arguments(self, parser) -> None:
-        """Implement add_arguments behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and
-        DB2 export formats.
+        """Register the command-line paths and reset options accepted by this management command
+        for command.
         """
         parser.add_argument("--dir", required=True, type=Path)
         parser.add_argument("--dry-run", action="store_true")
@@ -94,8 +94,8 @@ class Command(BaseCommand):
         parser.add_argument("--date-format", choices=("iso", "us"), default="iso")
 
     def handle(self, *args, **options) -> None:
-        """Implement handle behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2
-        export formats.
+        """Validate command options, run the requested import operation, and report its totals for
+        command.
         """
         directory = options["dir"]
         if not directory.is_dir():

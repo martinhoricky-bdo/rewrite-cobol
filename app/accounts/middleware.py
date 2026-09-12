@@ -8,8 +8,9 @@ from django.urls import reverse
 
 
 class MustChangePasswordMiddleware:
-    """Provide MustChangePasswordMiddleware behavior for the LOGIN, EMPLO, and DEPT legacy
-    lineage.
+    """Encapsulates must change password middleware responsibilities required by authentication
+    and IT account workflows in UC-A01–A03 and UC-I01, with constraints declared on its
+    fields.
     """
 
     def __init__(self, get_response):

@@ -7,9 +7,7 @@ from .models import Airplane, Airport
 
 @admin.register(Airport)
 class AirportAdmin(admin.ModelAdmin):
-    """Provide AirportAdmin behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
-    """
+    """Configures the Django administration list, search, and edit controls for airport records."""
 
     list_display = ("airportid", "name", "city", "country")
     search_fields = ("airportid", "name", "city", "country")
@@ -17,9 +15,7 @@ class AirportAdmin(admin.ModelAdmin):
 
 @admin.register(Airplane)
 class AirplaneAdmin(admin.ModelAdmin):
-    """Provide AirplaneAdmin behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
-    """
+    """Configures the Django administration list, search, and edit controls for airplane records."""
 
     list_display = ("airplaneid", "type", "numseats", "totalfuel")
     search_fields = ("airplaneid", "type")

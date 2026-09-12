@@ -18,16 +18,16 @@ ROLES = (Role.IT, Role.SCHEDULE)
 class FleetFormView(
     RoleRequiredMixin, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
 ):
-    """Provide FleetFormView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the fleet form screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = ROLES
     template_name = "core/form.html"
 
     def get_page_title(self) -> str:
-        """Implement get_page_title behavior for the AIRPORT and AIRPLANE tables and Design
-        use cases UC-I02/UC-I03.
+        """Process get page title for Design catalogue maintenance in UC-I02 and UC-I03 according
+        to the rules in this callable.
         """
         if not self.object:
             return self.page_title
@@ -35,16 +35,16 @@ class FleetFormView(
 
 
 class FleetDeleteView(RoleRequiredMixin, generic.ProtectedDeleteView):
-    """Provide FleetDeleteView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the fleet delete screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = ROLES
 
 
 class AirportView:
-    """Provide AirportView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the airport screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     model = Airport
@@ -54,8 +54,8 @@ class AirportView:
 
 
 class AirplaneView:
-    """Provide AirplaneView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the airplane screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     model = Airplane
@@ -65,8 +65,8 @@ class AirplaneView:
 
 
 class AirportListView(AirportView, RoleRequiredMixin, generic.PageTitleMixin, ListView):
-    """Provide AirportListView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the airport list screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = ROLES
@@ -75,8 +75,8 @@ class AirportListView(AirportView, RoleRequiredMixin, generic.PageTitleMixin, Li
 
 
 class AirportCreateView(AirportView, FleetFormView, CreateView):
-    """Provide AirportCreateView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airport create screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     form_class = AirportForm
@@ -84,24 +84,24 @@ class AirportCreateView(AirportView, FleetFormView, CreateView):
 
 
 class AirportUpdateView(AirportView, FleetFormView, UpdateView):
-    """Provide AirportUpdateView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airport update screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     form_class = AirportForm
 
 
 class AirportDeleteView(AirportView, FleetDeleteView):
-    """Provide AirportDeleteView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airport delete screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     page_title = "Delete airport"
 
 
 class AirplaneListView(AirplaneView, RoleRequiredMixin, generic.PageTitleMixin, ListView):
-    """Provide AirplaneListView behavior for the AIRPORT and AIRPLANE tables and Design use
-    cases UC-I02/UC-I03.
+    """Serves the airplane list screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     allowed_roles = ROLES
@@ -110,8 +110,8 @@ class AirplaneListView(AirplaneView, RoleRequiredMixin, generic.PageTitleMixin, 
 
 
 class AirplaneCreateView(AirplaneView, FleetFormView, CreateView):
-    """Provide AirplaneCreateView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airplane create screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     form_class = AirplaneForm
@@ -119,16 +119,16 @@ class AirplaneCreateView(AirplaneView, FleetFormView, CreateView):
 
 
 class AirplaneUpdateView(AirplaneView, FleetFormView, UpdateView):
-    """Provide AirplaneUpdateView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airplane update screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     form_class = AirplaneForm
 
 
 class AirplaneDeleteView(AirplaneView, FleetDeleteView):
-    """Provide AirplaneDeleteView behavior for the AIRPORT and AIRPLANE tables and Design
-    use cases UC-I02/UC-I03.
+    """Serves the airplane delete screen for Design catalogue maintenance in UC-I02 and UC-I03,
+    applying the access, query, form, and redirect rules configured below.
     """
 
     page_title = "Delete airplane"

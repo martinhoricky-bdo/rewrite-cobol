@@ -7,8 +7,8 @@ from django.urls import reverse
 
 
 class Airport(models.Model):
-    """Provide Airport behavior for the AIRPORT and AIRPLANE tables and Design use cases
-    UC-I02/UC-I03.
+    """Represents one row from the legacy AIRPORT catalogue table maintained by Design use
+    cases UC-I02/UC-I03.
     """
 
     airportid = models.CharField(max_length=4, primary_key=True)
@@ -19,10 +19,6 @@ class Airport(models.Model):
     zipcode = models.CharField(max_length=15)
 
     class Meta:
-        """Provide Meta behavior for the AIRPORT and AIRPLANE tables and Design use cases
-        UC-I02/UC-I03.
-        """
-
         db_table = "airport"
         ordering = ["airportid"]
 
@@ -30,15 +26,13 @@ class Airport(models.Model):
         return f"{self.airportid} — {self.name}"
 
     def get_absolute_url(self) -> str:
-        """Implement get_absolute_url behavior for the AIRPORT and AIRPLANE tables and
-        Design use cases UC-I02/UC-I03.
-        """
+        """Build the canonical detail URL used after saving this record for airport."""
         return reverse("it:airport_edit", kwargs={"airportid": self.pk})
 
 
 class Airplane(models.Model):
-    """Provide Airplane behavior for the AIRPORT and AIRPLANE tables and Design use cases
-    UC-I02/UC-I03.
+    """Represents one row from the legacy AIRPLANE catalogue table maintained by Design use
+    cases UC-I02/UC-I03.
     """
 
     airplaneid = models.CharField(max_length=8, primary_key=True)
@@ -47,10 +41,6 @@ class Airplane(models.Model):
     totalfuel = models.PositiveIntegerField()
 
     class Meta:
-        """Provide Meta behavior for the AIRPORT and AIRPLANE tables and Design use cases
-        UC-I02/UC-I03.
-        """
-
         db_table = "airplane"
         constraints = [
             models.CheckConstraint(
@@ -62,7 +52,5 @@ class Airplane(models.Model):
         return self.airplaneid
 
     def get_absolute_url(self) -> str:
-        """Implement get_absolute_url behavior for the AIRPORT and AIRPLANE tables and
-        Design use cases UC-I02/UC-I03.
-        """
+        """Build the canonical detail URL used after saving this record for airplane."""
         return reverse("it:airplane_edit", kwargs={"airplaneid": self.pk})

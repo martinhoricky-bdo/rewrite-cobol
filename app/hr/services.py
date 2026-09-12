@@ -9,7 +9,9 @@ from accounts.services import ensure_user_for_employee
 
 @transaction.atomic
 def create_employee(form):
-    """Implement create_employee behavior for Design use cases UC-H01 and UC-H02."""
+    """Process create employee for Design employee and department maintenance in UC-H01 and
+    UC-H02 according to the rules in this callable.
+    """
     employee = form.save()
     ensure_user_for_employee(employee)
     return employee

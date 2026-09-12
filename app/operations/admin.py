@@ -7,7 +7,7 @@ from .models import Crew, Flight, Shift
 
 @admin.register(Crew)
 class CrewAdmin(admin.ModelAdmin):
-    """Provide CrewAdmin behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+    """Configures the Django administration list, search, and edit controls for crew records."""
 
     list_display = ("crewid", "commander", "copilote", "fachief")
     search_fields = ("crewid", "commander__empid", "commander__lastname")
@@ -15,9 +15,7 @@ class CrewAdmin(admin.ModelAdmin):
 
 @admin.register(Shift)
 class ShiftAdmin(admin.ModelAdmin):
-    """Provide ShiftAdmin behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
-    """
+    """Configures the Django administration list, search, and edit controls for shift records."""
 
     list_display = ("shiftid", "shiftdate", "begintime", "endtime", "crew")
     search_fields = ("shiftid", "crew__crewid")
@@ -25,9 +23,7 @@ class ShiftAdmin(admin.ModelAdmin):
 
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
-    """Provide FlightAdmin behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
-    lineage.
-    """
+    """Configures the Django administration list, search, and edit controls for flight records."""
 
     list_display = ("flightid", "flightnum", "flightdate", "deptime", "airportdep", "airportarr")
     search_fields = ("flightid", "flightnum", "airportdep__name", "airportarr__name")
