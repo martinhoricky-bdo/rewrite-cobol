@@ -42,7 +42,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R24 Kontrakt validace formulářů a testy neplatných cest | – | – | issue se zakládá |
+| R24 Kontrakt validace formulářů a testy neplatných cest | #53 | – | zadáno 16:25, zmínka `@codex` odeslána, kontrola každých 15 min |
 
 ## Fronta
 prázdná – R24 je poslední krok fáze 3.
