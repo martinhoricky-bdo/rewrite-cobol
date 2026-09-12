@@ -25,7 +25,9 @@ full structure.
 Copy `.env.example` to `.env` to configure `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`,
 `DATABASE_URL`, `LEGACY_ROOT`, `SECURE_SSL_REDIRECT`, and `SECURE_HSTS_SECONDS`. Compose supplies
 development-safe defaults automatically. Login protection permits 10 failed attempts per
-USERID and client IP in a 15-minute window; a successful login clears that counter.
+USERID and client IP in a 15-minute window; a successful login clears that counter. The counter
+lives in the Django cache (`LocMemCache`, per process), so with several Gunicorn workers the limit
+applies per worker; configure a shared cache backend if a strict global limit is required.
 
 ## Production
 

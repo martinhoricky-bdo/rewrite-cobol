@@ -8,9 +8,9 @@ WORKDIR /app
 COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
 COPY . .
-ENV DJANGO_SETTINGS_MODULE=config.settings.prod \
-    SECRET_KEY=collectstatic-only-example-key-with-more-than-fifty-characters \
-    ALLOWED_HOSTS=localhost
-RUN python manage.py collectstatic --noinput
+ENV DJANGO_SETTINGS_MODULE=config.settings.prod
+# Build-time only values; the runtime image must receive real SECRET_KEY/ALLOWED_HOSTS via --env-file.
+RUN SECRET_KEY=collectstatic-only-example-key-with-more-than-fifty-characters ALLOWED_HOSTS=localhost \
+    python manage.py collectstatic --noinput
 EXPOSE 8000
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
