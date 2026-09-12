@@ -210,7 +210,7 @@ Zadáno uživatelem 2026-09-12 po dokončení fáze 2: v `app/` chybí komentá�
 
 Společná kritéria fáze 3: chování se nemění (existující testy beze změn asercí, `tests/e2e/` nedotčené, URL a texty UI stejné, žádné migrace); pravidla stylu z `AGENTS.md` kap. 3 platí dál.
 
-## R23 – Docstringy a vazba na legacy (M)
+## ✔ R23 (#52) – Docstringy a vazba na legacy (M)
 
 - **Cíl:** čtenář kódu ví, co modul dělá a ze kterého legacy programu a use casu pochází.
 - **Rozsah:** docstring každého modulu v `app/` (mimo `__init__.py`, `migrations/`, `config/settings/`), každé view, formuláře, modelu, `QuerySet`u a veřejné funkce ve `services.py` podle `03-target-architecture.md` kap. 3.1 (řádek „Docstringy“); u modelů odkaz na tabulku DB2 (`DB2/DCLGEN`), u obrazovek na program, mapu a UC (`01-inventory.md` kap. 2.1 a 3, `02-functional-spec.md` kap. 5), u služeb pravidla ze specifikace (pořadí validací, `select_for_update`, přidělení sedadla); komentáře `#` jen tam, kde je potřeba vysvětlit *proč*.

@@ -3,10 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 15:50
+- Poslední aktualizace: 2026-09-12 16:20
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22): hotovo** (zadáno uživatelem 2026-09-12 „není DRY, žádné generic views“, poslední merge 12:13).
 - **Fáze 3 – docstringy a kontrakt validace (R23–R24)**: běží, zadáno uživatelem 2026-09-12 („chybí komentáře“ + otázka na `form_valid`/`form_invalid`).
-- Aktuální krok: R23 (zadáno Codexu)
+- Aktuální krok: R24 (zadáno Codexu)
 - Blokuje: nic
 
 ## Hotovo
@@ -37,14 +37,15 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R20 Schedule, HR a IT na generických views | #45 | #46 | 2026-09-12 11:03 (review 1 vráceno: `view_classes.py` shimy, `AttributeError` v `get_page_title`, `template_name` na mixinu před `ProtectedDeleteView`, `empty_label`, chybějící testy; review 2: Claude rozbalil tuple-přiřazení/aliasy a doplnil `order_by()` po `annotate()`; sada s `-W error::UnorderedObjectListWarning`) |
 | R21 Sales a Reports na generických views | #47 | #48 | 2026-09-12 11:32 (1. běh OK; Claude opravil duplicitní `<h1>`/GET formulář v seznamu cestujících, `FlightSearchView.model`, duplicitní konstantu varování, `type="date"` a hodnoty ve filtru dashboardu; e2e 9/9 dvakrát po `seed_demo --flush`) |
 | R22 Závěr refaktoringu: úklid, matice oprávnění, docs | #49 | #50 | 2026-09-12 12:13 (1. běh OK, review čisté: 675 testů (`test_permissions.py` 405 samostatně), matice 50 URL × 7 rolí + anonym, 24 duplicitních testů oprávnění smazáno, `get_absolute_url` na 9 modelech, e2e 9/9 dvakrát; bez oprav) |
+| R23 Docstringy a vazba na legacy | #51 | #52 | 2026-09-12 16:17 (1. běh vrácen: 285 z ~400 docstringů šablonou `Implement <název> behavior for …`; fix run šablonu odstranil, ale 39 docstringů tříd `Serves the … screen …` a 87 metodových `… for <třída> view.` přepsal Claude sám (`5366970`) + merge `3c44aed`; 676 testů, e2e 9/9, rozsah testu 52 modulů / 164 tříd / 184 funkcí) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R23 Docstringy a vazba na legacy | #51 | #52 | 1. běh vrácen 15:48: 285 z ~400 docstringů vygenerovaných šablonou `Implement <název> behavior for …`; mechanické kontroly prošly (676 testů). Fix run zadán, čeká se na push do stejné větve |
+| R24 Kontrakt validace formulářů a testy neplatných cest | – | – | issue se zakládá |
 
 ## Fronta
-R24 – kontrakt validace formulářů a testy neplatných cest (zadání hotové v `codex-tasks/R24.md`, čeká na merge R23).
+prázdná – R24 je poslední krok fáze 3.
 
 ## Co zbývá ručně (uživatel)
 - Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (26 větví R01–R22 vč. `codex/R19-generic-core` bez PR a `codex/smoke-test`; mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté nebo nahrazené).
