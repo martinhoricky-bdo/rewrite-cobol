@@ -36,7 +36,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | – | – | zadávání |
+| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | #42 | – | zadáno 06:25, čeká se na PR |
 
 ## Fronta
 R20 (schedule/HR/IT), R21 (sales/reports) – po R19, mohou běžet po sobě; R22 (úklid, matice oprávnění, docs) – po R20 a R21. Zadání v `codex-tasks/R20–R22.md`.
