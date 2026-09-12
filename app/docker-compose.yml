@@ -32,13 +32,13 @@ services:
         condition: service_healthy
   e2e:
     profiles: ["e2e"]
-    image: mcr.microsoft.com/playwright/python:v1.47.0-jammy
+    image: mcr.microsoft.com/playwright/python:v1.47.0-noble
     working_dir: /app
     volumes:
       - .:/app
     environment:
       BASE_URL: http://web:8000
-    command: sh -c "pip install -q -e .[dev] pytest-playwright && pytest -q tests/e2e"
+    command: sh -c "pip install -q -e '.[dev]' && pytest -m e2e tests/e2e"
     depends_on: [web]
 volumes:
   pgdata:

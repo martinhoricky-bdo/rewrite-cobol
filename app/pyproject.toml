@@ -20,7 +20,9 @@ dev = [
   "pytest-django>=4.8",
   "factory-boy>=3.3",
   "freezegun>=1.4",
+  "playwright>=1.47,<1.48",
   "ruff>=0.5",
+  "pytest-playwright>=0.5",
 ]
 
 [tool.setuptools.packages.find]
@@ -38,4 +40,5 @@ per-file-ignores = { "*/migrations/*" = ["E501"] }
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-q --strict-markers"
+markers = ["e2e: browser tests against a running seeded application"]
+addopts = "-q --strict-markers -m 'not e2e'"

@@ -42,3 +42,20 @@ Development logins are `10000006 / kxXRk7GIHw` (Sales), `10000029 / 8s1i3NL`
 `10000022 / 8I324l` (Schedule), `10000003 / 7bVHdRyqYD` (Crew), and
 `10000017 / fijshQ3d` (Legal). These test passwords come from the legacy
 repository and are for development only.
+
+## E2E testy
+
+Playwright scénáře se spouštějí proti běžícímu stacku naplněnému seed daty:
+
+```sh
+make up && make migrate && make seed && make e2e
+```
+
+Pro lokální spuštění bez Dockeru nejprve spusťte webový server, nainstalujte Chromium
+pomocí `playwright install chromium` a v dalším terminálu spusťte:
+
+```sh
+BASE_URL=http://localhost:8000 pytest -m e2e tests/e2e
+```
+
+Běžné `pytest` a `make test` E2E scénáře automaticky vynechávají.
