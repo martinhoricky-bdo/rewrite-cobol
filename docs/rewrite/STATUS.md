@@ -3,9 +3,9 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 11:55
-- Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R22 (Codex pracuje) – poslední krok fáze 2
+- Poslední aktualizace: 2026-09-12 12:20
+- Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22): hotovo** (zadáno uživatelem 2026-09-12 „není DRY, žádné generic views“, poslední merge 12:13).
+- Aktuální krok: žádný – automatický režim ukončen, další kontroly se neplánují.
 - Blokuje: nic
 
 ## Hotovo
@@ -32,13 +32,17 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R16b Schedule – posádky a směny | #36 | #37 | 2026-09-12 02:49 (1. běh OK, 274 testů, ruční průchod: posádka 13 z oddělení 2/3/4, směna na zítřek, překryv/obrácené časy odmítnuty, E-REF-01, 403; Claude doplnil číslo PR v CHANGELOG) |
 | R17 Crew my shifts + CEO dashboard | #38 | #39 | 2026-09-12 03:04 (1. běh OK, 297 testů, ruční průchod: 10000003 → /crew/my-shifts/ s CB2204/CB2205, `past=1`, jiný člen posádky směny nevidí; CEO dashboard karty + 3 tabulky nad e2e prodeji, neplatné filtry 200, agregace v ORM (9 dotazů); 403 pro ostatní role; bez oprav) |
 | R18 Hardening a závěr | #40 | #41 | 2026-09-12 05:38 (1. běh OK, 310 testů, e2e 9/9 dvakrát proti runserveru; ruční průchod: limiter 10/15 min per USERID+IP, `check --deploy` s `.env.example` bez varování, collectstatic s whitenoise, 404/403, placeholder jen legal, menu vs. matice; Claude opravil: 500 handler bez request kontextu + test, `SECRET_KEY` jen v build kroku Dockerfile, `hr*`/`reports*` ve wheelu, poznámka o per-proces limiteru v README) |
-| R22 Závěr refaktoringu: úklid, matice oprávnění, docs | #49 | – | zadáno 11:58, čeká se na PR |
+| R19 Základ: generické views, mixiny, sdílené šablony, `fleet` | #42 | #44 | 2026-09-12 10:25 (review 1 vráceno: `# fmt: off`/`noqa`, tuple-přiřazení kvůli limitu řádků, chybějící `template_name`, chybějící testy; fix runy 1–3 selhaly na push 403 konektoru; fix run 4 přes gh-token URL OK; Claude opravil `form_class` jen na Create/Update; 351 testů) |
+| R20 Schedule, HR a IT na generických views | #45 | #46 | 2026-09-12 11:03 (review 1 vráceno: `view_classes.py` shimy, `AttributeError` v `get_page_title`, `template_name` na mixinu před `ProtectedDeleteView`, `empty_label`, chybějící testy; review 2: Claude rozbalil tuple-přiřazení/aliasy a doplnil `order_by()` po `annotate()`; sada s `-W error::UnorderedObjectListWarning`) |
+| R21 Sales a Reports na generických views | #47 | #48 | 2026-09-12 11:32 (1. běh OK; Claude opravil duplicitní `<h1>`/GET formulář v seznamu cestujících, `FlightSearchView.model`, duplicitní konstantu varování, `type="date"` a hodnoty ve filtru dashboardu; e2e 9/9 dvakrát po `seed_demo --flush`) |
+| R22 Závěr refaktoringu: úklid, matice oprávnění, docs | #49 | #50 | 2026-09-12 12:13 (1. běh OK, review čisté: 675 testů (`test_permissions.py` 405 samostatně), matice 50 URL × 7 rolí + anonym, 24 duplicitních testů oprávnění smazáno, `get_absolute_url` na 9 modelech, e2e 9/9 dvakrát; bez oprav) |
 
 ## Fronta
-prázdná – R22 je poslední krok fáze 2; po jeho merge Claude zapíše závěrečné shrnutí a přestane plánovat kontroly.
+prázdná – fáze 2 dokončena. Automatický režim je zastaven; další krok zadává uživatel.
 
 ## Co zbývá ručně (uživatel)
-- Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté).
+- Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (26 větví R01–R22 vč. `codex/R19-generic-core` bez PR a `codex/smoke-test`; mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté nebo nahrazené).
+- Volitelně sjednotit osm lokálních helperů `login_role` v `tests/sales/test_*.py` na fixture `role_client` (mimo rozsah R22, chování testů to nemění).
 - Nasazení: sestavit image (`docker build`), nastavit reálný `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL` (viz `app/README.md`), spustit `migrate` a `import_legacy` z exportu DB2.
 - Rozhodnout otevřené body z `02-functional-spec.md` (platební metoda u účtenky, role legal bez funkcí).
 - Codex Cloud: nepravidelné selhání pushe na 1. běhu (viz poznámky) – zkontrolovat token v nastavení prostředí, pokud se bude Codex používat dál.

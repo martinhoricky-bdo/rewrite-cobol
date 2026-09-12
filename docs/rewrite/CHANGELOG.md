@@ -1,5 +1,7 @@
 # CHANGELOG přepisu
 
+Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
+
 ## R22 – Závěr refaktoringu: úklid, testy, dokumentace
 - PR: #50 (codex/R22-refactor-cleanup)
 - Přidáno: kanonické URL modelů a úplná matice oprávnění pro všechny aplikační URL a role.
@@ -17,8 +19,6 @@
 - Přidáno: doménové querysety, filtrovací formuláře a služby pro účty a založení zaměstnance.
 - Změněno: Schedule, HR a IT používají generické class-based views a sdílené šablony.
 - Odchylky od specifikace: žádné.
-
-Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R19 – Základ generického jádra
 - PR: #44 (codex/R19-generic-core-v3)
