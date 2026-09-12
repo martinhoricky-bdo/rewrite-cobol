@@ -29,7 +29,6 @@ class FleetDeleteView(RoleRequiredMixin, generic.ProtectedDeleteView):
 
 class AirportView:
     model = Airport
-    form_class = AirportForm
     pk_url_kwarg = "airportid"
     cancel_url_name = "it:airports"
     success_url = reverse_lazy("it:airports")
@@ -37,7 +36,6 @@ class AirportView:
 
 class AirplaneView:
     model = Airplane
-    form_class = AirplaneForm
     pk_url_kwarg = "airplaneid"
     cancel_url_name = "it:airplanes"
     success_url = reverse_lazy("it:airplanes")
@@ -50,11 +48,12 @@ class AirportListView(AirportView, RoleRequiredMixin, generic.PageTitleMixin, Li
 
 
 class AirportCreateView(AirportView, FleetFormView, CreateView):
+    form_class = AirportForm
     page_title = "New airport"
 
 
 class AirportUpdateView(AirportView, FleetFormView, UpdateView):
-    pass
+    form_class = AirportForm
 
 
 class AirportDeleteView(AirportView, FleetDeleteView):
@@ -68,11 +67,12 @@ class AirplaneListView(AirplaneView, RoleRequiredMixin, generic.PageTitleMixin, 
 
 
 class AirplaneCreateView(AirplaneView, FleetFormView, CreateView):
+    form_class = AirplaneForm
     page_title = "New airplane"
 
 
 class AirplaneUpdateView(AirplaneView, FleetFormView, UpdateView):
-    pass
+    form_class = AirplaneForm
 
 
 class AirplaneDeleteView(AirplaneView, FleetDeleteView):
