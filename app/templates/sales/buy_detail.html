@@ -12,7 +12,7 @@
   </dl>
   <div class="table-wrap"><table>
     <thead><tr><th>TICKET ID</th><th>PASSENGER</th><th>SEAT</th></tr></thead>
-    <tbody>{% for ticket in buy.tickets.all %}<tr><td><a href="{% url 'sales:ticket_detail' ticket.ticketid %}">{{ ticket.ticketid }}</a></td><td>{{ ticket.client.full_name }}</td><td>{{ ticket.seat }}</td></tr>{% endfor %}</tbody>
+    <tbody>{% for ticket in buy.tickets.all %}<tr><td><a href="{{ ticket.get_absolute_url }}">{{ ticket.ticketid }}</a></td><td>{{ ticket.client.full_name }}</td><td>{{ ticket.seat }}</td></tr>{% endfor %}</tbody>
   </table></div>
   <p>
     <a role="button" href="{% url 'sales:sell_step1' %}">New sale</a>

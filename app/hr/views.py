@@ -59,9 +59,6 @@ class EmployeeFormView(
     form_class = EmployeeForm
     template_name = "core/form.html"
 
-    def get_success_url(self):
-        return reverse_lazy("hr:employee_detail", kwargs={"empid": self.object.empid})
-
 
 class EmployeeCreateView(EmployeeFormView, CreateView):
     page_title = "New employee"

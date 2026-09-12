@@ -27,6 +27,8 @@ def check_role(request: HttpRequest, allowed: tuple[Role, ...]) -> HttpResponse 
 
 
 def role_required(*roles: Role | str):
+    """Jen pro funkční HTMX views; ostatní views používají ``RoleRequiredMixin``."""
+
     allowed = tuple(Role(role) for role in roles)
 
     def decorator(view: Callable) -> Callable:

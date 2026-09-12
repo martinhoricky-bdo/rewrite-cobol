@@ -62,20 +62,3 @@ def test_shift_with_flights_cannot_be_deleted(role_client):
     response = client.post(reverse("schedule:shift_delete", args=[shift.pk]), follow=True)
     assert E_REF_01.format(Entity="Shift", n=1, related="flights") in response.content.decode()
     assert Shift.objects.filter(pk=shift.pk).exists()
-
-
-@pytest.mark.parametrize(
-    ("name", "args", "method"),
-    [
-        ("schedule:shifts", [], "get"),
-        ("schedule:shift_create", [], "get"),
-        ("schedule:shift_create", [], "post"),
-        ("schedule:shift_edit", [1], "get"),
-        ("schedule:shift_edit", [1], "post"),
-        ("schedule:shift_delete", [1], "get"),
-        ("schedule:shift_delete", [1], "post"),
-    ],
-)
-def test_sales_role_gets_403_for_every_shift_url(role_client, name, args, method):
-    client = role_client(Role.SALES)
-    assert getattr(client, method)(reverse(name, args=args)).status_code == 403

@@ -195,7 +195,7 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 - **Akceptace:** existující testy `test_passengers.py`, `test_flight_search.py`, `test_ticket_search.py`, `test_sell_step1.py`, `test_sell_step2.py`, `test_receipt.py`, `test_boarding_pass*.py`, `test_crew_my_shifts.py`, `test_ceo_dashboard.py` beze změn asercí; e2e 9/9; bez `view_classes*.py`, tuple-přiřazení a aliasů importů.
 - **Závislosti:** R19.
 
-## R22 – Závěr refaktoringu: úklid, testy, dokumentace (S)
+## ✔ R22 (#50) – Závěr refaktoringu: úklid, testy, dokumentace (S)
 
 - **Cíl:** odstranit zbytky starého stylu a sjednotit testy.
 - **Rozsah:** smazat `role_required`, pokud ho nepoužívá žádná view mimo HTMX fragment (jinak ponechat jen tam); `get_absolute_url()` na modelech s detailem (`Employee`, `Passenger`, `Ticket`, `Buy`) a jejich použití v šablonách; všechny testy 403 sjednotit do parametrizované matice v `tests/views/test_permissions.py` (`ROLE_MATRIX` = URL × role → 200/302/403) a z ostatních souborů duplicitní testy oprávnění odstranit; zrušit lokální helpery v testech ve prospěch fixtur z R19; `01-inventory.md` kap. 6 a `app/README.md` (struktura), `AGENTS.md` kap. 3 (odkaz na `03` kap. 3.1 už platí), CHANGELOG.

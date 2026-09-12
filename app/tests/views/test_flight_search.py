@@ -54,24 +54,6 @@ def test_results_are_paginated_and_query_is_preserved(client):
     assert "flightnum=CB1104&amp;page=2" in first.content.decode()
 
 
-@pytest.mark.parametrize("deptid", [7, 1, 9, 2])
-def test_authorized_roles_can_search(client, deptid):
-    login_role(client, deptid)
-    assert client.get("/sales/flights/").status_code == 200
-
-
-@pytest.mark.parametrize("deptid", [5, 6, 8])
-def test_unauthorized_roles_are_denied(client, deptid):
-    login_role(client, deptid)
-    assert client.get("/sales/flights/").status_code == 403
-
-
-def test_anonymous_user_is_redirected(client):
-    response = client.get("/sales/flights/")
-    assert response.status_code == 302
-    assert response.url == "/login/?next=/sales/flights/"
-
-
 def test_sales_home_redirects_to_flight_search(client):
     login_role(client, 7)
     response = client.get("/")

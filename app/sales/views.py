@@ -173,9 +173,6 @@ class PassengerView(SalesView):
     pk_url_kwarg = "clientid"
     cancel_url_name = "sales:passenger_list"
 
-    def get_success_url(self):
-        return reverse("sales:passenger_detail", kwargs={"clientid": self.object.pk})
-
 
 class PassengerListView(PassengerView, generic.PageTitleMixin, generic.FilteredListView):
     page_title = "Passengers"

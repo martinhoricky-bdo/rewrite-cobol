@@ -12,7 +12,7 @@
     <thead><tr><th>CLIENT ID</th><th>LAST NAME</th><th>FIRST NAME</th><th>CITY</th><th>COUNTRY</th><th>TELEPHONE</th><th>EMAIL</th><th>ACTIONS</th></tr></thead>
     <tbody>{% for passenger in page_obj %}<tr>
       <td>{{ passenger.clientid }}</td><td>{{ passenger.lastname }}</td><td>{{ passenger.firstname }}</td><td>{{ passenger.city }}</td><td>{{ passenger.country }}</td><td>{{ passenger.telephone }}</td><td>{{ passenger.email }}</td>
-      <td><a href="{% url 'sales:passenger_detail' passenger.clientid %}">Detail</a> <a href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a></td>
+      <td><a href="{{ passenger.get_absolute_url }}">Detail</a> <a href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a></td>
     </tr>{% empty %}<tr><td colspan="8">No passengers found.</td></tr>{% endfor %}</tbody>
   </table></div>
 {% endblock %}

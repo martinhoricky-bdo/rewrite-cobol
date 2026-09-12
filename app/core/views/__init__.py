@@ -1,8 +1,9 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import connection
 from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.views import View
 
 from accounts.permissions import current_role
 from core.exceptions import NotFound
@@ -10,16 +11,16 @@ from core.messages import E_AUTH_02
 from core.navigation import ROLE_HOME
 
 
-@login_required
-def home(request):
-    role = current_role(request.user)
-    if role is None and request.user.is_superuser:
-        return render(request, "core/not_available.html", {"admin_only": True})
-    if role is None:
-        return render(request, "403.html", status=403)
-    if home_url := ROLE_HOME[role]:
-        return redirect(home_url)
-    return render(request, "core/not_available.html", {"role_label": role.label})
+class HomeView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        role = current_role(self.request.user)
+        if role is None and self.request.user.is_superuser:
+            return render(self.request, "core/not_available.html", {"admin_only": True})
+        if role is None:
+            return render(self.request, "403.html", status=403)
+        if home_url := ROLE_HOME[role]:
+            return redirect(home_url)
+        return render(self.request, "core/not_available.html", {"role_label": role.label})
 
 
 def permission_denied(request, exception=None):

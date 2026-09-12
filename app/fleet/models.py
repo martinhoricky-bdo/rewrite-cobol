@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Airport(models.Model):
@@ -15,6 +16,9 @@ class Airport(models.Model):
 
     def __str__(self) -> str:
         return f"{self.airportid} — {self.name}"
+
+    def get_absolute_url(self) -> str:
+        return reverse("it:airport_edit", kwargs={"airportid": self.pk})
 
 
 class Airplane(models.Model):
@@ -33,3 +37,6 @@ class Airplane(models.Model):
 
     def __str__(self) -> str:
         return self.airplaneid
+
+    def get_absolute_url(self) -> str:
+        return reverse("it:airplane_edit", kwargs={"airplaneid": self.pk})

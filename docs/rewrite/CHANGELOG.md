@@ -1,5 +1,11 @@
 # CHANGELOG přepisu
 
+## R22 – Závěr refaktoringu: úklid, testy, dokumentace
+- PR: #50 (codex/R22-refactor-cleanup)
+- Přidáno: kanonické URL modelů a úplná matice oprávnění pro všechny aplikační URL a role.
+- Změněno: duplicitní testy oprávnění nahradila matice; testovací helpery nahradily sdílené fixtures a README popisuje přidání obrazovky.
+- Odchylky od specifikace: žádné.
+
 ## R21 – Sales a Reports na generických views
 - PR: #48 (codex/R21-generic-sales)
 - Přidáno: queryset API pro cestující, letenky a nákupy, filtry reportů a testy session a období.

@@ -49,18 +49,3 @@ def test_create_makes_inactive_unusable_account(role_client):
     assert not user.is_active
     assert not user.has_usable_password()
     assert user.employee.empid == "10000040"
-
-
-def test_ceo_read_only_and_sales_forbidden(role_client):
-    employee = EmployeeFactory(dept=DepartmentFactory(deptid=4))
-    client = role_client(Role.CEO)
-    assert client.get(reverse("hr:employees")).status_code == 200
-    assert client.get(reverse("hr:employee_detail", args=[employee.pk])).status_code == 200
-    assert client.get(reverse("hr:employee_create")).status_code == 403
-    assert client.post(reverse("hr:employee_create"), {}).status_code == 403
-    assert client.get(reverse("hr:employee_edit", args=[employee.pk])).status_code == 403
-    assert client.post(reverse("hr:employee_edit", args=[employee.pk]), {}).status_code == 403
-    client.logout()
-    client = role_client(Role.SALES)
-    assert client.get(reverse("hr:employees")).status_code == 403
-    assert client.get(reverse("hr:employee_detail", args=[employee.pk])).status_code == 403

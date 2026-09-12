@@ -35,15 +35,12 @@ def test_airplane_cannot_shrink_below_sold_tickets(role_client):
     assert f"2 tickets are already sold on flight {flight.flightnum}." in response.content.decode()
 
 
-def test_airplane_delete_reference_and_permissions(role_client):
+def test_airplane_delete_reference(role_client):
     client = role_client(Role.SCHEDULE)
     flight = FlightFactory()
     response = client.post(reverse("it:airplane_delete", args=[flight.airplane_id]), follow=True)
     assert E_REF_01.format(Entity="Airplane", n=1, related="flights") in response.content.decode()
     assert Airplane.objects.filter(pk=flight.airplane_id).exists()
-    client.logout()
-    client = role_client(Role.HR)
-    assert client.get(reverse("it:airplanes")).status_code == 403
 
 
 def test_airplane_without_flights_can_be_deleted(role_client):

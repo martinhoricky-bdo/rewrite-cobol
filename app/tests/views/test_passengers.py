@@ -94,19 +94,3 @@ def test_duplicate_email_warns_but_saves(client):
 def test_missing_passenger_returns_404(client, url):
     login_role(client)
     assert client.get(url).status_code == 404
-
-
-@pytest.mark.parametrize(
-    "url",
-    [
-        "/sales/passengers/",
-        "/sales/passengers/new/",
-        "/sales/passengers/999999/",
-        "/sales/passengers/999999/edit/",
-    ],
-)
-@pytest.mark.parametrize("deptid,expected", [(7, 200), (1, 403), (5, 403)])
-def test_permissions(client, url, deptid, expected):
-    login_role(client, deptid)
-    response = client.get(url)
-    assert response.status_code == expected or (deptid == 7 and response.status_code == 404)

@@ -74,22 +74,3 @@ def test_delete_and_generate(role_client):
         follow=True,
     )
     assert "Generated 7 flights, skipped 0 existing." in response.content.decode()
-
-
-@pytest.mark.parametrize(
-    ("name", "args", "method"),
-    [
-        ("schedule:flights", [], "get"),
-        ("schedule:flight_create", [], "get"),
-        ("schedule:flight_create", [], "post"),
-        ("schedule:flights_generate", [], "get"),
-        ("schedule:flights_generate", [], "post"),
-        ("schedule:flight_edit", [1], "get"),
-        ("schedule:flight_edit", [1], "post"),
-        ("schedule:flight_delete", [1], "get"),
-        ("schedule:flight_delete", [1], "post"),
-    ],
-)
-def test_sales_role_gets_403_for_every_schedule_action(role_client, name, args, method):
-    client = role_client(Role.SALES)
-    assert getattr(client, method)(reverse(name, args=args)).status_code == 403

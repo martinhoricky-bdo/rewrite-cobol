@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 
 from .roles import ROLE_BY_DEPT
 
@@ -88,6 +89,9 @@ class Employee(models.Model):
 
     def __str__(self) -> str:
         return self.full_name
+
+    def get_absolute_url(self) -> str:
+        return reverse("hr:employee_detail", kwargs={"empid": self.pk})
 
     @property
     def role(self) -> str:
