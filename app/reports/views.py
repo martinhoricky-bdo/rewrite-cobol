@@ -12,9 +12,7 @@ from .services import crew_shifts, dashboard_report
 
 
 class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
-    """Serves the my shifts screen for Design shift and executive reporting in UC-C01 and
-    UC-E01, applying the access, query, form, and redirect rules configured below.
-    """
+    """Lists the shifts and flights of the signed-in crew member, optionally including past days."""
 
     allowed_roles = (Role.CREW,)
     page_title = "My shifts"
@@ -23,7 +21,7 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
     paginate_by = 20
 
     def get_queryset(self):
-        """Build the ordered or related queryset required by this screen for my shifts view."""
+        """Load the shifts of the signed-in crew member, past ones only on request."""
         self.filter_form = self.get_filter_form()
         include_past = self.filter_form.value("past", False)
         return crew_shifts(
@@ -33,26 +31,20 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
         )
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for my shifts
-        view.
-        """
+        """Tell the template whether past shifts are included."""
         return super().get_context_data(
             include_past=self.filter_form.value("past", False), **kwargs
         )
 
 
 class DashboardView(RoleRequiredMixin, TemplateView):
-    """Serves the dashboard screen for Design shift and executive reporting in UC-C01 and
-    UC-E01, applying the access, query, form, and redirect rules configured below.
-    """
+    """Summarises sales, revenue, tickets and load factor for the CEO over the selected period."""
 
     allowed_roles = (Role.CEO,)
     template_name = "reports/dashboard.html"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for dashboard
-        view.
-        """
+        """Read the period from the query string, defaulting to the current month."""
         today = timezone.localdate()
         first_day = today.replace(day=1)
         form = PeriodFilterForm(self.request.GET)

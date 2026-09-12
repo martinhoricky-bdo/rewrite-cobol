@@ -28,9 +28,7 @@ from .services import generate_flights
 
 
 class ScheduleView(RoleRequiredMixin):
-    """Serves the schedule screen for Design scheduling workflows in UC-P01–P04, applying the
-    access, query, form, and redirect rules configured below.
-    """
+    """Restricts every schedule screen to the Schedule role."""
 
     allowed_roles = (Role.SCHEDULE,)
 
@@ -38,25 +36,19 @@ class ScheduleView(RoleRequiredMixin):
 class ScheduleFormView(
     ScheduleView, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
 ):
-    """Serves the schedule form screen for Design scheduling workflows in UC-P01–P04, applying
-    the access, query, form, and redirect rules configured below.
-    """
+    """Shared base for the flight, crew and shift forms rendered by core/form.html."""
 
     template_name = "core/form.html"
 
     def get_page_title(self):
-        """Process get page title for Design scheduling workflows in UC-P01–P04 according to the
-        rules in this callable.
-        """
+        """Title the screen with the edited record, or with the create title."""
         if self.object:
             return f"Edit {self.model._meta.verbose_name} {self.object.pk}"
         return self.page_title
 
 
 class ScheduleListView(ScheduleView, generic.PageTitleMixin, generic.FilteredListView):
-    """Serves the schedule list screen for Design scheduling workflows in UC-P01–P04, applying
-    the access, query, form, and redirect rules configured below.
-    """
+    """Shared base for the filtered flight, crew and shift lists."""
 
     pass
 
@@ -79,9 +71,7 @@ class FlightListView(FlightView, ScheduleListView):
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for flight
-        list view.
-        """
+        """Filter flights by period, number and airports and count the tickets sold."""
         today = timezone.localdate()
         queryset = (
             queryset.in_period(
@@ -133,9 +123,7 @@ class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrl
     cancel_url_name = "schedule:flights"
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for flight
-        generate view.
-        """
+        """Generate the flights, report created and skipped counts, return to the list."""
         result = generate_flights(
             form.cleaned_data["template"],
             form.cleaned_data["date_from"],
@@ -168,9 +156,7 @@ class CrewListView(CrewView, ScheduleListView):
     template_name = "schedule/crew_list.html"
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for crew list
-        view.
-        """
+        """Join the crew members and count their shifts."""
         return queryset.with_members().with_shift_count()
 
 
@@ -211,9 +197,7 @@ class ShiftListView(ShiftView, ScheduleListView):
     paginate_by = 20
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for shift
-        list view.
-        """
+        """Filter shifts by period and crew and count their flights."""
         today = timezone.localdate()
         return (
             queryset.in_period(

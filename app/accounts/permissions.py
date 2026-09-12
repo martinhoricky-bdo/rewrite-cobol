@@ -51,17 +51,12 @@ def role_required(*roles: Role | str):
 
 
 class RoleRequiredMixin:
-    """Serves the role required screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Restricts a view to allowed_roles and sends anonymous users to the login screen."""
 
     allowed_roles: tuple[Role, ...] = ()
 
     def dispatch(self, request, *args, **kwargs):
-        """Enforce the prerequisite workflow state before delegating the HTTP request for role
-        required mixin.
-        """
+        """Reject the request with 403, or with a login redirect, before the view runs."""
         if response := check_role(request, self.allowed_roles):
             return response
         return super().dispatch(request, *args, **kwargs)

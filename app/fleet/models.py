@@ -26,7 +26,7 @@ class Airport(models.Model):
         return f"{self.airportid} — {self.name}"
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for airport."""
+        """Return the IT edit URL of this airport."""
         return reverse("it:airport_edit", kwargs={"airportid": self.pk})
 
 
@@ -52,5 +52,5 @@ class Airplane(models.Model):
         return self.airplaneid
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for airplane."""
+        """Return the IT edit URL of this airplane."""
         return reverse("it:airplane_edit", kwargs={"airplaneid": self.pk})

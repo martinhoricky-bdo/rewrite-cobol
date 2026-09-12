@@ -42,25 +42,19 @@ from .services import (
 
 
 class SalesView(RoleRequiredMixin):
-    """Serves the sales screen for passenger and ticket sales workflows in UC-S01–S09, applying
-    the access, query, form, and redirect rules configured below.
-    """
+    """Restricts a sales screen to the Sales role."""
 
     allowed_roles = (Role.SALES,)
 
 
 class SalesAndCeoView(RoleRequiredMixin):
-    """Serves the sales and ceo screen for passenger and ticket sales workflows in UC-S01–S09,
-    applying the access, query, form, and redirect rules configured below.
-    """
+    """Restricts a screen to the Sales role and to the CEO, who reads the same records."""
 
     allowed_roles = (Role.SALES, Role.CEO)
 
 
 class SaleSessionMixin:
-    """Serves the sale session screen for passenger and ticket sales workflows in UC-S01–S09,
-    applying the access, query, form, and redirect rules configured below.
-    """
+    """Keeps the pending sale quote in the session, replacing the 66-byte COMMAREA of SELLCOB1."""
 
     def get_quote(self):
         """Restore the pending sale quote from the current browser session."""
@@ -99,15 +93,13 @@ class SellStep1View(SalesView, SaleSessionMixin, generic.FormErrorsAsMessagesMix
         }
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for sell step1
-        view.
-        """
+        """Publish the stored quote so the recapitulation survives a redisplay."""
         kwargs.setdefault("quote", self.get_quote())
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for sell step1
-        view.
+        """Price the sale, keep the quote in the session and redisplay the screen with the
+        recapitulation.
         """
         try:
             quote = quote_sale(**form.cleaned_data, today=timezone.localdate())
@@ -119,9 +111,7 @@ class SellStep1View(SalesView, SaleSessionMixin, generic.FormErrorsAsMessagesMix
         return self.render_to_response(self.get_context_data(form=form, quote=quote))
 
     def form_invalid(self, form):
-        """Redisplay invalid input while exposing its validation messages to the user for sell
-        step1 view.
-        """
+        """Drop the stored quote so an invalid search cannot be confirmed."""
         self.clear_quote()
         return super().form_invalid(form)
 
@@ -133,9 +123,7 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
     template_name = "sales/sell_step2.html"
 
     def dispatch(self, request, *args, **kwargs):
-        """Enforce the prerequisite workflow state before delegating the HTTP request for sell
-        step2 view.
-        """
+        """Require a quote in the session, otherwise redirect with E-SEL-09."""
         if response := check_role(request, self.allowed_roles):
             return response
         self.quote = self.get_quote()
@@ -157,9 +145,7 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
         return {"client_1": self.quote.client_id}
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for sell step2
-        view.
-        """
+        """Publish the quote and one row per passenger with the resolved name."""
         form = kwargs.pop("form", None) or self.get_form()
         names = kwargs.pop(
             "names", {1: self.quote.client_name} if self.request.method == "GET" else {}
@@ -169,9 +155,7 @@ class SellStep2View(SalesView, SaleSessionMixin, FormView):
         )
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for sell step2
-        view.
-        """
+        """Confirm the sale on the confirm action, otherwise only resolve the passenger names."""
         client_ids = [
             form.cleaned_data[f"client_{number}"] for number in range(1, self.quote.count + 1)
         ]
@@ -232,9 +216,7 @@ class PassengerListView(PassengerView, generic.PageTitleMixin, generic.FilteredL
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for passenger
-        list view.
-        """
+        """Filter passengers by the submitted criteria; an invalid filter shows nothing."""
         return queryset.filter_by(**form.cleaned_data) if form.is_valid() else queryset.none()
 
 
@@ -248,9 +230,7 @@ class PassengerDetailView(PassengerView, generic.PageTitleMixin, DetailView):
         return f"Passenger {self.object.pk}"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for passenger
-        detail view.
-        """
+        """Publish the tickets of this passenger."""
         tickets = Ticket.objects.with_related().for_passenger(self.object)
         return super().get_context_data(tickets=tickets, **kwargs)
 
@@ -264,9 +244,7 @@ class PassengerFormView(
     model_label = "Passenger"
 
     def get_cancel_url(self):
-        """Process get cancel url for passenger and ticket sales workflows in UC-S01–S09 according
-        to the rules in this callable.
-        """
+        """Cancel back to the passenger detail when editing, to the list when creating."""
         if self.object:
             return reverse("sales:passenger_detail", kwargs={"clientid": self.object.pk})
         return super().get_cancel_url()
@@ -275,9 +253,7 @@ class PassengerFormView(
         return f"Edit passenger {self.object.pk}" if self.object else "New passenger"
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for passenger
-        form view.
-        """
+        """Warn about a duplicate e-mail address but save the passenger anyway."""
         warning = duplicate_email_warning(
             form.cleaned_data["email"], getattr(self.object, "pk", None)
         )
@@ -309,7 +285,7 @@ class FlightSearchView(RoleRequiredMixin, generic.SearchListView):
     paginate_by = 10
 
     def search_queryset(self, form):
-        """Apply the screen’s validated search terms to its base queryset for flight search view."""
+        """Search flights by number, date and airports, counted from today."""
         return search_flights(**form.cleaned_data, today=timezone.localdate())
 
 
@@ -325,14 +301,12 @@ class TicketSearchView(SalesAndCeoView, generic.SearchListView):
     paginate_by = 10
 
     def search_queryset(self, form):
-        """Apply the screen’s validated search terms to its base queryset for ticket search view."""
+        """Search tickets by ticket id, client id or passenger name."""
         return search_tickets(**form.cleaned_data)
 
 
 class TicketView(SalesAndCeoView, DetailView):
-    """Serves the ticket screen for passenger and ticket sales workflows in UC-S01–S09,
-    applying the access, query, form, and redirect rules configured below.
-    """
+    """Binds the TICKET table and raises E-TKT-03 when the requested ticket id does not exist."""
 
     model = Ticket
     pk_url_kwarg = "ticketid"
@@ -359,9 +333,7 @@ class BoardingPassView(TicketView):
     template_name = "sales/boarding_pass.html"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for boarding pass
-        view.
-        """
+        """Publish the boarding-pass fields in the TICKET-FORMAT layout."""
         return super().get_context_data(
             boarding_pass=boarding_pass_context(self.object),
             ticketid=self.object.ticketid,
@@ -370,15 +342,13 @@ class BoardingPassView(TicketView):
 
 
 class BuyView(SalesAndCeoView, DetailView):
-    """Serves the buy screen for passenger and ticket sales workflows in UC-S01–S09, applying
-    the access, query, form, and redirect rules configured below.
-    """
+    """Binds the BUY table with the tickets and passengers needed by the receipt screens."""
 
     model = Buy
     pk_url_kwarg = "buyid"
 
     def get_queryset(self):
-        """Build the ordered or related queryset required by this screen for buy view."""
+        """Join the records the confirmation and receipt screens print."""
         return Buy.objects.with_related()
 
 
@@ -404,9 +374,7 @@ class BoardingPassesView(BuyView):
     template_name = "sales/boarding_passes.html"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for boarding
-        passes view.
-        """
+        """Publish one boarding pass per ticket of the purchase."""
         tickets = Ticket.objects.with_related().for_buy(self.object)
         passes = [boarding_pass_context(ticket) for ticket in tickets]
         return super().get_context_data(boarding_passes=passes, **kwargs)

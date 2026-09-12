@@ -20,9 +20,7 @@ PASSWORD_SESSION_KEY = "it_temporary_password"
 
 
 class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
-    """Serves the user list screen for authentication and IT account workflows in UC-A01–A03
-    and UC-I01, applying the access, query, form, and redirect rules configured below.
-    """
+    """Lists employee accounts with their login state, searchable by name or EMPID."""
 
     allowed_roles = (Role.IT,)
     model = Employee
@@ -32,37 +30,27 @@ class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for user list
-        view.
-        """
+        """Search accounts by EMPID or name and order them by EMPID."""
         return queryset.select_related("dept", "user").search(form.value("q", "")).order_by("empid")
 
 
 class AccountActionView(RoleRequiredMixin, SingleObjectMixin, View):
-    """Serves the account action screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Shared base for the POST-only account actions, loading the employee with its account row."""
 
     allowed_roles = (Role.IT,)
     model = Employee
     pk_url_kwarg = "empid"
 
     def get_queryset(self):
-        """Build the ordered or related queryset required by this screen for account action view."""
+        """Load the employee together with the account row the action updates."""
         return Employee.objects.select_related("user")
 
 
 class ResetPasswordView(AccountActionView):
-    """Serves the reset password screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Resets an employee password to a generated one and hands it to the confirmation screen."""
 
     def post(self, request, *args, **kwargs):
-        """Process the submitted account action and redirect with its resulting status message for
-        reset password view.
-        """
+        """Generate a new password, keep it in the session and redirect to the screen showing it."""
         employee = self.get_object()
         password = reset_employee_password(employee)
         request.session[PASSWORD_SESSION_KEY] = {"empid": employee.empid, "password": password}
@@ -71,17 +59,12 @@ class ResetPasswordView(AccountActionView):
 
 
 class AccountStateView(AccountActionView):
-    """Serves the account state screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Shared base for activation and deactivation; the concrete view supplies the service."""
 
     service = None
 
     def post(self, request, *args, **kwargs):
-        """Process the submitted account action and redirect with its resulting status message for
-        account state view.
-        """
+        """Run the configured account service and report its outcome as a message."""
         try:
             message = self.service(self.get_object(), request.user)
         except AccountError as error:
@@ -92,36 +75,25 @@ class AccountStateView(AccountActionView):
 
 
 class ActivateUserView(AccountStateView):
-    """Serves the activate user screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Activates the employee account through accounts.services.activate_account."""
 
     service = staticmethod(activate_account)
 
 
 class DeactivateUserView(AccountStateView):
-    """Serves the deactivate user screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Deactivates the employee account, refusing the signed-in IT user's own account."""
 
     service = staticmethod(deactivate_account)
 
 
 class PasswordShownView(RoleRequiredMixin, TemplateView):
-    """Serves the password shown screen for authentication and IT account workflows in
-    UC-A01–A03 and UC-I01, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Shows the generated password once, reading it from the session left by the reset."""
 
     allowed_roles = (Role.IT,)
     template_name = "it/user_password_shown.html"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for password
-        shown view.
-        """
+        """Take the generated password out of the session so it is displayed only once."""
         return super().get_context_data(
             temporary=self.request.session.pop(PASSWORD_SESSION_KEY, None), **kwargs
         )

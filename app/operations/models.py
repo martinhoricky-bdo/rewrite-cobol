@@ -81,7 +81,7 @@ class Crew(models.Model):
         return f"Crew {self.crewid}"
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for crew."""
+        """Return the schedule edit URL of this crew."""
         return reverse("schedule:crew_edit", kwargs={"crewid": self.pk})
 
     def members(self) -> list[Employee]:
@@ -96,9 +96,7 @@ class Crew(models.Model):
         ]
 
     def clean(self) -> None:
-        """Validate related fields together and attach the applicable domain error messages for
-        crew.
-        """
+        """Refuse a crew whose six positions are not held by six different employees."""
         super().clean()
         member_ids = [
             self.commander_id,
@@ -119,9 +117,7 @@ class ShiftQuerySet(models.QuerySet):
     """
 
     def in_period(self, date_from, date_to):
-        """Restrict records to dates inside the inclusive period supplied by the screen for shift
-        query set.
-        """
+        """Restrict the shifts to the inclusive date range."""
         return self.filter(shiftdate__range=(date_from, date_to))
 
     def with_flight_count(self):
@@ -159,7 +155,7 @@ class Shift(models.Model):
         return f"Shift {self.shiftid} ({self.shiftdate})"
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for shift."""
+        """Return the schedule edit URL of this shift."""
         return reverse("schedule:shift_edit", kwargs={"shiftid": self.pk})
 
 
@@ -173,15 +169,11 @@ class FlightQuerySet(models.QuerySet):
         return self.annotate(sold=Count("tickets"))
 
     def in_period(self, date_from, date_to):
-        """Restrict records to dates inside the inclusive period supplied by the screen for flight
-        query set.
-        """
+        """Restrict the flights to the inclusive date range."""
         return self.filter(flightdate__range=(date_from, date_to))
 
     def with_related(self):
-        """Load the related records needed by the consuming screen without extra queries for flight
-        query set.
-        """
+        """Join the airports, the airplane and the shift shown in the flight lists."""
         return self.select_related("airportdep", "airportarr", "airplane", "shift")
 
 
@@ -232,5 +224,5 @@ class Flight(models.Model):
         return f"{self.flightnum} {self.flightdate}"
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for flight."""
+        """Return the schedule edit URL of this flight."""
         return reverse("schedule:flight_edit", kwargs={"flightid": self.pk})

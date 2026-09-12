@@ -112,7 +112,7 @@ class Employee(models.Model):
         return self.full_name
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for employee."""
+        """Return the HR detail URL of this employee."""
         return reverse("hr:employee_detail", kwargs={"empid": self.pk})
 
     @property

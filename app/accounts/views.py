@@ -29,16 +29,12 @@ class AccountLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get(self, request, *args, **kwargs):
-        """Serve the requested page after applying the workflow’s access and state checks for
-        account login view.
-        """
+        """Show the login screen with the welcome banner of the LOGON map."""
         messages.info(request, "Welcome to COBOL AIRLINES system")
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """Process the submitted account action and redirect with its resulting status message for
-        account login view.
-        """
+        """Refuse the attempt with E-AUTH-03 while this user and address are still blocked."""
         username = request.POST.get("username", "")
         ip_address = request.META.get("REMOTE_ADDR", "unknown")
         if minutes := login_block_minutes(username, ip_address):
@@ -49,9 +45,7 @@ class AccountLoginView(LoginView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for account
-        login view.
-        """
+        """Clear the failure counter of the signed-in user and log the successful attempt."""
         username = form.cleaned_data["username"]
         ip_address = self.request.META.get("REMOTE_ADDR", "unknown")
         clear_login_failures(username, ip_address)
@@ -59,9 +53,7 @@ class AccountLoginView(LoginView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        """Redisplay invalid input while exposing its validation messages to the user for account
-        login view.
-        """
+        """Count the failed attempt per user and address unless the pair is already blocked."""
         username = self.request.POST.get("username", "")
         ip_address = self.request.META.get("REMOTE_ADDR", "unknown")
         if self.request.method == "POST" and not login_block_minutes(username, ip_address):
@@ -76,9 +68,7 @@ class AccountLogoutView(View):
     http_method_names = ["get", "post"]
 
     def dispatch(self, request, *args, **kwargs):
-        """Enforce the prerequisite workflow state before delegating the HTTP request for account
-        logout view.
-        """
+        """Log the user out on GET as well, mirroring the F3 key of the legacy maps."""
         username = request.user.get_username() if request.user.is_authenticated else "anonymous"
         logout(request)
         logger.info("logout user=%s", username)
@@ -95,9 +85,7 @@ class AccountPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy("core:home")
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for account
-        password change view.
-        """
+        """Clear the forced-change flag and keep the session signed in under the new password."""
         response = super().form_valid(form)
         self.request.user.must_change_password = False
         self.request.user.save(update_fields=["must_change_password"])

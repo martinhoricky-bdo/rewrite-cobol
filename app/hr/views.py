@@ -19,9 +19,7 @@ from .services import create_employee
 
 
 class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
-    """Serves the employee screen for Design employee and department maintenance in UC-H01 and
-    UC-H02, applying the access, query, form, and redirect rules configured below.
-    """
+    """Binds the EMPLO table for HR, which may edit, and for the CEO, who only reads."""
 
     model = Employee
     pk_url_kwarg = "empid"
@@ -30,9 +28,7 @@ class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
 
 
 class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredListView):
-    """Serves the employee list screen for Design employee and department maintenance in UC-H01
-    and UC-H02, applying the access, query, form, and redirect rules configured below.
-    """
+    """Lists employees with a name, department and initial-letter filter."""
 
     page_title = "Employees"
     template_name = "hr/employee_list.html"
@@ -40,9 +36,7 @@ class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredLis
     paginate_by = 10
 
     def filter_queryset(self, queryset, form):
-        """Apply validated filter fields to the records displayed by this list screen for employee
-        list view.
-        """
+        """Filter employees by the initial letters of the surname and by department."""
         return (
             queryset.select_related("dept", "user")
             .name_starts_with(form.value("name", ""))
@@ -51,10 +45,7 @@ class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredLis
 
 
 class EmployeeDetailView(EmployeeView, generic.PageTitleMixin, DetailView):
-    """Serves the employee detail screen for Design employee and department maintenance in
-    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Shows one employee together with the crews they belong to."""
 
     template_name = "hr/employee_detail.html"
     context_object_name = "employee_record"
@@ -67,9 +58,7 @@ class EmployeeDetailView(EmployeeView, generic.PageTitleMixin, DetailView):
         return f"Employee {self.object.empid}"
 
     def get_context_data(self, **kwargs):
-        """Add the screen-specific display values to the generic template context for employee
-        detail view.
-        """
+        """Publish the crews the employee serves in."""
         return super().get_context_data(crews=Crew.objects.with_member(self.object), **kwargs)
 
 
@@ -79,9 +68,7 @@ class EmployeeFormView(
     generic.CancelUrlMixin,
     generic.SavedMessageMixin,
 ):
-    """Serves the employee form screen for Design employee and department maintenance in UC-H01
-    and UC-H02, applying the access, query, form, and redirect rules configured below.
-    """
+    """Shared base for the HR employee create and edit forms."""
 
     allowed_roles = (Role.HR,)
     form_class = EmployeeForm
@@ -89,46 +76,33 @@ class EmployeeFormView(
 
 
 class EmployeeCreateView(EmployeeFormView, CreateView):
-    """Serves the employee create screen for Design employee and department maintenance in
-    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Creates an employee and an inactive account through hr.services.create_employee."""
 
     page_title = "New employee"
 
     def form_valid(self, form):
-        """Persist validated input and continue with the workflow’s success response for employee
-        create view.
-        """
+        """Create the employee with an account through the service and confirm it."""
         self.object = create_employee(form)
         messages.success(self.request, self.get_saved_message())
         return HttpResponseRedirect(self.get_success_url())
 
 
 class EmployeeUpdateView(EmployeeFormView, UpdateView):
-    """Serves the employee update screen for Design employee and department maintenance in
-    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Edits an employee; EMPID stays unchanged because it is the primary key."""
 
     def get_page_title(self):
         return f"Edit employee {self.object.empid}"
 
 
 class DepartmentView(RoleRequiredMixin):
-    """Serves the department screen for Design employee and department maintenance in UC-H01
-    and UC-H02, applying the access, query, form, and redirect rules configured below.
-    """
+    """Binds the DEPT table for the HR role."""
 
     allowed_roles = (Role.HR,)
     model = Department
 
 
 class DepartmentListView(DepartmentView, generic.PageTitleMixin, ListView):
-    """Serves the department list screen for Design employee and department maintenance in
-    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Lists departments with their manager and the number of employees."""
 
     page_title = "Departments"
     template_name = "hr/department_list.html"
@@ -147,10 +121,7 @@ class DepartmentUpdateView(
     generic.SavedMessageMixin,
     UpdateView,
 ):
-    """Serves the department update screen for Design employee and department maintenance in
-    UC-H01 and UC-H02, applying the access, query, form, and redirect rules configured
-    below.
-    """
+    """Edits a department; the manager must be one of its own employees."""
 
     form_class = DepartmentForm
     pk_url_kwarg = "deptid"

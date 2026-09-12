@@ -42,9 +42,7 @@ class EmployeeChoiceField(forms.ModelChoiceField):
     """
 
     def label_from_instance(self, employee: Employee) -> str:
-        """Render a choice label containing the operational identifiers users need to distinguish
-        records for employee choice field.
-        """
+        """Label an employee with EMPID and full name."""
         return f"{employee.pk} – {employee.full_name}"
 
 
@@ -80,9 +78,7 @@ class CrewForm(forms.ModelForm):
             self.fields[field].queryset = attendants
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        crew form.
-        """
+        """Refuse a crew in which one employee holds two positions."""
         cleaned = super().clean()
         members = [cleaned.get(field) for field in self._meta.fields]
         members = [member for member in members if member is not None]
@@ -106,9 +102,7 @@ class ShiftForm(forms.ModelForm):
         }
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        shift form.
-        """
+        """Refuse reversed times and a shift overlapping another shift of the same crew."""
         cleaned = super().clean()
         day = cleaned.get("shiftdate")
         begin = cleaned.get("begintime")
@@ -133,9 +127,7 @@ class ShiftChoiceField(forms.ModelChoiceField):
     """Labels shift choices with date, crew, and period for clear scheduling."""
 
     def label_from_instance(self, shift: Shift) -> str:
-        """Render a choice label containing the operational identifiers users need to distinguish
-        records for shift choice field.
-        """
+        """Label a shift with its date, its times and its crew."""
         return (
             f"{shift.shiftdate} {shift.begintime:%H:%M}–{shift.endtime:%H:%M} crew {shift.crew_id}"
         )
@@ -188,9 +180,7 @@ class FlightForm(forms.ModelForm):
         return price
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        flight form.
-        """
+        """Refuse identical airports and a duplicate flight number on the same date."""
         cleaned = super().clean()
         dep, arr = cleaned.get("airportdep"), cleaned.get("airportarr")
         if dep and arr and dep == arr:
@@ -246,9 +236,7 @@ class FlightGenerateForm(forms.Form):
         )
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        flight generate form.
-        """
+        """Refuse a reversed period and one longer than 91 days."""
         cleaned = super().clean()
         start, end = cleaned.get("date_from"), cleaned.get("date_to")
         if start and end:

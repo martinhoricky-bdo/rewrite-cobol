@@ -33,18 +33,14 @@ class Command(BaseCommand):
     help = "Seed development data from the read-only legacy files."
 
     def add_arguments(self, parser) -> None:
-        """Register the command-line paths and reset options accepted by this management command
-        for command.
-        """
+        """Accept the flush switch and the period the generated flights cover."""
         parser.add_argument("--flush", action="store_true")
         parser.add_argument("--from-date", type=date.fromisoformat, default=None)
         parser.add_argument("--days", type=int, default=60)
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
-        """Validate command options, run the requested import operation, and report its totals for
-        command.
-        """
+        """Load the legacy fixtures and generate the demo flights for the chosen period."""
         if options["days"] < 1:
             raise CommandError("--days must be a positive integer")
         start = options["from_date"] or timezone.localdate()

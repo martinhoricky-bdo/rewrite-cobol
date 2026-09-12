@@ -93,9 +93,7 @@ class SellStep2Form(forms.Form):
             )
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        sell step2 form.
-        """
+        """Refuse a passenger listed twice with E-SEL-11."""
         cleaned_data = super().clean()
         seen = set()
         for client_id in cleaned_data.values():
@@ -149,9 +147,7 @@ class PassengerForm(forms.ModelForm):
         )
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        passenger form.
-        """
+        """Trim the whitespace around every text field before saving."""
         cleaned_data = super().clean()
         for field_name in self.Meta.fields:
             value = cleaned_data.get(field_name)
@@ -177,9 +173,7 @@ class FlightSearchForm(forms.Form):
     airportarr = forms.CharField(min_length=3, max_length=4, required=False, label="LAND AIRPORT")
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        flight search form.
-        """
+        """Require at least one search field, otherwise report E-FLT-01."""
         cleaned_data = super().clean()
         field_names = ("flightnum", "flightdate", "airportdep", "airportarr")
         if not any(str(self.data.get(name, "")).strip() for name in field_names):
@@ -213,9 +207,7 @@ class TicketSearchForm(forms.Form):
         return ticketid
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        ticket search form.
-        """
+        """Require a ticket id, a client id or both names, otherwise report E-TKT-01."""
         cleaned_data = super().clean()
         if not (
             cleaned_data.get("ticketid")

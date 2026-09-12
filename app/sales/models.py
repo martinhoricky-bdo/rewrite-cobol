@@ -57,14 +57,12 @@ class Passenger(models.Model):
         return self.full_name
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for passenger."""
+        """Return the sales detail URL of this passenger."""
         return reverse("sales:passenger_detail", kwargs={"clientid": self.pk})
 
     @property
     def full_name(self) -> str:
-        """Combine the stored first name and surname for labels and printed documents for
-        passenger.
-        """
+        """Join the first name and the surname for lists and printed documents."""
         return f"{self.firstname} {self.lastname}"
 
 
@@ -74,9 +72,7 @@ class BuyQuerySet(models.QuerySet):
     """
 
     def with_related(self):
-        """Load the related records needed by the consuming screen without extra queries for buy
-        query set.
-        """
+        """Join the seller, the buyer and the tickets printed on the receipt."""
         return self.select_related("emp", "client").prefetch_related("tickets__client")
 
 
@@ -101,7 +97,7 @@ class Buy(models.Model):
         return f"Buy {self.buyid}"
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for buy."""
+        """Return the sales detail URL of this purchase."""
         return reverse("sales:buy_detail", kwargs={"buyid": self.pk})
 
 
@@ -111,9 +107,7 @@ class TicketQuerySet(models.QuerySet):
     """
 
     def with_related(self):
-        """Load the related records needed by the consuming screen without extra queries for ticket
-        query set.
-        """
+        """Join the passenger, the flight with its airports and the purchase with its seller."""
         return self.select_related(
             "client", "flight", "flight__airportdep", "flight__airportarr", "buy", "buy__emp"
         )
@@ -156,5 +150,5 @@ class Ticket(models.Model):
         return self.ticketid
 
     def get_absolute_url(self) -> str:
-        """Build the canonical detail URL used after saving this record for ticket."""
+        """Return the sales detail URL of this ticket."""
         return reverse("sales:ticket_detail", kwargs={"ticketid": self.pk})

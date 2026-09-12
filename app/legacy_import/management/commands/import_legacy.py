@@ -85,18 +85,14 @@ class Command(BaseCommand):
     help = "Import a DB2 EXPORT OF DEL directory."
 
     def add_arguments(self, parser) -> None:
-        """Register the command-line paths and reset options accepted by this management command
-        for command.
-        """
+        """Accept the export directory, the date format and the dry-run and report options."""
         parser.add_argument("--dir", required=True, type=Path)
         parser.add_argument("--dry-run", action="store_true")
         parser.add_argument("--report", type=Path)
         parser.add_argument("--date-format", choices=("iso", "us"), default="iso")
 
     def handle(self, *args, **options) -> None:
-        """Validate command options, run the requested import operation, and report its totals for
-        command.
-        """
+        """Import every table in dependency order and write the row counts into the report."""
         directory = options["dir"]
         if not directory.is_dir():
             raise CommandError(f"Import directory not found: {directory}")
