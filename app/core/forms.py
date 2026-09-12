@@ -1,8 +1,6 @@
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.forms.renderers import DjangoTemplates
-from django.template import engines
-from django.utils.functional import cached_property
+from django.forms.renderers import TemplatesSetting
 
 
 class FilterForm(forms.Form):
@@ -15,9 +13,9 @@ class FilterForm(forms.Form):
             raise ImproperlyConfigured(f"Filter fields must not be required: {', '.join(required)}")
 
     def value(self, name: str, default=None):
-        self.full_clean()
+        errors = self.errors
         value = self.cleaned_data.get(name)
-        return default if name in self.errors or value in self.fields[name].empty_values else value
+        return default if name in errors or value in self.fields[name].empty_values else value
 
     def is_empty(self) -> bool:
         return not any(
@@ -25,11 +23,7 @@ class FilterForm(forms.Form):
         )
 
 
-class FormRenderer(DjangoTemplates):
+class FormRenderer(TemplatesSetting):
     """Render bound fields with the application's shared field template."""
 
     field_template_name = "core/forms/field.html"
-
-    @cached_property
-    def engine(self):
-        return engines["django"]

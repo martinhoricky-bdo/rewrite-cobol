@@ -55,12 +55,17 @@ class FormErrorsAsMessagesMixin:
     """Copy all form validation errors into Django messages."""
 
     def form_invalid(self, form: BaseForm) -> HttpResponse:
-        for field in form:
-            for error in field.errors:
-                messages.error(self.request, error)
-        for error in form.non_field_errors():
-            messages.error(self.request, error)
+        form_errors_as_messages(self.request, form)
         return super().form_invalid(form)
+
+
+def form_errors_as_messages(request, form: BaseForm) -> None:
+    """Copy every form validation error to the request message storage."""
+    for field in form:
+        for error in field.errors:
+            messages.error(request, error)
+    for error in form.non_field_errors():
+        messages.error(request, error)
 
 
 class FilteredListView(ListView):
@@ -68,10 +73,12 @@ class FilteredListView(ListView):
 
     filter_form_class = None
 
-    def get_filter_form(self) -> BaseForm:
+    def get_filter_form(self) -> BaseForm | None:
+        if self.filter_form_class is None:
+            return None
         return self.filter_form_class(self.request.GET)
 
-    def filter_queryset(self, queryset, form: BaseForm):
+    def filter_queryset(self, queryset, form: BaseForm | None):
         return queryset
 
     def get_queryset(self):
@@ -110,11 +117,7 @@ class SearchListView(FormErrorsAsMessagesMixin, FilteredListView):
         return results
 
     def form_invalid(self, form: BaseForm) -> None:
-        for field in form:
-            for error in field.errors:
-                messages.error(self.request, error)
-        for error in form.non_field_errors():
-            messages.error(self.request, error)
+        form_errors_as_messages(self.request, form)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
