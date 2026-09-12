@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R15 – HR: zaměstnanci a oddělení
+- PR: #TBD (codex/R15-hr)
+- Přidáno: HR seznam, detail a formuláře zaměstnanců a správa názvů a manažerů oddělení s testy oprávnění.
+- Změněno: navigace rolí HR a CEO a sdílené automatické vytváření uživatelského účtu zaměstnance.
+- Odchylky od specifikace: žádné.
+
 ## R14 – Import z exportu DB2
 - PR: #31 (codex/R14-import-legacy)
 - Přidáno: atomický a idempotentní import DB2 DEL souborů, JSON report, dry-run, normalizace a testovací exporty.

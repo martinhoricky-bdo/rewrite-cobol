@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Employees | COBOL AIRLINES{% endblock %}
+{% block content %}
+<h1>Employees</h1>
+{% if can_edit %}<p><a href="{% url 'hr:employee_create' %}" role="button">New employee</a></p>{% endif %}
+<form method="get">
+  <label>Name starts with<input name="name" value="{{ name }}"></label>
+  <label>Department<select name="dept"><option value="">All</option>{% for dept in departments %}<option value="{{ dept.deptid }}"{% if selected_dept == dept.deptid|stringformat:"s" %} selected{% endif %}>{{ dept.name }}</option>{% endfor %}</select></label>
+  <button type="submit">Filter</button>
+</form>
+<table><thead><tr><th>EMPID</th><th>LAST NAME</th><th>FIRST NAME</th><th>DEPT</th><th>ADMIDATE</th><th>EMAIL</th><th>ACCOUNT</th><th>ACTIONS</th></tr></thead>
+<tbody>{% for employee in page_obj %}<tr><td>{{ employee.empid }}</td><td>{{ employee.lastname }}</td><td>{{ employee.firstname }}</td><td>{{ employee.dept.name }}</td><td>{{ employee.admidate|date:"Y-m-d" }}</td><td>{{ employee.email }}</td><td>{% if not employee.user %}no account{% elif not employee.user.is_active %}inactive{% elif not employee.user.has_usable_password %}no password{% else %}active{% endif %}</td><td><a href="{% url 'hr:employee_detail' employee.empid %}">Detail</a>{% if can_edit %} | <a href="{% url 'hr:employee_edit' employee.empid %}">Edit</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="8">No employees found.</td></tr>{% endfor %}</tbody></table>
+{% include "partials/pagination.html" with page_obj=page_obj query_params=query_params %}
+{% endblock %}
