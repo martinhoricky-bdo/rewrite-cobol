@@ -21,6 +21,7 @@ DATABASES = {
 LEGACY_ROOT = env.path("LEGACY_ROOT", default=BASE_DIR.parent)
 
 INSTALLED_APPS = [
+    "django.forms",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -83,6 +84,7 @@ LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+FORM_RENDERER = "core.forms.FormRenderer"
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

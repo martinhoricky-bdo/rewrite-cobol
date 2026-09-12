@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} | COBOL AIRLINES{% endblock %}
+{% block content %}
+<h1>{{ page_title }}</h1>
+{% block actions %}{% endblock %}
+{% block filters %}{% if form %}<form method="get">{{ form }}<button type="submit">{{ view.filter_button_label|default:"Filter" }}</button></form>{% endif %}{% endblock %}
+{% block table %}<table><thead>{% block thead %}{% endblock %}</thead><tbody>{% block rows %}{% for item in object_list %}{% empty %}{% block empty %}<tr><td colspan="{{ colspan|default:1 }}">{{ empty_text }}</td></tr>{% endblock %}{% endfor %}{% endblock %}</tbody></table>{% endblock %}
+{% include "core/pagination.html" %}
+{% endblock %}

@@ -18,16 +18,22 @@ def current_role(user) -> Role | None:
         return None
 
 
+def check_role(request: HttpRequest, allowed: tuple[Role, ...]) -> HttpResponse | None:
+    if not request.user.is_authenticated:
+        return redirect_to_login(request.get_full_path(), settings.LOGIN_URL)
+    if not request.user.is_superuser and current_role(request.user) not in allowed:
+        raise PermissionDenied
+    return None
+
+
 def role_required(*roles: Role | str):
-    allowed = {Role(role) for role in roles}
+    allowed = tuple(Role(role) for role in roles)
 
     def decorator(view: Callable) -> Callable:
         @wraps(view)
         def wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
-            if not request.user.is_authenticated:
-                return redirect_to_login(request.get_full_path(), settings.LOGIN_URL)
-            if not request.user.is_superuser and current_role(request.user) not in allowed:
-                raise PermissionDenied
+            if response := check_role(request, allowed):
+                return response
             return view(request, *args, **kwargs)
 
         return wrapped
@@ -36,12 +42,9 @@ def role_required(*roles: Role | str):
 
 
 class RoleRequiredMixin:
-    roles: tuple[Role | str, ...] = ()
+    allowed_roles: tuple[Role, ...] = ()
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect_to_login(request.get_full_path(), settings.LOGIN_URL)
-        allowed = {Role(role) for role in self.roles}
-        if not request.user.is_superuser and current_role(request.user) not in allowed:
-            raise PermissionDenied
+        if response := check_role(request, self.allowed_roles):
+            return response
         return super().dispatch(request, *args, **kwargs)

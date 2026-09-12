@@ -16,5 +16,5 @@
       <td><a href="{% url 'sales:passenger_detail' passenger.clientid %}">Detail</a> <a href="{% url 'sales:passenger_edit' passenger.clientid %}">Edit</a></td>
     </tr>{% empty %}<tr><td colspan="8">No passengers found.</td></tr>{% endfor %}</tbody>
   </table></div>
-  {% include "partials/pagination.html" %}
+  {% include "core/pagination.html" %}
 {% endblock %}

@@ -5,9 +5,9 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 
 from accounts.permissions import current_role
-
-from .messages import E_AUTH_02
-from .navigation import ROLE_HOME
+from core.exceptions import NotFound
+from core.messages import E_AUTH_02
+from core.navigation import ROLE_HOME
 
 
 @login_required
@@ -27,12 +27,12 @@ def permission_denied(request, exception=None):
 
 
 def page_not_found(request, exception=None):
-    return render(request, "404.html", status=404)
+    context = {"error_message": exception.message} if isinstance(exception, NotFound) else {}
+    return render(request, "404.html", context, status=404)
 
 
 def server_error(request):
-    # Rendered without the request context so that failing context processors
-    # (session, database) cannot break the error page itself.
+    # Rendered without request context so a failing context processor cannot break this page.
     return HttpResponseServerError(render_to_string("500.html"))
 
 
