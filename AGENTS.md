@@ -73,6 +73,19 @@ Pravidla:
 - Každý testovací soubor musí projít i samostatně (`pytest tests/views/test_x.py`), ne jen v celé sadě (žádná závislost na pořadí, na čítačích factory ani na stavu sekvencí v DB).
 - E2E (Playwright, `tests/e2e`, marker `e2e`): tvůj sandbox nemá Chromium, testy tedy piš tak, aby prošly napoprvé při spuštění reviewerem: override fixtur `base_url` / `browser_type_launch_args` musí být `scope="session"`; akční odkazy aplikace jsou `<a role="button">` → `get_by_role("button", name=…)`, běžné odkazy v menu a tabulkách `get_by_role("link", …)`; nový panel (`expect_popup`) jen u odkazů s `target="_blank"`, jinak klikni a vrať se přes `Back`; texty opakované na tiskových stránkách (jméno a sedadlo na vstupence) ověřuj přes `.first`; data v testu musí být unikátní a scénář opakovatelný bez `--flush`.
 
+## 4a. Push a otevření PR (závazné od 2026-09-12)
+
+`git push origin …` v Codex Cloud jde přes proxy Codexu s tokenem jeho GitHub App, která u tohoto repozitáře zápis odmítá (HTTP 403 `Permission to … denied to chatgpt-codex-connector[bot]`). Proto **vždy** pushuj přímo na GitHub s tokenem uloženým v `gh` a nikdy přes `origin`:
+
+```
+git push "https://x-access-token:$(gh auth token)@github.com/martinhoricky-bdo/rewrite-cobol.git" HEAD:refs/heads/<větev>
+gh pr create --base rewrite --head <větev> --title "<ID>: <název>" --body-file <soubor s popisem dle šablony>
+```
+
+- Před prací ověř `gh auth status`; pokud `gh auth token` selže nebo push vrátí chybu, do issue kroku napiš kompletní výstup `gh auth status` a přesnou chybu z `git push` – nic dalšího nezkoušej.
+- Opravy po review pushuj stejným příkazem do **stejné** větve (bez force-push) a do issue kroku napiš „fixes pushed“.
+- Po úspěchu napiš do issue kroku číslo PR.
+
 ## 5. Co musí obsahovat každý PR
 
 1. Popis podle šablony v `04-migration-plan.md` (sekce „Šablona popisu PR“): ID a název kroku s odkazem na plán a na zadání `docs/rewrite/codex-tasks/<ID>.md`, co PR dělá, jak ověřit, výstup `make check`, odchylky/otevřené otázky, checklist.
