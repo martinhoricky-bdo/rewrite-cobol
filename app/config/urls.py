@@ -11,6 +11,8 @@ urlpatterns = [
     path("it/", include("core.urls_it", namespace="it")),
     path("hr/", include("hr.urls")),
     path("schedule/", include("operations.urls")),
+    path("crew/", include("reports.urls_crew")),
+    path("ceo/", include("reports.urls_ceo")),
     path("", include("core.urls")),
 ]
 

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}CEO dashboard – COBOL AIRLINES{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<form method="get"><label>From <input type="date" name="from" value="{{ date_from|date:'Y-m-d' }}"></label><label>To <input type="date" name="to" value="{{ date_to|date:'Y-m-d' }}"></label><button type="submit">Filter</button></form>
+<section class="grid"><article><strong>Sales</strong><br>{{ sales }}</article><article><strong>Revenue</strong><br>{{ revenue|floatformat:2 }} EUR</article><article><strong>Tickets</strong><br>{{ tickets }}</article><article><strong>Average load factor</strong><br>{{ average_load_factor|floatformat:2 }}%</article><article><strong>Flights</strong><br>{{ flights }}</article></section>
+<h2>Top 5 routes</h2><table><thead><tr><th>ROUTE</th><th>TICKETS</th></tr></thead><tbody>{% for row in top_routes %}<tr><td>{{ row.airportdep_id }}→{{ row.airportarr_id }}</td><td>{{ row.ticket_count }}</td></tr>{% empty %}<tr><td colspan="2">No data.</td></tr>{% endfor %}</tbody></table>
+<h2>Sales by seller</h2><table><thead><tr><th>EMPID</th><th>NAME</th><th>SALES</th><th>REVENUE</th></tr></thead><tbody>{% for row in sales_by_seller %}<tr><td>{{ row.emp_id }}</td><td>{{ row.emp__firstname }} {{ row.emp__lastname }}</td><td>{{ row.sale_count }}</td><td>{{ row.revenue|floatformat:2 }} EUR</td></tr>{% empty %}<tr><td colspan="4">No data.</td></tr>{% endfor %}</tbody></table>
+<h2>Load factor by flight number</h2><table><thead><tr><th>FLIGHTNUM</th><th>AVERAGE LOAD FACTOR</th></tr></thead><tbody>{% for row in load_by_flight_number %}<tr><td>{{ row.flightnum }}</td><td>{{ row.load_factor|floatformat:2 }}%</td></tr>{% empty %}<tr><td colspan="2">No data.</td></tr>{% endfor %}</tbody></table>
+{% endblock %}

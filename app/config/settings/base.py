@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "fleet",
     "operations",
     "sales",
+    "reports",
     "legacy_import",
 ]
 MIDDLEWARE = [

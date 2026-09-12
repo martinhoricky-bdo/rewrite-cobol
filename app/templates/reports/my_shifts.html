@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}My shifts – COBOL AIRLINES{% endblock %}
+{% block content %}
+<h1>My shifts</h1>
+<form method="get"><label><input type="checkbox" name="past" value="1"{% if include_past %} checked{% endif %}> Show past shifts</label><button type="submit">Apply</button></form>
+{% for shift in page_obj %}
+<article><header><strong>{{ shift.shiftdate }}</strong> · {{ shift.begintime|time:"H:i" }}–{{ shift.endtime|time:"H:i" }} · Crew {{ shift.crew_id }}</header>
+<table><thead><tr><th>FLIGHTNUM</th><th>ROUTE</th><th>TDEP–TLAND</th><th>AIRPLANE</th><th>PASSENGERS</th></tr></thead><tbody>
+{% for flight in shift.flights.all %}<tr><td>{{ flight.flightnum }}</td><td>{{ flight.airportdep_id }}→{{ flight.airportarr_id }}</td><td>{{ flight.deptime|time:"H:i" }}–{{ flight.arrtime|time:"H:i" }}</td><td>{{ flight.airplane_id }}</td><td>{{ flight.passenger_count }} / {{ flight.airplane.numseats }}</td></tr>{% empty %}<tr><td colspan="5">No flights.</td></tr>{% endfor %}
+</tbody></table></article>
+{% empty %}<p>No shifts found.</p>{% endfor %}
+{% include "partials/pagination.html" %}
+{% endblock %}
