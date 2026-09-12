@@ -3,7 +3,7 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 01:26
+- Poslední aktualizace: 2026-09-12 01:35
 - Aktuální krok: R14 (Codex pracuje)
 - Blokuje: nic
 
@@ -29,7 +29,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R14 import z exportu DB2 | #30 | – | zadáno 01:26, čeká se na PR |
+| R14 import z exportu DB2 | #30 | – | zadáno 01:12; 1. běh skončil za minutu prázdným komentářem (bez větve); second run zadán 01:35, čeká se na PR |
 
 ## Fronta
 R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
