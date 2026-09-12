@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 01:12
-- Aktuální krok: R13 (Codex pracuje)
+- Poslední aktualizace: 2026-09-12 01:26
+- Aktuální krok: R14 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -24,18 +24,19 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R10 prodej krok 2 + potvrzení | #22 | #23 | 2026-09-12 00:08 (1. běh OK, 196 testů vč. souběhu na PostgreSQL, ruční prodej 641+100+200 → CB00000002..4/A01..C01/362.97; Claude doplnil test 403 pro `buy_detail`, číslo PR v CHANGELOG a nezávislost testu ID na sekvenci) |
 | R11 účtenka + hromadný tisk | #24 | #25 | 2026-09-12 00:27 (1. běh OK, 208 testů, ruční průchod účtenky dle RECEIPT-FORMAT a 3 vstupenek; Claude doplnil číslo PR v CHANGELOG) |
 | R12 e2e testy Sales (Playwright) | #26 | #27 | 2026-09-12 00:55 (1. běh OK; Codex e2e nemohl spustit – sandbox blokuje stažení Chromia; Claude testy rozběhl lokálně: scope fixtur, `role="button"` lokátory, navigace na účtenku, `.first` u duplicitních textů → 9/9 dvakrát bez flush; 206 unit/view testů) |
+| R13 IT Support (účty, letiště, letadla) | #28 | #29 | 2026-09-12 01:24 (1. běh OK; review 1: chování správné, vráceno kvůli chybějícím testům ze zadání §5; fix run doplnil testy za 6 min; 226 testů, ruční průchod reset hesla → /password/, deaktivace, CRUD, E-REF-01, oprávnění) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R13 IT Support (účty, letiště, letadla) | #28 | #29 | PR 00:51; review 01:12: chování OK (214 testů, ruční průchod), vráceno jen kvůli chybějícím testům ze zadání §5 – fix run zadán, čeká se na „fixes pushed“ |
+| R14 import z exportu DB2 | #30 | – | zadáno 01:26, čeká se na PR |
 
 ## Fronta
-R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
+R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
 - Codex sandbox nemá Docker ani Chromium (`playwright install` → 403 „Domain forbidden“). E2E testy (R12, případně další) ověřuje Claude lokálně proti `runserver` s předinstalovaným Chromiem; Codex je odevzdává „naslepo“, drobné opravy lokátorů dělá Claude přímo ve větvi.
 - Dev DB (`airlines`) obsahuje po e2e bězích prodeje 641+100 na `CB1104` (19. 9., 13. 9., 14. 9., 15. 9.) a e2e cestující `E2E-<timestamp>`; seed je nemaže. Pro čistý stav `seed_demo --flush`.
-- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R12/1 prošly; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
+- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R13/1 prošly; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
