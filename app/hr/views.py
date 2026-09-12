@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import Count as C
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
@@ -15,17 +15,17 @@ from .services import create_employee
 
 
 class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
-    model, pk_url_kwarg = Employee, "empid"
-    allowed_roles, edit_roles = (Role.HR, Role.CEO), (Role.HR,)
+    model = Employee
+    pk_url_kwarg = "empid"
+    allowed_roles = (Role.HR, Role.CEO)
+    edit_roles = (Role.HR,)
 
 
 class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredListView):
-    page_title, template_name, filter_form_class, paginate_by = (
-        "Employees",
-        "hr/employee_list.html",
-        EmployeeFilterForm,
-        10,
-    )
+    page_title = "Employees"
+    template_name = "hr/employee_list.html"
+    filter_form_class = EmployeeFilterForm
+    paginate_by = 10
 
     def filter_queryset(self, queryset, form):
         return (
@@ -36,7 +36,8 @@ class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredLis
 
 
 class EmployeeDetailView(EmployeeView, generic.PageTitleMixin, DetailView):
-    template_name, context_object_name = "hr/employee_detail.html", "employee_record"
+    template_name = "hr/employee_detail.html"
+    context_object_name = "employee_record"
 
     def get_queryset(self):
         return Employee.objects.select_related("dept", "user")
@@ -54,7 +55,9 @@ class EmployeeFormView(
     generic.CancelUrlMixin,
     generic.SavedMessageMixin,
 ):
-    allowed_roles, form_class, template_name = (Role.HR,), EmployeeForm, "core/form.html"
+    allowed_roles = (Role.HR,)
+    form_class = EmployeeForm
+    template_name = "core/form.html"
 
     def get_success_url(self):
         return reverse_lazy("hr:employee_detail", kwargs={"empid": self.object.empid})
@@ -75,14 +78,18 @@ class EmployeeUpdateView(EmployeeFormView, UpdateView):
 
 
 class DepartmentView(RoleRequiredMixin):
-    allowed_roles, model = (Role.HR,), Department
+    allowed_roles = (Role.HR,)
+    model = Department
 
 
 class DepartmentListView(DepartmentView, generic.PageTitleMixin, ListView):
-    page_title, template_name = "Departments", "hr/department_list.html"
+    page_title = "Departments"
+    template_name = "hr/department_list.html"
 
     def get_queryset(self):
-        return self.model.objects.select_related("manager").annotate(employee_count=C("employees"))
+        return self.model.objects.select_related("manager").annotate(
+            employee_count=Count("employees")
+        )
 
 
 class DepartmentUpdateView(
@@ -93,8 +100,10 @@ class DepartmentUpdateView(
     UpdateView,
 ):
     form_class = DepartmentForm
-    pk_url_kwarg, template_name = "deptid", "core/form.html"
-    cancel_url_name, success_url = "hr:departments", reverse_lazy("hr:departments")
+    pk_url_kwarg = "deptid"
+    template_name = "core/form.html"
+    cancel_url_name = "hr:departments"
+    success_url = reverse_lazy("hr:departments")
 
     def get_page_title(self):
         return f"Edit department {self.object.pk}"

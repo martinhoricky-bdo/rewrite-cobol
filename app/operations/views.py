@@ -11,7 +11,14 @@ from accounts.permissions import RoleRequiredMixin
 from accounts.roles import Role
 from core.views import generic
 
-from . import forms as f
+from .forms import (
+    CrewForm,
+    FlightFilterForm,
+    FlightForm,
+    FlightGenerateForm,
+    ShiftFilterForm,
+    ShiftForm,
+)
 from .models import Crew, Flight, Shift
 from .services import generate_flights
 
@@ -43,12 +50,10 @@ class FlightView:
 
 
 class FlightListView(FlightView, ScheduleListView):
-    page_title, template_name, filter_form_class, paginate_by = (
-        "Flights",
-        "schedule/flight_list.html",
-        f.FlightFilterForm,
-        10,
-    )
+    page_title = "Flights"
+    template_name = "schedule/flight_list.html"
+    filter_form_class = FlightFilterForm
+    paginate_by = 10
 
     def filter_queryset(self, queryset, form):
         today = timezone.localdate()
@@ -59,8 +64,10 @@ class FlightListView(FlightView, ScheduleListView):
             .with_related()
             .select_related("shift__crew")
             .with_sold()
+            .order_by("flightdate", "deptime", "flightnum")
         )
-        number, airport = form.value("flightnum", "").strip(), form.value("airport", "").strip()
+        number = form.value("flightnum", "").strip()
+        airport = form.value("airport", "").strip()
         if number:
             queryset = queryset.filter(flightnum__iexact=number)
         if airport:
@@ -71,11 +78,12 @@ class FlightListView(FlightView, ScheduleListView):
 
 
 class FlightCreateView(FlightView, ScheduleFormView, CreateView):
-    form_class, page_title = f.FlightForm, "New flight"
+    form_class = FlightForm
+    page_title = "New flight"
 
 
 class FlightUpdateView(FlightView, ScheduleFormView, UpdateView):
-    form_class = f.FlightForm
+    form_class = FlightForm
 
 
 class FlightDeleteView(FlightView, ScheduleView, generic.ProtectedDeleteView):
@@ -83,11 +91,9 @@ class FlightDeleteView(FlightView, ScheduleView, generic.ProtectedDeleteView):
 
 
 class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrlMixin, FormView):
-    form_class, template_name, page_title = (
-        f.FlightGenerateForm,
-        "schedule/flight_generate.html",
-        "Generate flights",
-    )
+    form_class = FlightGenerateForm
+    template_name = "schedule/flight_generate.html"
+    page_title = "Generate flights"
     cancel_url_name = "schedule:flights"
 
     def form_valid(self, form):
@@ -108,23 +114,27 @@ class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrl
 
 
 class CrewView:
-    model, pk_url_kwarg = Crew, "crewid"
-    success_url, cancel_url_name = reverse_lazy("schedule:crews"), "schedule:crews"
+    model = Crew
+    pk_url_kwarg = "crewid"
+    success_url = reverse_lazy("schedule:crews")
+    cancel_url_name = "schedule:crews"
 
 
 class CrewListView(CrewView, ScheduleListView):
-    page_title, template_name = "Crews", "schedule/crew_list.html"
+    page_title = "Crews"
+    template_name = "schedule/crew_list.html"
 
     def filter_queryset(self, queryset, form):
         return queryset.with_members().with_shift_count()
 
 
 class CrewCreateView(CrewView, ScheduleFormView, CreateView):
-    form_class, page_title = f.CrewForm, "New crew"
+    form_class = CrewForm
+    page_title = "New crew"
 
 
 class CrewUpdateView(CrewView, ScheduleFormView, UpdateView):
-    form_class = f.CrewForm
+    form_class = CrewForm
 
 
 class CrewDeleteView(CrewView, ScheduleView, generic.ProtectedDeleteView):
@@ -132,17 +142,17 @@ class CrewDeleteView(CrewView, ScheduleView, generic.ProtectedDeleteView):
 
 
 class ShiftView:
-    model, pk_url_kwarg = Shift, "shiftid"
-    success_url, cancel_url_name = reverse_lazy("schedule:shifts"), "schedule:shifts"
+    model = Shift
+    pk_url_kwarg = "shiftid"
+    success_url = reverse_lazy("schedule:shifts")
+    cancel_url_name = "schedule:shifts"
 
 
 class ShiftListView(ShiftView, ScheduleListView):
-    page_title, template_name, filter_form_class, paginate_by = (
-        "Shifts",
-        "schedule/shift_list.html",
-        f.ShiftFilterForm,
-        20,
-    )
+    page_title = "Shifts"
+    template_name = "schedule/shift_list.html"
+    filter_form_class = ShiftFilterForm
+    paginate_by = 20
 
     def filter_queryset(self, queryset, form):
         today = timezone.localdate()
@@ -158,11 +168,12 @@ class ShiftListView(ShiftView, ScheduleListView):
 
 
 class ShiftCreateView(ShiftView, ScheduleFormView, CreateView):
-    form_class, page_title = f.ShiftForm, "New shift"
+    form_class = ShiftForm
+    page_title = "New shift"
 
 
 class ShiftUpdateView(ShiftView, ScheduleFormView, UpdateView):
-    form_class = f.ShiftForm
+    form_class = ShiftForm
 
 
 class ShiftDeleteView(ShiftView, ScheduleView, generic.ProtectedDeleteView):

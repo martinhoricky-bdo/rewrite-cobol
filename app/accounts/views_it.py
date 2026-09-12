@@ -16,15 +16,21 @@ PASSWORD_SESSION_KEY = "it_temporary_password"
 
 
 class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
-    allowed_roles, model, page_title = (Role.IT,), Employee, "Users"
-    template_name, filter_form_class, paginate_by = "it/user_list.html", UserFilterForm, 10
+    allowed_roles = (Role.IT,)
+    model = Employee
+    page_title = "Users"
+    template_name = "it/user_list.html"
+    filter_form_class = UserFilterForm
+    paginate_by = 10
 
     def filter_queryset(self, queryset, form):
         return queryset.select_related("dept", "user").search(form.value("q", "")).order_by("empid")
 
 
 class AccountActionView(RoleRequiredMixin, SingleObjectMixin, View):
-    allowed_roles, model, pk_url_kwarg = (Role.IT,), Employee, "empid"
+    allowed_roles = (Role.IT,)
+    model = Employee
+    pk_url_kwarg = "empid"
 
     def get_queryset(self):
         return Employee.objects.select_related("user")
@@ -61,7 +67,8 @@ class DeactivateUserView(AccountStateView):
 
 
 class PasswordShownView(RoleRequiredMixin, TemplateView):
-    allowed_roles, template_name = (Role.IT,), "it/user_password_shown.html"
+    allowed_roles = (Role.IT,)
+    template_name = "it/user_password_shown.html"
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(
