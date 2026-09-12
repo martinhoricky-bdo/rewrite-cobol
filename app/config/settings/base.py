@@ -75,6 +75,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 SESSION_COOKIE_AGE = 8 * 60 * 60
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
@@ -91,7 +92,16 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "formatters": {
+        "application": {
+            "format": "{asctime} {levelname} {name} {message}",
+            "style": "{",
+        }
+    },
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "application"}},
     "root": {"handlers": ["console"], "level": "WARNING"},
-    "loggers": {"cobol_airlines": {"handlers": ["console"], "level": "INFO"}},
+    "loggers": {
+        "cobol_airlines.auth": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "cobol_airlines.sales": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
 }

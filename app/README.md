@@ -23,7 +23,24 @@ full structure.
 ## Environment
 
 Copy `.env.example` to `.env` to configure `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`,
-`DATABASE_URL`, and `LEGACY_ROOT`. Compose supplies development-safe defaults automatically.
+`DATABASE_URL`, `LEGACY_ROOT`, `SECURE_SSL_REDIRECT`, and `SECURE_HSTS_SECONDS`. Compose supplies
+development-safe defaults automatically. Login protection permits 10 failed attempts per
+USERID and client IP in a 15-minute window; a successful login clears that counter.
+
+## Production
+
+Build the production image with `docker build -t cobol-airlines .`. The image collects and
+serves versioned static files with WhiteNoise, then starts three Gunicorn workers on port 8000:
+
+```sh
+docker run --env-file .env -p 8000:8000 cobol-airlines
+```
+
+Use a long random `SECRET_KEY`, the externally visible comma-separated `ALLOWED_HOSTS`, and the
+PostgreSQL `DATABASE_URL`. Keep `SECURE_SSL_REDIRECT=True` when TLS terminates at the application
+or a trusted reverse proxy; only disable it for an explicitly secured deployment topology. The
+production settings enable secure session/CSRF cookies and one-year HSTS. Validate an environment
+before deployment with `python manage.py check --deploy --settings=config.settings.prod`.
 
 ## Přihlášení
 

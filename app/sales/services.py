@@ -193,7 +193,7 @@ def confirm_sale(
         ]
         Ticket.objects.bulk_create(tickets)
         logger.info(
-            "sale buyid=%s empid=%s flight=%s tickets=%s",
+            "sale buyid=%s user=%s flight=%s tickets=%s",
             buy.pk,
             seller.pk,
             flight.flightnum,

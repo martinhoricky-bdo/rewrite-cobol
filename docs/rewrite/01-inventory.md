@@ -334,17 +334,17 @@ Role = oddělení zaměstnance (`EMPLO.DEPTID` → `DEPT`). Číselník z `DB2/i
 
 Stav funkcí role Sales:
 
-| Funkce | Stav v originálu |
-|---|---|
-| Přihlášení / odhlášení | Hotovo |
-| Hledání letů (`SRCHFLY`) | Hotovo |
-| Hledání letenek (`SRCHTKT`) včetně stránkování | Hotovo |
-| Tisk palubní vstupenky (`PRINTCI`) | Hotovo (tisk přes JES, hláška „TICKET PRINTED“ na snímku) |
-| Prodej – krok 1 (`SELLCOB1`) | Hotovo |
-| Prodej – krok 2 (`SELLCOB2`) | Obrazovka existuje a dle snímků fungovalo dohledání jmen; zdroj chybí, zápis prodeje neověřitelný |
-| Tisk účtenky (`PRINTPA`) | Program hotov, volání chybí; platební metoda neimplementována |
-| Registrace / správa cestujících (F7) | Neimplementováno |
-| Výpočet ceny | Pevná konstanta 120.99 s komentářem, že má vzniknout samostatný program |
+| Funkce | Stav v originálu | Stav v nové aplikaci |
+|---|---|---|
+| Přihlášení / odhlášení | Hotovo | Hotovo (včetně limiteru) |
+| Hledání letů (`SRCHFLY`) | Hotovo | Hotovo |
+| Hledání letenek (`SRCHTKT`) včetně stránkování | Hotovo | Hotovo |
+| Tisk palubní vstupenky (`PRINTCI`) | Hotovo (tisk přes JES, hláška „TICKET PRINTED“ na snímku) | Hotovo (tiskové HTML) |
+| Prodej – krok 1 (`SELLCOB1`) | Hotovo | Hotovo |
+| Prodej – krok 2 (`SELLCOB2`) | Obrazovka existuje a dle snímků fungovalo dohledání jmen; zdroj chybí, zápis prodeje neověřitelný | Hotovo |
+| Tisk účtenky (`PRINTPA`) | Program hotov, volání chybí; platební metoda neimplementována | Hotovo (platební metoda se neeviduje) |
+| Registrace / správa cestujících (F7) | Neimplementováno | Hotovo |
+| Výpočet ceny | Pevná konstanta 120.99 s komentářem, že má vzniknout samostatný program | Hotovo (cena letu × počet cestujících) |
 
 Ostatní role nemají žádné obrazovky ani programy. Pro ně existuje pouze datový model (`CREW`, `SHIFT`, `EMPLO`, `DEPT`, `AIRPLANE`), plněný ručně SQL skripty a dávkami.
 
