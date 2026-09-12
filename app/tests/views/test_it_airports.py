@@ -36,7 +36,7 @@ def test_airport_crud_uppercase_and_validation(role_client):
     assert not Airport.objects.filter(pk="ABCDE").exists()
 
 
-def test_airport_delete_reference_and_permissions(role_client):
+def test_airport_delete_reference(role_client):
     client = role_client(Role.SCHEDULE)
     flight = FlightFactory()
     url = reverse("it:airport_delete", args=[flight.airportdep_id])
@@ -48,9 +48,6 @@ def test_airport_delete_reference_and_permissions(role_client):
     )
     client.post(reverse("it:airport_delete", args=[unused.pk]))
     assert not Airport.objects.filter(pk="ORY").exists()
-    client.logout()
-    client = role_client(Role.HR)
-    assert client.get(reverse("it:airports")).status_code == 403
 
 
 @pytest.mark.parametrize("role", [Role.IT, Role.SCHEDULE])

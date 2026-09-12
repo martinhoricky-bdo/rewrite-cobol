@@ -69,7 +69,7 @@ def test_confirm_redirects_to_buy_and_clears_quote(client):
     assert SESSION_KEY not in client.session
 
 
-def test_name_endpoint_return_and_permissions(client):
+def test_name_endpoint_return(client):
     first = PassengerFactory(firstname="EDITH", lastname="DWELLY")
     login_role(client, 7)
     assert (
@@ -83,22 +83,3 @@ def test_name_endpoint_return_and_permissions(client):
     flight = FlightFactory(flightdate=date.today())
     set_quote(client, flight, first, 1)
     assert client.post("/sales/sell/passengers/", {"action": "return"}).url == "/sales/sell/"
-    client.logout()
-    login_role(client, 1)
-    assert client.get("/sales/sell/passengers/").status_code == 403
-    assert client.get(f"/sales/sell/passenger-name/?clientid={first.pk}").status_code == 403
-
-
-@pytest.mark.parametrize(("deptid", "status"), [(7, 200), (1, 200), (5, 403)])
-def test_buy_detail_permissions(client, deptid, status):
-    login_role(client, 7)
-    passenger = PassengerFactory()
-    flight = FlightFactory(flightdate=date.today())
-    set_quote(client, flight, passenger, 1)
-    response = client.post(
-        "/sales/sell/passengers/", {"action": "confirm", "client_1": passenger.pk}
-    )
-    buy_url = response.url
-    client.logout()
-    login_role(client, deptid)
-    assert client.get(buy_url).status_code == status

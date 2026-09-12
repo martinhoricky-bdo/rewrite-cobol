@@ -57,23 +57,3 @@ def test_missing_ticket_uses_custom_404(client):
     response = client.get("/sales/tickets/CB99999999/")
     assert response.status_code == 404
     assert E_TKT_03 in response.content.decode()
-
-
-@pytest.mark.parametrize("deptid", [7, 1])
-@pytest.mark.parametrize("url", ["/sales/tickets/", "/sales/tickets/CB99999999/"])
-def test_authorized_roles_can_access(client, deptid, url):
-    login_role(client, deptid)
-    assert client.get(url).status_code in (200, 404)
-
-
-@pytest.mark.parametrize("deptid", [5, 6, 8])
-@pytest.mark.parametrize("url", ["/sales/tickets/", "/sales/tickets/CB99999999/"])
-def test_unauthorized_roles_are_denied(client, deptid, url):
-    login_role(client, deptid)
-    assert client.get(url).status_code == 403
-
-
-def test_anonymous_user_is_redirected(client):
-    response = client.get("/sales/tickets/")
-    assert response.status_code == 302
-    assert response.url == "/login/?next=/sales/tickets/"

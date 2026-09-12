@@ -1,4 +1,4 @@
 {% extends "core/list.html" %}
 {% block actions %}<p><a href="{% url 'it:airplane_create' %}" role="button">New airplane</a></p>{% endblock %}
 {% block thead %}<tr><th>AIRPLANEID</th><th>TYPE</th><th>NUMSEATS</th><th>TOTALFUEL</th><th>ACTIONS</th></tr>{% endblock %}
-{% block rows %}{% for item in object_list %}<tr><td>{{ item.airplaneid }}</td><td>{{ item.type }}</td><td>{{ item.numseats }}</td><td>{{ item.totalfuel }}</td><td><a href="{% url 'it:airplane_edit' item.pk %}">Edit</a> <a href="{% url 'it:airplane_delete' item.pk %}">Delete</a></td></tr>{% endfor %}{% endblock %}
+{% block rows %}{% for item in object_list %}<tr><td>{{ item.airplaneid }}</td><td>{{ item.type }}</td><td>{{ item.numseats }}</td><td>{{ item.totalfuel }}</td><td><a href="{{ item.get_absolute_url }}">Edit</a> <a href="{% url 'it:airplane_delete' item.pk %}">Delete</a></td></tr>{% endfor %}{% endblock %}

@@ -76,13 +76,6 @@ def test_missing_buy_returns_404(client):
     assert client.get(reverse("sales:boarding_passes", args=[999999])).status_code == 404
 
 
-@pytest.mark.parametrize(("deptid", "status"), [(7, 200), (1, 200), (5, 403)])
-def test_boarding_passes_permissions(client, deptid, status):
-    buy = BuyFactory()
-    login_role(client, deptid)
-    assert client.get(reverse("sales:boarding_passes", args=[buy.buyid])).status_code == status
-
-
 def test_buy_detail_links_to_both_print_views(client):
     login_role(client, 7)
     buy = BuyFactory()

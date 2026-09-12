@@ -34,12 +34,3 @@ def test_manager_from_another_department_is_rejected(role_client):
     )
     assert response.status_code == 200
     assert MANAGER_DEPARTMENT_ERROR in response.content.decode()
-
-
-def test_foreign_role_forbidden_for_every_department_url(role_client):
-    department = DepartmentFactory(deptid=7)
-    client = role_client(Role.SALES)
-    assert client.get(reverse("hr:departments")).status_code == 403
-    url = reverse("hr:department_edit", args=[department.pk])
-    assert client.get(url).status_code == 403
-    assert client.post(url, {}).status_code == 403

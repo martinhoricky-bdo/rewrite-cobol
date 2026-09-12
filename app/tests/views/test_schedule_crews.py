@@ -53,20 +53,3 @@ def test_crew_with_shifts_cannot_be_deleted(role_client):
     response = client.post(reverse("schedule:crew_delete", args=[crew.pk]), follow=True)
     assert E_REF_01.format(Entity="Crew", n=1, related="shifts") in response.content.decode()
     assert Crew.objects.filter(pk=crew.pk).exists()
-
-
-@pytest.mark.parametrize(
-    ("name", "args", "method"),
-    [
-        ("schedule:crews", [], "get"),
-        ("schedule:crew_create", [], "get"),
-        ("schedule:crew_create", [], "post"),
-        ("schedule:crew_edit", [1], "get"),
-        ("schedule:crew_edit", [1], "post"),
-        ("schedule:crew_delete", [1], "get"),
-        ("schedule:crew_delete", [1], "post"),
-    ],
-)
-def test_sales_role_gets_403_for_every_crew_url(role_client, name, args, method):
-    client = role_client(Role.SALES)
-    assert getattr(client, method)(reverse(name, args=args)).status_code == 403

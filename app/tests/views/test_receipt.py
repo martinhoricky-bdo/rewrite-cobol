@@ -45,10 +45,3 @@ def test_receipt_contains_sale_data_without_application_menu(client):
 def test_missing_buy_returns_404(client):
     login_role(client, 7)
     assert client.get(reverse("sales:receipt", args=[999999])).status_code == 404
-
-
-@pytest.mark.parametrize(("deptid", "status"), [(7, 200), (1, 200), (5, 403)])
-def test_receipt_permissions(client, deptid, status):
-    buy = BuyFactory()
-    login_role(client, deptid)
-    assert client.get(reverse("sales:receipt", args=[buy.buyid])).status_code == status

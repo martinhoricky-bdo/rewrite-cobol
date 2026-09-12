@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Count, Q
+from django.urls import reverse
 
 from accounts.models import Employee
 from fleet.models import Airplane, Airport
@@ -66,6 +67,9 @@ class Crew(models.Model):
     def __str__(self) -> str:
         return f"Crew {self.crewid}"
 
+    def get_absolute_url(self) -> str:
+        return reverse("schedule:crew_edit", kwargs={"crewid": self.pk})
+
     def members(self) -> list[Employee]:
         return [
             self.commander,
@@ -123,6 +127,9 @@ class Shift(models.Model):
     def __str__(self) -> str:
         return f"Shift {self.shiftid} ({self.shiftdate})"
 
+    def get_absolute_url(self) -> str:
+        return reverse("schedule:shift_edit", kwargs={"shiftid": self.pk})
+
 
 class FlightQuerySet(models.QuerySet):
     def with_sold(self):
@@ -176,3 +183,6 @@ class Flight(models.Model):
 
     def __str__(self) -> str:
         return f"{self.flightnum} {self.flightdate}"
+
+    def get_absolute_url(self) -> str:
+        return reverse("schedule:flight_edit", kwargs={"flightid": self.pk})

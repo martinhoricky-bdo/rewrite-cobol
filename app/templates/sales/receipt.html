@@ -23,7 +23,7 @@
       </section>
       <nav class="print-controls" aria-label="Receipt actions">
         <button type="button" onclick="window.print()">Print</button>
-        <a href="{% url 'sales:buy_detail' buy.buyid %}">Back</a>
+        <a href="{{ buy.get_absolute_url }}">Back</a>
       </nav>
     </main>
   </body>

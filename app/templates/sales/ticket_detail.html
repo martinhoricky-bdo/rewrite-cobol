@@ -11,6 +11,6 @@
     <dt>SEAT</dt><dd>{{ ticket.seat }}</dd>
   </dl>
   <h2>Purchase</h2>
-  <dl><dt>BUYID</dt><dd><a href="{% url 'sales:buy_detail' ticket.buy_id %}">{{ ticket.buy_id }}</a></dd><dt>DATE</dt><dd>{{ ticket.buy.buydate|date:"Y-m-d" }} {{ ticket.buy.buytime|time:"H:i" }}</dd><dt>SELLER</dt><dd>{{ ticket.buy.emp_id }} – {{ ticket.buy.emp.full_name }}</dd><dt>PRICE</dt><dd>{{ ticket.buy.price|floatformat:2 }} EUR</dd></dl>
+  <dl><dt>BUYID</dt><dd><a href="{{ ticket.buy.get_absolute_url }}">{{ ticket.buy_id }}</a></dd><dt>DATE</dt><dd>{{ ticket.buy.buydate|date:"Y-m-d" }} {{ ticket.buy.buytime|time:"H:i" }}</dd><dt>SELLER</dt><dd>{{ ticket.buy.emp_id }} – {{ ticket.buy.emp.full_name }}</dd><dt>PRICE</dt><dd>{{ ticket.buy.price|floatformat:2 }} EUR</dd></dl>
   <p><a role="button" href="{% url 'sales:ticket_search' %}">Back to search</a> <a role="button" href="{% url 'sales:boarding_pass' ticket.ticketid %}" target="_blank">Print boarding pass</a></p>
 {% endblock %}

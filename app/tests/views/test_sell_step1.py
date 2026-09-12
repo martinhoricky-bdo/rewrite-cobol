@@ -73,11 +73,3 @@ def test_step_two_without_quote_redirects_with_message(client):
     response = client.get("/sales/sell/passengers/", follow=True)
     assert response.redirect_chain == [("/sales/sell/", 302)]
     assert E_SEL_09 in response.content.decode()
-
-
-@pytest.mark.parametrize(("deptid", "status"), [(7, 200), (1, 403)])
-def test_sell_permissions(client, deptid, status):
-    login_role(client, deptid)
-    assert client.get("/sales/sell/").status_code == status
-    expected_step2 = status if status == 403 else 302
-    assert client.get("/sales/sell/passengers/").status_code == expected_step2

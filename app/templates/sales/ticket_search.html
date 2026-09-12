@@ -9,8 +9,8 @@
   {% if page_obj %}
     <div class="table-wrap"><table>
       <thead><tr><th>TICKET ID</th><th>FIRST NAME</th><th>LAST NAME</th><th>FLIGHT NUM</th><th>FLIGHT DATE</th><th>TIME DEP</th><th>TIME LAND</th><th>AIRPORT DEP</th><th>AIRPORT LAND</th><th>SEAT</th></tr></thead>
-      <tbody>{% for t in page_obj %}<tr class="clickable-row" data-href="{% url 'sales:ticket_detail' t.ticketid %}">
-        <td><a href="{% url 'sales:ticket_detail' t.ticketid %}">{{ t.ticketid }}</a></td><td>{{ t.client.firstname }}</td><td>{{ t.client.lastname }}</td><td>{{ t.flight.flightnum }}</td><td>{{ t.flight.flightdate|date:"Y-m-d" }}</td><td>{{ t.flight.deptime|time:"H:i" }}</td><td>{{ t.flight.arrtime|time:"H:i" }}</td><td>{{ t.flight.airportdep_id }}</td><td>{{ t.flight.airportarr_id }}</td><td>{{ t.seat }}</td>
+      <tbody>{% for t in page_obj %}<tr class="clickable-row" data-href="{{ t.get_absolute_url }}">
+        <td><a href="{{ t.get_absolute_url }}">{{ t.ticketid }}</a></td><td>{{ t.client.firstname }}</td><td>{{ t.client.lastname }}</td><td>{{ t.flight.flightnum }}</td><td>{{ t.flight.flightdate|date:"Y-m-d" }}</td><td>{{ t.flight.deptime|time:"H:i" }}</td><td>{{ t.flight.arrtime|time:"H:i" }}</td><td>{{ t.flight.airportdep_id }}</td><td>{{ t.flight.airportarr_id }}</td><td>{{ t.seat }}</td>
       </tr>{% endfor %}</tbody>
     </table></div>
     {% include "core/pagination.html" %}

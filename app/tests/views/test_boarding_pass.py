@@ -58,26 +58,6 @@ def test_missing_ticket_uses_custom_404(client):
     assert E_TKT_03 in response.content.decode()
 
 
-@pytest.mark.parametrize("deptid", [7, 1])
-def test_authorized_roles_can_access(client, deptid):
-    login_role(client, deptid)
-    ticket = reference_ticket()
-    assert client.get(reverse("sales:boarding_pass", args=[ticket.ticketid])).status_code == 200
-
-
-def test_hr_role_is_denied(client):
-    login_role(client, 5)
-    ticket = reference_ticket()
-    assert client.get(reverse("sales:boarding_pass", args=[ticket.ticketid])).status_code == 403
-
-
-def test_anonymous_user_is_redirected(client):
-    url = reverse("sales:boarding_pass", args=["CB00000001"])
-    response = client.get(url)
-    assert response.status_code == 302
-    assert response.url == f"/login/?next={url}"
-
-
 def test_ticket_detail_links_to_boarding_pass_in_new_tab(client):
     login_role(client, 7)
     ticket = reference_ticket()

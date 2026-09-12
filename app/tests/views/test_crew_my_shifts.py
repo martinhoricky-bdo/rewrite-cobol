@@ -5,8 +5,6 @@ from freezegun import freeze_time
 
 from tests.factories import (
     CrewFactory,
-    DepartmentFactory,
-    EmployeeFactory,
     FlightFactory,
     ShiftFactory,
 )
@@ -14,13 +12,9 @@ from tests.factories import (
 pytestmark = pytest.mark.django_db
 
 
-def _crew_employee(deptid=2):
-    return EmployeeFactory(dept=DepartmentFactory(deptid=deptid), with_user=True)
-
-
 @freeze_time("2026-09-12")
-def test_crew_member_sees_own_upcoming_shift_and_flight(client):
-    employee = _crew_employee()
+def test_crew_member_sees_own_upcoming_shift_and_flight(client, employee_of):
+    employee = employee_of("crew")
     crew = CrewFactory(commander=employee)
     shift = ShiftFactory(
         crew=crew, shiftdate=date(2026, 9, 13), begintime=time(8), endtime=time(16)
@@ -38,17 +32,11 @@ def test_crew_member_sees_own_upcoming_shift_and_flight(client):
 
 
 @freeze_time("2026-09-12")
-def test_past_shifts_only_appear_when_requested(client):
-    employee = _crew_employee()
+def test_past_shifts_only_appear_when_requested(client, employee_of):
+    employee = employee_of("crew")
     shift = ShiftFactory(crew=CrewFactory(copilote=employee), shiftdate=date(2026, 9, 11))
     FlightFactory(shift=shift, flightdate=shift.shiftdate, flightnum="CB2205")
     client.force_login(employee.user)
     assert b"CB2205" not in client.get("/crew/my-shifts/").content
     assert b"CB2205" in client.get("/crew/my-shifts/?past=1").content
     assert client.get("/crew/my-shifts/?past=invalid").status_code == 200
-
-
-def test_my_shifts_forbids_foreign_role(client):
-    sales = _crew_employee(deptid=7)
-    client.force_login(sales.user)
-    assert client.get("/crew/my-shifts/").status_code == 403

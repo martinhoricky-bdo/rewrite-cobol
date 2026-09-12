@@ -13,12 +13,16 @@ make migrate
 Open <http://localhost:8000/>. Run all checks with `make check`, and stop the stack with
 `make down`.
 
-## Structure
+## Struktura kódu
 
-The Django project is in `config/`, application modules are in `accounts/` and `core/`, shared
-templates and static assets are in `templates/` and `static/`, and automated checks are in
-`tests/`. See [the target architecture](../docs/rewrite/03-target-architecture.md) for the planned
-full structure.
+Konfigurace Django projektu je v `config/`, doménové aplikace jsou v samostatných adresářích a sdílený kód je v `core/`.
+Generické views a mixiny pro seznamy, hledání, formuláře a mazání jsou v `core/views/generic.py`.
+Novou obrazovku přidejte jako class-based view složenou z Django generic view a odpovídajících mixinů.
+Nastavte na ní model, formulář, povolené role, název stránky a pojmenované cílové URL.
+Její pojmenovanou cestu zapište do `urls.py` příslušné aplikace.
+Doménové dotazy patří do `QuerySet`/`Manager`, transakce do `services.py` a filtry do `FilterForm`.
+Nakonec přidejte test view v `tests/views/` a záznam URL se všemi rolemi do `ROLE_MATRIX`.
+HTML šablona rozšiřuje vhodnou sdílenou šablonu v `templates/core/`; vlastní šablonu vytvářejte jen pro obsah specifický pro obrazovku.
 
 ## Environment
 

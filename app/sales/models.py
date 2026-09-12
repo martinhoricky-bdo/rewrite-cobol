@@ -1,6 +1,7 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.functions import Upper
+from django.urls import reverse
 
 from accounts.models import Employee
 from operations.models import Flight
@@ -42,6 +43,9 @@ class Passenger(models.Model):
     def __str__(self) -> str:
         return self.full_name
 
+    def get_absolute_url(self) -> str:
+        return reverse("sales:passenger_detail", kwargs={"clientid": self.pk})
+
     @property
     def full_name(self) -> str:
         return f"{self.firstname} {self.lastname}"
@@ -67,6 +71,9 @@ class Buy(models.Model):
 
     def __str__(self) -> str:
         return f"Buy {self.buyid}"
+
+    def get_absolute_url(self) -> str:
+        return reverse("sales:buy_detail", kwargs={"buyid": self.pk})
 
 
 class TicketQuerySet(models.QuerySet):
@@ -105,3 +112,6 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return self.ticketid
+
+    def get_absolute_url(self) -> str:
+        return reverse("sales:ticket_detail", kwargs={"ticketid": self.pk})

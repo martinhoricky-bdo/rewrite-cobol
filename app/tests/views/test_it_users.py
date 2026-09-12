@@ -11,7 +11,7 @@ from tests.factories import DepartmentFactory, EmployeeFactory, UserFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_user_list_status_filter_and_permissions(role_client):
+def test_user_list_status_filter(role_client):
     client = role_client(Role.IT)
     EmployeeFactory(firstname="Ada", dept=DepartmentFactory(deptid=7), user=None)
     inactive = UserFactory(is_active=False)
@@ -22,9 +22,6 @@ def test_user_list_status_filter_and_permissions(role_client):
     assert response.status_code == 200
     assert "Ada" in response.content.decode()
     assert "no account" in response.content.decode()
-    client.logout()
-    client = role_client(Role.SALES)
-    assert client.get(reverse("it:users")).status_code == 403
 
 
 def test_reset_creates_account_and_password_is_shown_once(role_client):
@@ -125,19 +122,3 @@ def test_user_list_no_password_status_and_pagination(role_client):
     response = client.get(reverse("it:users"), {"page": 2})
     assert response.status_code == 200
     assert len(response.context["page_obj"]) == 1
-
-
-def test_hr_cannot_view_users(role_client):
-    client = role_client(Role.HR)
-    assert client.get(reverse("it:users")).status_code == 403
-
-
-@pytest.mark.parametrize(
-    "url_name",
-    ["it:user_reset_password", "it:user_activate", "it:user_deactivate"],
-)
-def test_sales_cannot_post_user_actions(role_client, url_name):
-    client = role_client(Role.SALES)
-    target = EmployeeFactory(with_user=True)
-
-    assert client.post(reverse(url_name, args=[target.pk])).status_code == 403
