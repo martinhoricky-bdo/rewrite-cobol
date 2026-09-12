@@ -16,7 +16,7 @@
   </table></div>
   <p>
     <a role="button" href="{% url 'sales:sell_step1' %}">New sale</a>
-    <a role="button" href="/sales/buys/{{ buy.buyid }}/receipt/">Print receipt</a>
-    <a role="button" href="/sales/buys/{{ buy.buyid }}/boarding-passes/">Print all boarding passes</a>
+    <a role="button" href="{% url 'sales:receipt' buy.buyid %}">Print receipt</a>
+    <a role="button" href="{% url 'sales:boarding_passes' buy.buyid %}">Print all boarding passes</a>
   </p>
 {% endblock %}

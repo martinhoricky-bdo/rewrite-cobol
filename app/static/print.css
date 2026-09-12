@@ -27,6 +27,27 @@ main {
   background: #fff;
 }
 
+.boarding-pass-page:not(:last-of-type) {
+  break-after: page;
+  page-break-after: always;
+}
+
+.receipt-page {
+  max-width: 80mm;
+}
+
+.receipt {
+  padding: 8mm;
+  border: 2px solid currentColor;
+  background: #fff;
+  text-align: center;
+}
+
+.receipt h1,
+.receipt p {
+  margin: 0 0 1rem;
+}
+
 .main-pass,
 .stub {
   padding: 10mm;

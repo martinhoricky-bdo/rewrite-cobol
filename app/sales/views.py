@@ -153,6 +153,26 @@ def buy_detail(request, buyid):
     return render(request, "sales/buy_detail.html", {"buy": buy})
 
 
+@role_required(Role.SALES, Role.CEO)
+def receipt(request, buyid):
+    buy = get_object_or_404(Buy, pk=buyid)
+    return render(request, "sales/receipt.html", {"buy": buy})
+
+
+@role_required(Role.SALES, Role.CEO)
+def boarding_passes(request, buyid):
+    buy = get_object_or_404(Buy, pk=buyid)
+    tickets = buy.tickets.select_related(
+        "client", "flight", "flight__airportdep", "flight__airportarr"
+    ).order_by("ticketid")
+    passes = [boarding_pass_context(ticket) for ticket in tickets]
+    return render(
+        request,
+        "sales/boarding_passes.html",
+        {"buy": buy, "boarding_passes": passes},
+    )
+
+
 @role_required(Role.SALES)
 def passenger_list(request):
     form = PassengerFilterForm(request.GET)
@@ -291,4 +311,8 @@ def boarding_pass(request, ticketid):
     )
     if ticket is None:
         return render(request, "404.html", {"error_message": E_TKT_03}, status=404)
-    return render(request, "sales/boarding_pass.html", boarding_pass_context(ticket))
+    return render(
+        request,
+        "sales/boarding_pass.html",
+        {"boarding_pass": boarding_pass_context(ticket), "ticketid": ticket.ticketid},
+    )

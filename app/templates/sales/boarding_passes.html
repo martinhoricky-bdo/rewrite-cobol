@@ -4,15 +4,19 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Boarding pass {{ ticketid }} | COBOL AIRLINES</title>
+    <title>Boarding passes for sale {{ buy.buyid }} | COBOL AIRLINES</title>
     <link rel="stylesheet" href="{% static 'print.css' %}">
   </head>
   <body>
     <main>
-      {% include "sales/_boarding_pass.html" with pass=boarding_pass %}
+      {% for pass in boarding_passes %}
+        <section class="boarding-pass-page">
+          {% include "sales/_boarding_pass.html" with pass=pass %}
+        </section>
+      {% endfor %}
       <nav class="print-controls" aria-label="Boarding pass actions">
         <button type="button" onclick="window.print()">Print</button>
-        <a href="{% url 'sales:ticket_detail' ticketid %}">Back</a>
+        <a href="{% url 'sales:buy_detail' buy.buyid %}">Back</a>
       </nav>
     </main>
   </body>
