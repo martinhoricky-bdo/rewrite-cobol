@@ -3,9 +3,9 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 11:20
+- Poslední aktualizace: 2026-09-12 11:55
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R21 (Codex pracuje)
+- Aktuální krok: R22 (Codex pracuje) – poslední krok fáze 2
 - Blokuje: nic
 
 ## Hotovo
@@ -32,10 +32,10 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R16b Schedule – posádky a směny | #36 | #37 | 2026-09-12 02:49 (1. běh OK, 274 testů, ruční průchod: posádka 13 z oddělení 2/3/4, směna na zítřek, překryv/obrácené časy odmítnuty, E-REF-01, 403; Claude doplnil číslo PR v CHANGELOG) |
 | R17 Crew my shifts + CEO dashboard | #38 | #39 | 2026-09-12 03:04 (1. běh OK, 297 testů, ruční průchod: 10000003 → /crew/my-shifts/ s CB2204/CB2205, `past=1`, jiný člen posádky směny nevidí; CEO dashboard karty + 3 tabulky nad e2e prodeji, neplatné filtry 200, agregace v ORM (9 dotazů); 403 pro ostatní role; bez oprav) |
 | R18 Hardening a závěr | #40 | #41 | 2026-09-12 05:38 (1. běh OK, 310 testů, e2e 9/9 dvakrát proti runserveru; ruční průchod: limiter 10/15 min per USERID+IP, `check --deploy` s `.env.example` bez varování, collectstatic s whitenoise, 404/403, placeholder jen legal, menu vs. matice; Claude opravil: 500 handler bez request kontextu + test, `SECRET_KEY` jen v build kroku Dockerfile, `hr*`/`reports*` ve wheelu, poznámka o per-proces limiteru v README) |
-| R21 Sales a Reports na generických views | #47 | – | zadáno 11:25, čeká se na PR |
+| R22 Závěr refaktoringu: úklid, matice oprávnění, docs | – | – | zadávání |
 
 ## Fronta
-R22 (úklid, matice oprávnění, docs) – po R21. Zadání v `codex-tasks/`.
+prázdná – R22 je poslední krok fáze 2; po jeho merge Claude zapíše závěrečné shrnutí a přestane plánovat kontroly.
 
 ## Co zbývá ručně (uživatel)
 - Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté).
@@ -47,5 +47,5 @@ R22 (úklid, matice oprávnění, docs) – po R21. Zadání v `codex-tasks/`.
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
 - Codex sandbox nemá Docker ani Chromium (`playwright install` → 403 „Domain forbidden“). E2E testy (R12, případně další) ověřuje Claude lokálně proti `runserver` s předinstalovaným Chromiem; Codex je odevzdává „naslepo“, drobné opravy lokátorů dělá Claude přímo ve větvi.
-- Dev DB (`airlines`) obsahuje po e2e bězích prodeje 641+100 na `CB1104` (19. 9., 13. 9., 14. 9., 15. 9.) a e2e cestující `E2E-<timestamp>`; seed je nemaže. Pro čistý stav `seed_demo --flush`.
+- Dev DB (`airlines`) po e2e bězích: e2e scénář obsazuje 641+100 na `CB1104` v příštích 14 dnech, po ~14 bězích test hlásí „No unbooked CB1104 flight“ → `seed_demo --flush` (provedeno 12. 9. 11:45). Dříve: obsahuje prodeje 641+100 na `CB1104` (19. 9., 13. 9., 14. 9., 15. 9.) a e2e cestující `E2E-<timestamp>`; seed je nemaže. Pro čistý stav `seed_demo --flush`.
 - Push přes `origin` u Codexu od 12. 9. 09:00 selhává trvale (403 konektoru) → standard je push přes gh-token URL (`AGENTS.md` kap. 4a). Dřívější poznámka: push selhával nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R13/1 prošly; R14/1 skončil za minutu prázdným komentářem bez větve, R14/2 OK; R15/1, R16a/1 a R16b/1 OK; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.

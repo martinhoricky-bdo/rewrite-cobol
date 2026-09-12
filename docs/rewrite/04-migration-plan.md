@@ -188,7 +188,7 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 - **Akceptace:** existující testy `test_schedule_*`, `test_hr_*`, `test_it_users.py`, `test_generate_flights.py`, `test_*_form.py` beze změn asercí; `operations/views.py` ≤ 170 řádků, `hr/views.py` ≤ 100, `accounts/views_it.py` ≤ 70 (bez pomocných modulů).
 - **Závislosti:** R19.
 
-## R21 – Sales a Reports na generických views (M)
+## ✔ R21 (#48) – Sales a Reports na generických views (M)
 
 - **Cíl:** převod `sales` a `reports`.
 - **Rozsah:** `PassengerListView` (`FilteredListView` + `PassengerFilterForm`), `PassengerDetailView`, `PassengerCreateView`, `PassengerUpdateView` (varování o duplicitním e-mailu ve službě `sales/services.py: duplicate_email_warning(passenger)`), `FlightSearchView` a `TicketSearchView` (`SearchListView`), `TicketDetailView`, `BoardingPassView`, `BuyDetailView`, `ReceiptView`, `BoardingPassesView` (`DetailView`, `NotFound(E_TKT_03)`), `SellStep1View` a `SellStep2View` (`FormView` + `SaleSessionMixin`), `passenger_name` zůstává funkční HTMX view s `role_required`; `MyShiftsView` (`FilteredListView` + `ShiftPeriodFilterForm`), `DashboardView` (`TemplateView` + `PeriodFilterForm`); querysety `Ticket.objects.with_related()`, `Passenger.objects.filter_by(...)`.
