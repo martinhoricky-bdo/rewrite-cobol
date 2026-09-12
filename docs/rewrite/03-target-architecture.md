@@ -64,6 +64,27 @@ app/
 
 Business logika (prodej, přidělení sedadla, výpočet volných míst, generování letů) žije v modulech `services.py` jednotlivých aplikací, ne ve views. Views jsou tenké (formulář → služba → šablona).
 
+### 3.1 Konvence views, formulářů a šablon (závazné od R19)
+
+Cíl: idiomatické Django 5 bez opakování. Každá obrazovka je **class-based view** složená z generických tříd Djanga a sdílených mixinů v `core/`; business logika zůstává v `services.py`, dotazy a anotace patří do `QuerySet`/`Manager` modelů.
+
+| Vrstva | Pravidlo |
+|---|---|
+| Oprávnění | `accounts.permissions.RoleRequiredMixin` (`allowed_roles = (Role.IT, Role.SCHEDULE)`) jako první v MRO; nepřihlášený → redirect na login, cizí role → `PermissionDenied` (403). Dekorátor `role_required` je jen pro výjimečné funkční views (HTMX fragmenty). |
+| Seznamy | `core.views.generic.FilteredListView` (`ListView` + filtr formulář vázaný na `request.GET`): atributy `filter_form_class`, `paginate_by`; metoda `filter_queryset(queryset, form)`; kontext `form`, `page_obj`, `object_list`. Neplatná stránka (`?page=abc`) vrací první stránku, ne 404 (override `paginate_queryset` přes `Paginator.get_page`). Odkazy na stránky přes vestavěný tag `{% querystring page=… %}` (Django 5.1) – žádné `query_params` v kontextu. |
+| Filtry | Filtr formulář dědí z `core.forms.FilterForm` (`forms.Form`, všechna pole `required=False`); metoda `value(name, default)` vrací výchozí hodnotu, pokud pole chybí nebo je neplatné (dnešní chování „neplatné datum → výchozí období“). Ruční čtení `request.GET` ve views je zakázané. |
+| Vyhledávání | Obrazovky SRCHFLY/SRCHTKT: `core.views.generic.SearchListView` – seznam se zobrazí jen s vázaným a platným formulářem; chyby formuláře jdou do `messages.error` (`FormErrorsAsMessagesMixin`), prázdný výsledek → `messages.info(empty_message)`. |
+| Detail | `DetailView` s `pk_url_kwarg` podle legacy názvu (`empid`, `clientid`, `buyid`, `ticketid`). „Nenalezeno“ s uživatelskou hláškou → `core.exceptions.NotFound(message)` (podtřída `Http404`); `handler404` ji vykreslí v `404.html`, ostatní `Http404` bez detailu. |
+| Formuláře | `CreateView`/`UpdateView` + `core.views.generic.SavedMessageMixin` (hláška `"{Model} {pk} saved."`, `success_url` z `get_success_url()`), `PageTitleMixin` (`page_title`, `get_page_title()`), `CancelUrlMixin` (`cancel_url`). Šablona vždy `core/form.html`; per-entita šablony formulářů neexistují. `ModelForm` pro každý model, validace v `clean_*`/`clean`; vlastní logika ukládání v `services.py`, volaná z `form_valid`. |
+| Mazání | `core.views.generic.ProtectedDeleteView`: `DeleteView`, které zachytí `ProtectedError` z `on_delete=PROTECT` a vrátí `E_REF_01` (`Entity` = `verbose_name` modelu s velkým písmenem, `n` = počet chráněných objektů, `related` = `verbose_name_plural` chráněného modelu). Šablona `core/confirm_delete.html`. Žádné ruční `count()` před mazáním. |
+| Akce (POST) | Jednoúčelové akce (reset hesla, aktivace) jako `View` s `post()` + `SingleObjectMixin`, logika v `services.py`. |
+| Session tok | Vícekrokové obrazovky (prodej) jako `FormView` s mixinem držícím stav v session (`SaleSessionMixin`: `get_quote()`, `store_quote()`, `clear_quote()`). |
+| QuerySety | Anotace a filtry, které používá více míst, patří do `models.QuerySet` s `as_manager()`: `Flight.objects.with_sold()`, `.in_period(a, b)`, `Crew.objects.with_member(employee)`, `.with_shift_count()`, `Shift.objects.with_flight_count()`, `Employee.objects.search(text)`. `services.py` nevrací holé querysety, pokud jde jen o filtr. |
+| Šablony | Základ `base.html`; stránkové šablony rozšiřují `core/list.html` (bloky `actions`, `filters`, `thead`, `rows`, `empty`), `core/form.html`, `core/confirm_delete.html`, `core/detail.html`. Titulek stránky z `page_title`. Formuláře vykresluje vlastní renderer (`FORM_RENDERER = "core.forms.FormRenderer"`) se šablonou pole `core/forms/field.html` – v šablonách jen `{{ form }}`, žádné `as_p` ani ruční cykly přes pole. Opakované fragmenty (stav účtu, tabulka letenek) jako inclusion tagy v `core/templatetags/core_tags.py`. Akční odkazy zůstávají `<a role="button">`, texty tlačítek a hlavičky tabulek se refaktoringem nemění (e2e). |
+| Navigace | `core/navigation.py` deklarativně: `MenuItem(label, url_name)`, `MENU: dict[Role, tuple[MenuItem, ...]]` a `ROLE_HOME` zapsané jednou pro každou roli, bez `append`/`extend`. |
+| URL | Názvy URL a namespace (`sales:passenger_detail`, `it:airports`, …) i cesty se nemění; view se registrují jako `Class.as_view()`. |
+| Testy | Sdílené fixtury v `tests/conftest.py`: `role_client(role)` (přihlášený `Client` zaměstnance dané role), `employee_of(role)`; lokální helpery `_employee(deptid)` v testovacích souborech nejsou povolené. Každá URL má parametrizovaný test 403 přes `ROLE_MATRIX` v `tests/views/test_permissions.py`. |
+
 ## 4. Mapování DB2 → PostgreSQL
 
 ### 4.1 Typy

@@ -40,7 +40,10 @@ Před první změnou si přečti v tomto pořadí: `docs/rewrite/04-migration-pl
 
 - Python 3.12, Django 5.x, PostgreSQL 16. Struktura aplikací dle `03-target-architecture.md` kap. 3.
 - Formátování a lint: `ruff` (konfigurace v `app/pyproject.toml`). Typové anotace u veřejných funkcí služeb.
-- Business logika v `services.py` dané aplikace; views tenké; formuláře jako `django.forms.Form`/`ModelForm`.
+- Views jsou **class-based** na generických třídách Djanga a mixinech z `core/` podle `docs/rewrite/03-target-architecture.md` kap. 3.1 (závazné od R19): `RoleRequiredMixin`, `FilteredListView`/`SearchListView`, `CreateView`/`UpdateView` + `SavedMessageMixin`, `ProtectedDeleteView`, `DetailView`. Function-based view jen pro HTMX fragmenty. Žádné `request.GET.get`, `Paginator` ani `render(...)` s ručně skládaným kontextem ve views.
+- Business logika (transakce, prodej, generování) v `services.py`; opakované dotazy a anotace v `QuerySet`/`Manager` modelu; formuláře jako `ModelForm`/`Form`, filtry jako `core.forms.FilterForm`.
+- Šablony rozšiřují `core/list.html`, `core/form.html`, `core/confirm_delete.html`, `core/detail.html`; formuláře jen `{{ form }}` (vlastní renderer), stránkování `{% querystring %}`; opakované fragmenty jako inclusion tagy.
+- Refaktoring nemění chování: existující testy procházejí bez úprav asercí, `tests/e2e/` se nemění, názvy URL a texty UI zůstávají.
 - Názvy DB tabulek a sloupců = legacy názvy malými písmeny (`db_table`, `db_column`), názvy polí modelů stejné (`flightnum`, `airportdep`). Nepřejmenovávej.
 - Texty v UI anglicky, hlášky doslova podle `02-functional-spec.md` kap. 6 (kódy `E-…`). V testech se na tyto texty odkazuj přes konstanty, ne opisem.
 - Datum/čas: `TIME_ZONE = 'Europe/Paris'`, `USE_TZ = True`; „dnes“ vždy přes `timezone.localdate()`.

@@ -3,9 +3,10 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 05:40
-- Aktuální krok: **vše hotovo** – všech 19 kroků plánu (R00–R18) je mergnuto v `rewrite`
-- Blokuje: nic; Claude už neplánuje další kontroly
+- Poslední aktualizace: 2026-09-12 06:20
+- Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
+- Aktuální krok: R19 (Codex pracuje)
+- Blokuje: nic
 
 ## Hotovo
 | Krok | Issue | PR | Merge |
@@ -35,10 +36,10 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| – | – | – | nic neběží |
+| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | – | – | zadávání |
 
 ## Fronta
-prázdná – plán je dokončen.
+R20 (schedule/HR/IT), R21 (sales/reports) – po R19, mohou běžet po sobě; R22 (úklid, matice oprávnění, docs) – po R20 a R21. Zadání v `codex-tasks/R20–R22.md`.
 
 ## Co zbývá ručně (uživatel)
 - Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté).

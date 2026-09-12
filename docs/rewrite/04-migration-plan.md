@@ -161,6 +161,48 @@ Společná akceptační kritéria pro **každý** krok (viz `AGENTS.md`):
 
 ---
 
+## Fáze 2 – Refaktoring na idiomatické Django (R19–R22)
+
+Zadáno uživatelem 2026-09-12 po dokončení fáze 1: kód z R04–R18 je funkční, ale psaný jako function-based views s ručně opakovanými vzory (formulář → `is_valid` → `messages` → `redirect`, `Paginator` + `query_params`, ruční parsování `request.GET`, pět kopií bloku mazání s `E_REF_01`, devět shodných šablon formulářů). Fáze 2 převádí aplikaci na konvence z `03-target-architecture.md` kap. 3.1 **beze změny chování**.
+
+Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
+
+- Chování se nemění: všechny existující testy (unit, views, e2e) procházejí **bez úprav asercí**; povolené úpravy testů jsou jen náhrada lokálních helperů sdílenými fixturami a přidání nových testů. Soubory v `tests/e2e/` se nemění.
+- Názvy URL, cesty, namespace, texty hlášek, hlavičky tabulek, texty tlačítek a `role="button"` u akčních odkazů zůstávají.
+- Žádná změna schématu (`makemigrations --check` čistý); přidání `QuerySet`/`Manager` nebo `verbose_name` migraci nevyžaduje – pokud by `makemigrations` migraci navrhl, je to chyba zadání a patří do PR jako odchylka.
+- V převedených aplikacích nezůstane žádná function-based view s `render(...)` kromě HTMX fragmentů výslovně uvedených v zadání; žádné `request.GET.get` ve views; žádné `Paginator` ve views; žádné `form.as_p` ani ruční cykly přes pole v šablonách.
+- Počet řádků převedených `views.py` klesne; duplicity uvedené v zadání zmizí (review to kontroluje diffem).
+
+## R19 – Základ: generické views, mixiny, sdílené šablony, `fleet` jako vzor (M)
+
+- **Cíl:** infrastruktura pro fázi 2 a její první použití.
+- **Rozsah:** `core/views/generic.py` (`FilteredListView`, `SearchListView`, `FormErrorsAsMessagesMixin`, `SavedMessageMixin`, `PageTitleMixin`, `CancelUrlMixin`, `ProtectedDeleteView`), `core/forms.py` (`FilterForm`, `FormRenderer`), `core/exceptions.py` (`NotFound`), `core/templatetags/core_tags.py` (`account_status`), šablony `core/list.html`, `core/form.html`, `core/confirm_delete.html`, `core/detail.html`, `core/forms/field.html`, stránkování přes `{% querystring %}`; `core/navigation.py` deklarativně; `RoleRequiredMixin` jako primární mechanismus oprávnění; `handler404` s `NotFound`; převod `fleet` (letiště, letadla) na generické views a zrušení `fleet/services.py`; sdílené fixtury `role_client`/`employee_of` v `tests/conftest.py`.
+- **Akceptace:** testy `tests/unit/test_generic_views.py` (každý mixin), `tests/unit/test_filter_form.py`, `tests/unit/test_core_tags.py`; existující testy `test_it_airports.py`, `test_it_airplanes.py`, `test_navigation.py`, `test_permissions.py` procházejí beze změn asercí; `fleet/views.py` ≤ 50 řádků.
+- **Závislosti:** R18.
+
+## R20 – Schedule, HR a IT na generických views (M)
+
+- **Cíl:** převod `operations`, `hr` a IT části `accounts` (`views_it.py`).
+- **Rozsah:** `QuerySet`y `Flight.objects.with_sold()/in_period()`, `Crew.objects.with_member()/with_shift_count()`, `Shift.objects.with_flight_count()/in_period()`, `Employee.objects.search()`; `FlightFilterForm`, `ShiftFilterForm`, `EmployeeFilterForm`, `UserFilterForm` (`FilterForm`); `FlightListView`, `FlightCreateView`, `FlightUpdateView`, `FlightDeleteView`, `FlightGenerateView(FormView)`, totéž pro `Crew` a `Shift`; `EmployeeListView`, `EmployeeDetailView`, `EmployeeCreateView`, `EmployeeUpdateView`, `DepartmentListView`, `DepartmentUpdateView`; `UserListView`, `ResetPasswordView`, `ActivateUserView`, `DeactivateUserView` (logika v `accounts/services.py`); zrušení šablon `schedule/*_form.html`, `schedule/*_confirm_delete.html`, `hr/*_form.html`, `it/fleet_*` (pokud zbyly); `schedule_flights/crews/shifts` v `operations/services.py` nahrazeny querysety.
+- **Akceptace:** existující testy `test_schedule_*`, `test_hr_*`, `test_it_users.py`, `test_generate_flights.py`, `test_*_form.py` beze změn asercí; `operations/views.py` ≤ 110 řádků, `hr/views.py` ≤ 60, `accounts/views_it.py` ≤ 60.
+- **Závislosti:** R19.
+
+## R21 – Sales a Reports na generických views (M)
+
+- **Cíl:** převod `sales` a `reports`.
+- **Rozsah:** `PassengerListView` (`FilteredListView` + `PassengerFilterForm`), `PassengerDetailView`, `PassengerCreateView`, `PassengerUpdateView` (varování o duplicitním e-mailu ve službě `sales/services.py: duplicate_email_warning(passenger)`), `FlightSearchView` a `TicketSearchView` (`SearchListView`), `TicketDetailView`, `BoardingPassView`, `BuyDetailView`, `ReceiptView`, `BoardingPassesView` (`DetailView`, `NotFound(E_TKT_03)`), `SellStep1View` a `SellStep2View` (`FormView` + `SaleSessionMixin`), `passenger_name` zůstává funkční HTMX view s `role_required`; `MyShiftsView` (`FilteredListView` + `ShiftPeriodFilterForm`), `DashboardView` (`TemplateView` + `PeriodFilterForm`); querysety `Ticket.objects.with_related()`, `Passenger.objects.filter_by(...)`.
+- **Akceptace:** existující testy `test_passengers.py`, `test_flight_search.py`, `test_ticket_search.py`, `test_sell_step1.py`, `test_sell_step2.py`, `test_receipt.py`, `test_boarding_pass*.py`, `test_crew_my_shifts.py`, `test_ceo_dashboard.py` beze změn asercí; e2e 9/9; `sales/views.py` ≤ 170 řádků, `reports/views.py` ≤ 40.
+- **Závislosti:** R19.
+
+## R22 – Závěr refaktoringu: úklid, testy, dokumentace (S)
+
+- **Cíl:** odstranit zbytky starého stylu a sjednotit testy.
+- **Rozsah:** smazat `role_required`, pokud ho nepoužívá žádná view mimo HTMX fragment (jinak ponechat jen tam); `get_absolute_url()` na modelech s detailem (`Employee`, `Passenger`, `Ticket`, `Buy`) a jejich použití v šablonách; všechny testy 403 sjednotit do parametrizované matice v `tests/views/test_permissions.py` (`ROLE_MATRIX` = URL × role → 200/302/403) a z ostatních souborů duplicitní testy oprávnění odstranit; zrušit lokální helpery v testech ve prospěch fixtur z R19; `01-inventory.md` kap. 6 a `app/README.md` (struktura), `AGENTS.md` kap. 3 (odkaz na `03` kap. 3.1 už platí), CHANGELOG.
+- **Akceptace:** `grep -rn "def .*(request" app/*/views*.py` vrací jen HTMX fragment(y); `grep -rn "as_p\|request.GET.get\|Paginator(" app --include=*.py --include=*.html` mimo `core/` prázdný; `make check` a e2e zelené; počet testů neklesne pod stav po R21 minus odstraněné duplicitní testy oprávnění (uvést v PR).
+- **Závislosti:** R20, R21.
+
+---
+
 ## Přehled závislostí
 
 ```mermaid
@@ -178,6 +220,8 @@ flowchart TD
     R14 --> R18
     R15 --> R18
     R17 --> R18
+    R18 --> R19 --> R20 --> R22
+    R19 --> R21 --> R22
 ```
 
 Kritická cesta (první funkční oblast Sales): R01 → R02 → R03 → R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R12. Po R12 je Sales role v paritě s originálem a nad ním (registrace cestujících, kontrola kapacity, účtenka).
