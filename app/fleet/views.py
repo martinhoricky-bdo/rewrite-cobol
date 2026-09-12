@@ -17,9 +17,6 @@ class FleetFormView(
     allowed_roles = ROLES
     template_name = "core/form.html"
 
-    def get_form_class(self):
-        return AirportForm if self.model is Airport else AirplaneForm
-
     def get_page_title(self) -> str:
         if not self.object:
             return self.page_title
@@ -32,6 +29,7 @@ class FleetDeleteView(RoleRequiredMixin, generic.ProtectedDeleteView):
 
 class AirportView:
     model = Airport
+    form_class = AirportForm
     pk_url_kwarg = "airportid"
     cancel_url_name = "it:airports"
     success_url = reverse_lazy("it:airports")
@@ -39,6 +37,7 @@ class AirportView:
 
 class AirplaneView:
     model = Airplane
+    form_class = AirplaneForm
     pk_url_kwarg = "airplaneid"
     cancel_url_name = "it:airplanes"
     success_url = reverse_lazy("it:airplanes")
