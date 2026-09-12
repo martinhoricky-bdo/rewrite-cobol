@@ -3,9 +3,9 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 03:12
-- Aktuální krok: R18 (Codex pracuje) – poslední krok plánu
-- Blokuje: nic
+- Poslední aktualizace: 2026-09-12 05:40
+- Aktuální krok: **vše hotovo** – všech 19 kroků plánu (R00–R18) je mergnuto v `rewrite`
+- Blokuje: nic; Claude už neplánuje další kontroly
 
 ## Hotovo
 | Krok | Issue | PR | Merge |
@@ -30,14 +30,21 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R16a Schedule – lety a generování | #34 | #35 | 2026-09-12 02:31 (1. běh OK, 258 testů, ruční průchod: generování CB2204 7/0 mimo seed a 0/7 v seedu, CRUD letů, E-REF-01, 403; seed po přesunu generátoru idempotentní; bez oprav) |
 | R16b Schedule – posádky a směny | #36 | #37 | 2026-09-12 02:49 (1. běh OK, 274 testů, ruční průchod: posádka 13 z oddělení 2/3/4, směna na zítřek, překryv/obrácené časy odmítnuty, E-REF-01, 403; Claude doplnil číslo PR v CHANGELOG) |
 | R17 Crew my shifts + CEO dashboard | #38 | #39 | 2026-09-12 03:04 (1. běh OK, 297 testů, ruční průchod: 10000003 → /crew/my-shifts/ s CB2204/CB2205, `past=1`, jiný člen posádky směny nevidí; CEO dashboard karty + 3 tabulky nad e2e prodeji, neplatné filtry 200, agregace v ORM (9 dotazů); 403 pro ostatní role; bez oprav) |
+| R18 Hardening a závěr | #40 | #41 | 2026-09-12 05:38 (1. běh OK, 310 testů, e2e 9/9 dvakrát proti runserveru; ruční průchod: limiter 10/15 min per USERID+IP, `check --deploy` s `.env.example` bez varování, collectstatic s whitenoise, 404/403, placeholder jen legal, menu vs. matice; Claude opravil: 500 handler bez request kontextu + test, `SECRET_KEY` jen v build kroku Dockerfile, `hr*`/`reports*` ve wheelu, poznámka o per-proces limiteru v README) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R18 Hardening a závěr | #40 | – | zadáno 03:12, čeká se na PR |
+| – | – | – | nic neběží |
 
 ## Fronta
-prázdná – R18 je poslední krok plánu; po jeho merge Claude zapíše závěrečné shrnutí a přestane plánovat kontroly.
+prázdná – plán je dokončen.
+
+## Co zbývá ručně (uživatel)
+- Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté).
+- Nasazení: sestavit image (`docker build`), nastavit reálný `SECRET_KEY`, `ALLOWED_HOSTS`, `DATABASE_URL` (viz `app/README.md`), spustit `migrate` a `import_legacy` z exportu DB2.
+- Rozhodnout otevřené body z `02-functional-spec.md` (platební metoda u účtenky, role legal bez funkcí).
+- Codex Cloud: nepravidelné selhání pushe na 1. běhu (viz poznámky) – zkontrolovat token v nastavení prostředí, pokud se bude Codex používat dál.
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.

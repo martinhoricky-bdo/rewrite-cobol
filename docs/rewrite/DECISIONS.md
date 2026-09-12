@@ -37,3 +37,8 @@ Záznam rozhodnutí, která Claude přijal v automatickém režimu bez dotazu na
 - Rozhodnutí: explicitní přepínač; hodnota mimo zvolený formát je chyba řádku v reportu. `03` kap. 7.3 upraveno. `seed_demo` (JSON `YYYY/MM/DD`) používá dál vlastní parser – není to formát DB2.
 - Dopad: `docs/rewrite/03-target-architecture.md` kap. 7.3; `app/legacy_import/parsers.py: parse_legacy_date(value, fmt)`.
 
+
+## 2026-09-12 – R18: limiter přihlášení v `LocMemCache`, chybová stránka 500 bez request kontextu
+- Kontext: zadání R18 požadovalo limiter bez externí závislosti (Django cache, `LocMemCache`). Codex v PR #41 implementoval čítač v cache s klíčem `login-fail:<user>:<ip>`; `LocMemCache` je per proces, takže u 3 Gunicorn workerů platí limit 10/15 min per worker (efektivně až 30 pokusů). Zároveň `handler500` renderoval `500.html` přes `render(request, …)`, tedy s context processory (`auth`, `core.context_processors.header`), které při výpadku DB/session samy padají.
+- Rozhodnutí: pro PoC ponechat `LocMemCache` (bez Redis/memcached), limit je dokumentován v `app/README.md`; pro striktní globální limit nasadit sdílený cache backend (`CACHES` v `prod.py`). `server_error` renderuje `500.html` přes `render_to_string` bez requestu (test `test_500_page_renders_without_request_context`). Ukázkový `SECRET_KEY` v Dockerfile jen v build kroku `collectstatic`, ne jako `ENV` runtime image – bez reálného `SECRET_KEY` aplikace odmítne start.
+- Dopad: `app/core/views.py`, `app/Dockerfile`, `app/README.md`, `app/pyproject.toml` (`hr*`, `reports*` v `packages.find`).
