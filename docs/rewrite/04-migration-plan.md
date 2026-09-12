@@ -171,7 +171,7 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 - Názvy URL, cesty, namespace, texty hlášek, hlavičky tabulek, texty tlačítek a `role="button"` u akčních odkazů zůstávají.
 - Žádná změna schématu (`makemigrations --check` čistý); přidání `QuerySet`/`Manager` nebo `verbose_name` migraci nevyžaduje – pokud by `makemigrations` migraci navrhl, je to chyba zadání a patří do PR jako odchylka.
 - V převedených aplikacích nezůstane žádná function-based view s `render(...)` kromě HTMX fragmentů výslovně uvedených v zadání; žádné `request.GET.get` ve views; žádné `Paginator` ve views; žádné `form.as_p` ani ruční cykly přes pole v šablonách.
-- Počet řádků převedených `views.py` klesne; duplicity uvedené v zadání zmizí (review to kontroluje diffem). Limity řádků se plní čitelným kódem: `ruff format` beze změn, žádné `# noqa`, `# fmt: off` ani slučování atributů do jednoho řádku.
+- Počet řádků převedených `views.py` klesne; duplicity uvedené v zadání zmizí (review to kontroluje diffem). Limity řádků se plní čitelným kódem: `ruff format` beze změn, žádné `# noqa`, `# fmt: off`, slučování atributů do jednoho řádku ani přesun tříd do pomocných modulů s re-export shimem.
 - Bez PostgreSQL v sandboxu se PR otevírá jako draft s výčtem testů, které neběžely (`AGENTS.md` kap. 4).
 
 ## R19 – Základ: generické views, mixiny, sdílené šablony, `fleet` jako vzor (M)
@@ -185,7 +185,7 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 
 - **Cíl:** převod `operations`, `hr` a IT části `accounts` (`views_it.py`).
 - **Rozsah:** `QuerySet`y `Flight.objects.with_sold()/in_period()`, `Crew.objects.with_member()/with_shift_count()`, `Shift.objects.with_flight_count()/in_period()`, `Employee.objects.search()`; `FlightFilterForm`, `ShiftFilterForm`, `EmployeeFilterForm`, `UserFilterForm` (`FilterForm`); `FlightListView`, `FlightCreateView`, `FlightUpdateView`, `FlightDeleteView`, `FlightGenerateView(FormView)`, totéž pro `Crew` a `Shift`; `EmployeeListView`, `EmployeeDetailView`, `EmployeeCreateView`, `EmployeeUpdateView`, `DepartmentListView`, `DepartmentUpdateView`; `UserListView`, `ResetPasswordView`, `ActivateUserView`, `DeactivateUserView` (logika v `accounts/services.py`); zrušení šablon `schedule/*_form.html`, `schedule/*_confirm_delete.html`, `hr/*_form.html`, `it/fleet_*` (pokud zbyly); `schedule_flights/crews/shifts` v `operations/services.py` nahrazeny querysety.
-- **Akceptace:** existující testy `test_schedule_*`, `test_hr_*`, `test_it_users.py`, `test_generate_flights.py`, `test_*_form.py` beze změn asercí; `operations/views.py` ≤ 110 řádků, `hr/views.py` ≤ 60, `accounts/views_it.py` ≤ 60.
+- **Akceptace:** existující testy `test_schedule_*`, `test_hr_*`, `test_it_users.py`, `test_generate_flights.py`, `test_*_form.py` beze změn asercí; `operations/views.py` ≤ 170 řádků, `hr/views.py` ≤ 100, `accounts/views_it.py` ≤ 70 (bez pomocných modulů).
 - **Závislosti:** R19.
 
 ## R21 – Sales a Reports na generických views (M)
