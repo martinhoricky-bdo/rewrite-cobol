@@ -3,9 +3,9 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 10:55
+- Poslední aktualizace: 2026-09-12 11:20
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
-- Aktuální krok: R20 (Codex pracuje)
+- Aktuální krok: R21 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -32,10 +32,10 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R16b Schedule – posádky a směny | #36 | #37 | 2026-09-12 02:49 (1. běh OK, 274 testů, ruční průchod: posádka 13 z oddělení 2/3/4, směna na zítřek, překryv/obrácené časy odmítnuty, E-REF-01, 403; Claude doplnil číslo PR v CHANGELOG) |
 | R17 Crew my shifts + CEO dashboard | #38 | #39 | 2026-09-12 03:04 (1. běh OK, 297 testů, ruční průchod: 10000003 → /crew/my-shifts/ s CB2204/CB2205, `past=1`, jiný člen posádky směny nevidí; CEO dashboard karty + 3 tabulky nad e2e prodeji, neplatné filtry 200, agregace v ORM (9 dotazů); 403 pro ostatní role; bez oprav) |
 | R18 Hardening a závěr | #40 | #41 | 2026-09-12 05:38 (1. běh OK, 310 testů, e2e 9/9 dvakrát proti runserveru; ruční průchod: limiter 10/15 min per USERID+IP, `check --deploy` s `.env.example` bez varování, collectstatic s whitenoise, 404/403, placeholder jen legal, menu vs. matice; Claude opravil: 500 handler bez request kontextu + test, `SECRET_KEY` jen v build kroku Dockerfile, `hr*`/`reports*` ve wheelu, poznámka o per-proces limiteru v README) |
-| R20 Schedule, HR a IT na generických views | #45 | #46 (draft) | PR 10:35 (Codex bez PG); review 1 (10:55) vráceno: 6 testů padá (`ModelView.get_page_title` v ListView, delete views s form šablonou), limity obejity přes `view_classes.py` + shim, chybí testy §5 a fixtury, `empty_label`; fix run zadán |
+| R21 Sales a Reports na generických views | – | – | zadávání |
 
 ## Fronta
-R21 (sales/reports) – po R20; R22 (úklid, matice oprávnění, docs) – po R21. Zadání v `codex-tasks/`.
+R22 (úklid, matice oprávnění, docs) – po R21. Zadání v `codex-tasks/`.
 
 ## Co zbývá ručně (uživatel)
 - Smazat vzdálené větve `claude/00-analysis-docs` a `codex/*` (mazání přes git proxy z prostředí Claude neprochází; všechny jsou mergnuté).

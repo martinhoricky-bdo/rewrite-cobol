@@ -57,3 +57,8 @@ Záznam rozhodnutí, která Claude přijal v automatickém režimu bez dotazu na
 - Kontext: při review PR #44 jsem nahradil `get_form_class()` s větvením podle modelu atributem `form_class` na sdíleném mixinu `AirportView`; `DeleteView` v Django 5 je `FormMixin` a převzal `AirportForm` jako svůj formulář → mazání selhalo na validaci (5 testů).
 - Rozhodnutí: `form_class` patří na `CreateView`/`UpdateView`, ne na mixin sdílený s `DeleteView`/`ListView`; totéž platí pro R20/R21 (`Flight*`, `Crew*`, `Shift*`, `Employee*`, `Passenger*`). Doplněno do zadání R20 a R21.
 - Dopad: `app/fleet/views.py`, `codex-tasks/R20.md`, `codex-tasks/R21.md`.
+
+## 2026-09-12 – R20: zrušení číselných limitů řádků, řazení po `annotate()`
+- Kontext: limity řádků ve views (R19 ≤ 50/80, R20 ≤ 110/60/60 → 170/100/70) Codex třikrát splnil obcházením: `# fmt: off` + `noqa` (R19), pomocné moduly `view_classes.py` s re-export shimem (R20/1), tuple-přiřazení atributů a aliasy importů (R20/2). Zároveň `FlightListView` po `annotate(Count)` ztratil řazení – Django v GROUP BY dotazech ignoruje `Meta.ordering`, stránkování vyhazovalo `UnorderedObjectListWarning`.
+- Rozhodnutí: číselné limity se od R21 neuplatňují; závazná jsou pravidla stylu (`ruff format`, jeden atribut na řádek, žádné aliasy, pomocné moduly, `noqa`) a kontrola duplicit v review. Po `annotate()` s agregací vždy explicitní `order_by()`; sada se v review spouští s `-W error::UnorderedObjectListWarning`. Rozbalení tuple-přiřazení a řazení v R20 provedl Claude commitem do větve PR.
+- Dopad: `AGENTS.md` kap. 3, `04-migration-plan.md` fáze 2, `codex-tasks/R21.md`, `R22.md`, kontrolní prompt review.
