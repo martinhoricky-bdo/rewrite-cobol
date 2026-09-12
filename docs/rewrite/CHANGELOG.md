@@ -1,5 +1,11 @@
 # CHANGELOG přepisu
 
+## R20 – Schedule, HR a IT na generických views
+- PR: #46 (codex/R20-generic-schedule-hr)
+- Přidáno: doménové querysety, filtrovací formuláře a služby pro účty a založení zaměstnance.
+- Změněno: Schedule, HR a IT používají generické class-based views a sdílené šablony.
+- Odchylky od specifikace: žádné.
+
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R19 – Základ generického jádra

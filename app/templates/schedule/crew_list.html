@@ -1,7 +1,1 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Crews</h1>
-<p><a role="button" href="{% url 'schedule:crew_create' %}">New crew</a></p>
-<table><thead><tr><th>CREWID</th><th>COMMANDER</th><th>COPILOTE</th><th>FA CHIEF</th><th>FA1</th><th>FA2</th><th>FA3</th><th>SHIFTS</th><th>ACTIONS</th></tr></thead>
-<tbody>{% for crew in crews %}<tr><td>{{ crew.pk }}</td><td>{{ crew.commander }}</td><td>{{ crew.copilote }}</td><td>{{ crew.fachief }}</td><td>{{ crew.fliattendant1 }}</td><td>{{ crew.fliattendant2 }}</td><td>{{ crew.fliattendant3 }}</td><td>{{ crew.shift_count }}</td><td><a href="{% url 'schedule:crew_edit' crew.pk %}">Edit</a> <a href="{% url 'schedule:crew_delete' crew.pk %}">Delete</a></td></tr>{% empty %}<tr><td colspan="9">No crews found.</td></tr>{% endfor %}</tbody></table>
-{% endblock %}
+{% extends "core/list.html" %}{% block actions %}<p><a role="button" href="{% url 'schedule:crew_create' %}">New crew</a></p>{% endblock %}{% block thead %}<tr><th>CREWID</th><th>COMMANDER</th><th>COPILOTE</th><th>FA CHIEF</th><th>FA1</th><th>FA2</th><th>FA3</th><th>SHIFTS</th><th>ACTIONS</th></tr>{% endblock %}{% block rows %}{% for crew in object_list %}<tr><td>{{ crew.pk }}</td><td>{{ crew.commander }}</td><td>{{ crew.copilote }}</td><td>{{ crew.fachief }}</td><td>{{ crew.fliattendant1 }}</td><td>{{ crew.fliattendant2 }}</td><td>{{ crew.fliattendant3 }}</td><td>{{ crew.shift_count }}</td><td><a href="{% url 'schedule:crew_edit' crew.pk %}">Edit</a> <a href="{% url 'schedule:crew_delete' crew.pk %}">Delete</a></td></tr>{% empty %}<tr><td colspan="9">No crews found.</td></tr>{% endfor %}{% endblock %}

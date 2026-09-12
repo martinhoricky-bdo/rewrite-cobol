@@ -1,4 +1,0 @@
-{% extends "base.html" %}
-{% block content %}<h1>{% if object.pk %}Edit crew{% else %}New crew{% endif %}</h1>
-<form method="post">{% csrf_token %}{{ form }}<button type="submit">Save</button></form>
-<p><a href="{% url 'schedule:crews' %}">Cancel</a></p>{% endblock %}

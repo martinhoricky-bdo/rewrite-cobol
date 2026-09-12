@@ -1,103 +1,109 @@
 from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db import transaction
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Count
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from accounts.models import Department, Employee
-from accounts.permissions import current_role, role_required
+from accounts.permissions import RoleRequiredMixin
 from accounts.roles import Role
-from accounts.services import ensure_user_for_employee
+from core.views import generic
 from operations.models import Crew
 
-from .forms import DepartmentForm, EmployeeForm
+from .forms import DepartmentForm, EmployeeFilterForm, EmployeeForm
+from .services import create_employee
 
 
-@role_required(Role.HR, Role.CEO)
-def employees(request):
-    name = request.GET.get("name", "").strip()
-    dept = request.GET.get("dept", "").strip()
-    queryset = Employee.objects.select_related("dept", "user").order_by("empid")
-    if name:
-        queryset = queryset.filter(Q(firstname__istartswith=name) | Q(lastname__istartswith=name))
-    if dept.isdigit():
-        queryset = queryset.filter(dept_id=int(dept))
-    page_obj = Paginator(queryset, 10).get_page(request.GET.get("page"))
-    params = request.GET.copy()
-    params.pop("page", None)
-    return render(
-        request,
-        "hr/employee_list.html",
-        {
-            "page_obj": page_obj,
-            "departments": Department.objects.order_by("deptid"),
-            "name": name,
-            "selected_dept": dept,
-            "query_params": params.urlencode(),
-            "can_edit": current_role(request.user) == Role.HR,
-        },
-    )
+class EmployeeView(RoleRequiredMixin, generic.EditableByMixin):
+    model = Employee
+    pk_url_kwarg = "empid"
+    allowed_roles = (Role.HR, Role.CEO)
+    edit_roles = (Role.HR,)
 
 
-@role_required(Role.HR, Role.CEO)
-def employee_detail(request, empid):
-    employee = get_object_or_404(Employee.objects.select_related("dept", "user"), pk=empid)
-    crews = Crew.objects.filter(
-        Q(commander=employee)
-        | Q(copilote=employee)
-        | Q(fachief=employee)
-        | Q(fliattendant1=employee)
-        | Q(fliattendant2=employee)
-        | Q(fliattendant3=employee)
-    ).distinct()
-    return render(
-        request,
-        "hr/employee_detail.html",
-        {
-            "employee_record": employee,
-            "crews": crews,
-            "can_edit": current_role(request.user) == Role.HR,
-        },
-    )
+class EmployeeListView(EmployeeView, generic.PageTitleMixin, generic.FilteredListView):
+    page_title = "Employees"
+    template_name = "hr/employee_list.html"
+    filter_form_class = EmployeeFilterForm
+    paginate_by = 10
+
+    def filter_queryset(self, queryset, form):
+        return (
+            queryset.select_related("dept", "user")
+            .name_starts_with(form.value("name", ""))
+            .in_department(getattr(form.value("dept"), "pk", None))
+        )
 
 
-@role_required(Role.HR)
-def employee_create(request):
-    form = EmployeeForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            employee = form.save()
-            ensure_user_for_employee(employee)
-        messages.success(request, f"Employee {employee.empid} saved.")
-        return redirect("hr:employee_detail", empid=employee.empid)
-    return render(request, "hr/employee_form.html", {"form": form, "heading": "New employee"})
+class EmployeeDetailView(EmployeeView, generic.PageTitleMixin, DetailView):
+    template_name = "hr/employee_detail.html"
+    context_object_name = "employee_record"
+
+    def get_queryset(self):
+        return Employee.objects.select_related("dept", "user")
+
+    def get_page_title(self):
+        return f"Employee {self.object.empid}"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(crews=Crew.objects.with_member(self.object), **kwargs)
 
 
-@role_required(Role.HR)
-def employee_edit(request, empid):
-    employee = get_object_or_404(Employee, pk=empid)
-    form = EmployeeForm(request.POST or None, instance=employee)
-    if request.method == "POST" and form.is_valid():
-        employee = form.save()
-        messages.success(request, f"Employee {employee.empid} saved.")
-        return redirect("hr:employee_detail", empid=employee.empid)
-    return render(request, "hr/employee_form.html", {"form": form, "heading": "Edit employee"})
+class EmployeeFormView(
+    EmployeeView,
+    generic.PageTitleMixin,
+    generic.CancelUrlMixin,
+    generic.SavedMessageMixin,
+):
+    allowed_roles = (Role.HR,)
+    form_class = EmployeeForm
+    template_name = "core/form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("hr:employee_detail", kwargs={"empid": self.object.empid})
 
 
-@role_required(Role.HR)
-def departments(request):
-    queryset = Department.objects.select_related("manager").annotate(
-        employee_count=Count("employees")
-    )
-    return render(request, "hr/department_list.html", {"departments": queryset})
+class EmployeeCreateView(EmployeeFormView, CreateView):
+    page_title = "New employee"
+
+    def form_valid(self, form):
+        self.object = create_employee(form)
+        messages.success(self.request, self.get_saved_message())
+        return HttpResponseRedirect(self.get_success_url())
 
 
-@role_required(Role.HR)
-def department_edit(request, deptid):
-    department = get_object_or_404(Department, pk=deptid)
-    form = DepartmentForm(request.POST or None, instance=department)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, f"Department {department.deptid} saved.")
-        return redirect("hr:departments")
-    return render(request, "hr/department_form.html", {"form": form, "department": department})
+class EmployeeUpdateView(EmployeeFormView, UpdateView):
+    def get_page_title(self):
+        return f"Edit employee {self.object.empid}"
+
+
+class DepartmentView(RoleRequiredMixin):
+    allowed_roles = (Role.HR,)
+    model = Department
+
+
+class DepartmentListView(DepartmentView, generic.PageTitleMixin, ListView):
+    page_title = "Departments"
+    template_name = "hr/department_list.html"
+
+    def get_queryset(self):
+        return self.model.objects.select_related("manager").annotate(
+            employee_count=Count("employees")
+        )
+
+
+class DepartmentUpdateView(
+    DepartmentView,
+    generic.PageTitleMixin,
+    generic.CancelUrlMixin,
+    generic.SavedMessageMixin,
+    UpdateView,
+):
+    form_class = DepartmentForm
+    pk_url_kwarg = "deptid"
+    template_name = "core/form.html"
+    cancel_url_name = "hr:departments"
+    success_url = reverse_lazy("hr:departments")
+
+    def get_page_title(self):
+        return f"Edit department {self.object.pk}"

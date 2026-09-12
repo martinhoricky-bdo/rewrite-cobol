@@ -3,23 +3,15 @@ from datetime import date
 import pytest
 from django.urls import reverse
 
+from accounts.roles import Role
 from core.messages import E_REF_01
 from operations.models import Flight
 from tests.factories import (
-    DepartmentFactory,
-    EmployeeFactory,
     FlightFactory,
     TicketFactory,
-    UserFactory,
 )
 
 pytestmark = pytest.mark.django_db
-
-
-def login_as(client, deptid=9):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
 
 
 def flight_data(flight, **updates):
@@ -38,8 +30,8 @@ def flight_data(flight, **updates):
     return data
 
 
-def test_list_filters_create_and_edit(client):
-    login_as(client)
+def test_list_filters_create_and_edit(role_client):
+    client = role_client(Role.SCHEDULE)
     flight = FlightFactory(flightdate=date(2026, 4, 1), flightnum="CB1000")
     response = client.get(
         reverse("schedule:flights"),
@@ -60,8 +52,8 @@ def test_list_filters_create_and_edit(client):
     assert str(created.price) == "88.00"
 
 
-def test_delete_and_generate(client):
-    login_as(client)
+def test_delete_and_generate(role_client):
+    client = role_client(Role.SCHEDULE)
     unused = FlightFactory()
     client.post(reverse("schedule:flight_delete", args=[unused.pk]))
     assert not Flight.objects.filter(pk=unused.pk).exists()
@@ -98,6 +90,6 @@ def test_delete_and_generate(client):
         ("schedule:flight_delete", [1], "post"),
     ],
 )
-def test_sales_role_gets_403_for_every_schedule_action(client, name, args, method):
-    login_as(client, 7)
+def test_sales_role_gets_403_for_every_schedule_action(role_client, name, args, method):
+    client = role_client(Role.SALES)
     assert getattr(client, method)(reverse(name, args=args)).status_code == 403

@@ -1,77 +1,76 @@
 from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
+from django.shortcuts import redirect
+from django.views import View
+from django.views.generic import TemplateView
+from django.views.generic.detail import SingleObjectMixin
 
-from accounts.permissions import role_required
+from accounts.permissions import RoleRequiredMixin
 from accounts.roles import Role
+from core.views import generic
 
+from .forms import UserFilterForm
 from .models import Employee
-from .services import reset_employee_password
+from .services import AccountError, activate_account, deactivate_account, reset_employee_password
 
 PASSWORD_SESSION_KEY = "it_temporary_password"
 
 
-@role_required(Role.IT)
-def users(request):
-    query = request.GET.get("q", "").strip()
-    employees = Employee.objects.select_related("dept", "user").order_by("empid")
-    if query:
-        employees = employees.filter(
-            Q(firstname__icontains=query)
-            | Q(lastname__icontains=query)
-            | Q(dept__name__icontains=query)
+class UserListView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
+    allowed_roles = (Role.IT,)
+    model = Employee
+    page_title = "Users"
+    template_name = "it/user_list.html"
+    filter_form_class = UserFilterForm
+    paginate_by = 10
+
+    def filter_queryset(self, queryset, form):
+        return queryset.select_related("dept", "user").search(form.value("q", "")).order_by("empid")
+
+
+class AccountActionView(RoleRequiredMixin, SingleObjectMixin, View):
+    allowed_roles = (Role.IT,)
+    model = Employee
+    pk_url_kwarg = "empid"
+
+    def get_queryset(self):
+        return Employee.objects.select_related("user")
+
+
+class ResetPasswordView(AccountActionView):
+    def post(self, request, *args, **kwargs):
+        employee = self.get_object()
+        password = reset_employee_password(employee)
+        request.session[PASSWORD_SESSION_KEY] = {"empid": employee.empid, "password": password}
+        messages.success(request, f"Password for {employee.empid} reset.")
+        return redirect("it:user_password_shown")
+
+
+class AccountStateView(AccountActionView):
+    service = None
+
+    def post(self, request, *args, **kwargs):
+        try:
+            message = self.service(self.get_object(), request.user)
+        except AccountError as error:
+            messages.error(request, str(error))
+        else:
+            messages.success(request, message)
+        return redirect("it:users")
+
+
+class ActivateUserView(AccountStateView):
+    service = staticmethod(activate_account)
+
+
+class DeactivateUserView(AccountStateView):
+    service = staticmethod(deactivate_account)
+
+
+class PasswordShownView(RoleRequiredMixin, TemplateView):
+    allowed_roles = (Role.IT,)
+    template_name = "it/user_password_shown.html"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(
+            temporary=self.request.session.pop(PASSWORD_SESSION_KEY, None), **kwargs
         )
-    page_obj = Paginator(employees, 10).get_page(request.GET.get("page"))
-    query_params = request.GET.copy()
-    query_params.pop("page", None)
-    return render(
-        request,
-        "it/user_list.html",
-        {"page_obj": page_obj, "query": query, "query_params": query_params.urlencode()},
-    )
-
-
-@require_POST
-@role_required(Role.IT)
-def user_reset_password(request, empid):
-    employee = get_object_or_404(Employee.objects.select_related("user"), pk=empid)
-    password = reset_employee_password(employee)
-    request.session[PASSWORD_SESSION_KEY] = {"empid": employee.empid, "password": password}
-    messages.success(request, f"Password for {empid} reset.")
-    return redirect("it:user_password_shown")
-
-
-@role_required(Role.IT)
-def user_password_shown(request):
-    temporary = request.session.pop(PASSWORD_SESSION_KEY, None)
-    return render(request, "it/user_password_shown.html", {"temporary": temporary})
-
-
-@require_POST
-@role_required(Role.IT)
-def user_activate(request, empid):
-    employee = get_object_or_404(Employee.objects.select_related("user"), pk=empid)
-    if employee.user is None:
-        messages.error(request, "This employee has no account.")
-    else:
-        employee.user.is_active = True
-        employee.user.save(update_fields=["is_active"])
-        messages.success(request, f"Account {empid} activated.")
-    return redirect("it:users")
-
-
-@require_POST
-@role_required(Role.IT)
-def user_deactivate(request, empid):
-    employee = get_object_or_404(Employee.objects.select_related("user"), pk=empid)
-    if employee.user_id == request.user.pk:
-        messages.error(request, "You cannot deactivate your own account.")
-    elif employee.user is None:
-        messages.error(request, "This employee has no account.")
-    else:
-        employee.user.is_active = False
-        employee.user.save(update_fields=["is_active"])
-        messages.success(request, f"Account {empid} deactivated.")
-    return redirect("it:users")

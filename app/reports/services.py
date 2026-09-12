@@ -10,33 +10,24 @@ from django.db.models import (
     IntegerField,
     OuterRef,
     Prefetch,
-    Q,
     Subquery,
     Sum,
     Value,
 )
 from django.db.models.functions import Coalesce
 
-from operations.models import Flight, Shift
+from operations.models import Crew, Flight, Shift
 from sales.models import Buy, Ticket
 
 
 def crew_shifts(employee, *, today: date, include_past: bool = False):
     """Return shifts assigned to an employee, including flight passenger counts."""
     start = today if not include_past else date.fromordinal(today.toordinal() - 90)
-    membership = (
-        Q(crew__commander=employee)
-        | Q(crew__copilote=employee)
-        | Q(crew__fachief=employee)
-        | Q(crew__fliattendant1=employee)
-        | Q(crew__fliattendant2=employee)
-        | Q(crew__fliattendant3=employee)
-    )
     flights = Flight.objects.select_related("airportdep", "airportarr", "airplane").annotate(
         passenger_count=Count("tickets")
     )
     return (
-        Shift.objects.filter(membership, shiftdate__gte=start)
+        Shift.objects.filter(crew__in=Crew.objects.with_member(employee), shiftdate__gte=start)
         .select_related("crew")
         .prefetch_related(Prefetch("flights", queryset=flights))
         .order_by("shiftdate", "begintime", "shiftid")

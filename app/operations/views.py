@@ -1,92 +1,102 @@
-from datetime import date, timedelta
+from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db import transaction
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.db.models import Q
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.views.generic import CreateView, FormView, UpdateView
 
-from accounts.permissions import role_required
+from accounts.permissions import RoleRequiredMixin
 from accounts.roles import Role
-from core.messages import E_REF_01
+from core.views import generic
 
-from .forms import CrewForm, FlightForm, FlightGenerateForm, ShiftForm
+from .forms import (
+    CrewForm,
+    FlightFilterForm,
+    FlightForm,
+    FlightGenerateForm,
+    ShiftFilterForm,
+    ShiftForm,
+)
 from .models import Crew, Flight, Shift
-from .services import generate_flights, schedule_crews, schedule_flights, schedule_shifts
+from .services import generate_flights
 
 
-@role_required(Role.SCHEDULE)
-def flights(request):
-    today = timezone.localdate()
-    start, end = today, today + timedelta(days=30)
-    try:
-        if request.GET.get("date_from"):
-            start = date.fromisoformat(request.GET["date_from"])
-        if request.GET.get("date_to"):
-            end = date.fromisoformat(request.GET["date_to"])
-    except (TypeError, ValueError):
-        pass
-    queryset = schedule_flights(
-        date_from=start,
-        date_to=end,
-        flightnum=request.GET.get("flightnum", ""),
-        airport=request.GET.get("airport", ""),
-    )
-    page = Paginator(queryset, 10).get_page(request.GET.get("page"))
-    params = request.GET.copy()
-    params.pop("page", None)
-    return render(
-        request,
-        "schedule/flight_list.html",
-        {
-            "page_obj": page,
-            "date_from": start,
-            "date_to": end,
-            "query_params": params.urlencode(),
-        },
-    )
+class ScheduleView(RoleRequiredMixin):
+    allowed_roles = (Role.SCHEDULE,)
 
 
-def _flight_form(request, flight):
-    form = FlightForm(request.POST or None, instance=flight)
-    if request.method == "POST" and form.is_valid():
-        with transaction.atomic():
-            saved = form.save()
-        messages.success(request, f"Flight {saved.pk} saved.")
-        return redirect("schedule:flights")
-    return render(request, "schedule/flight_form.html", {"form": form, "object": flight})
+class ScheduleFormView(
+    ScheduleView, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
+):
+    template_name = "core/form.html"
+
+    def get_page_title(self):
+        if self.object:
+            return f"Edit {self.model._meta.verbose_name} {self.object.pk}"
+        return self.page_title
 
 
-@role_required(Role.SCHEDULE)
-def flight_create(request):
-    return _flight_form(request, Flight())
+class ScheduleListView(ScheduleView, generic.PageTitleMixin, generic.FilteredListView):
+    pass
 
 
-@role_required(Role.SCHEDULE)
-def flight_edit(request, flightid):
-    return _flight_form(request, get_object_or_404(Flight, pk=flightid))
+class FlightView:
+    model = Flight
+    pk_url_kwarg = "flightid"
+    success_url = reverse_lazy("schedule:flights")
+    cancel_url_name = "schedule:flights"
 
 
-@role_required(Role.SCHEDULE)
-def flight_delete(request, flightid):
-    flight = get_object_or_404(Flight, pk=flightid)
-    if request.method == "POST":
-        count = flight.tickets.count()
-        if count:
-            messages.error(request, E_REF_01.format(Entity="Flight", n=count, related="tickets"))
-        else:
-            with transaction.atomic():
-                flight.delete()
-            messages.success(request, f"Flight {flightid} deleted.")
-        return redirect("schedule:flights")
-    return render(request, "schedule/flight_confirm_delete.html", {"flight": flight})
+class FlightListView(FlightView, ScheduleListView):
+    page_title = "Flights"
+    template_name = "schedule/flight_list.html"
+    filter_form_class = FlightFilterForm
+    paginate_by = 10
+
+    def filter_queryset(self, queryset, form):
+        today = timezone.localdate()
+        queryset = (
+            queryset.in_period(
+                form.value("date_from", today), form.value("date_to", today + timedelta(days=30))
+            )
+            .with_related()
+            .select_related("shift__crew")
+            .with_sold()
+            .order_by("flightdate", "deptime", "flightnum")
+        )
+        number = form.value("flightnum", "").strip()
+        airport = form.value("airport", "").strip()
+        if number:
+            queryset = queryset.filter(flightnum__iexact=number)
+        if airport:
+            queryset = queryset.filter(
+                Q(airportdep__airportid__iexact=airport) | Q(airportarr__airportid__iexact=airport)
+            )
+        return queryset
 
 
-@role_required(Role.SCHEDULE)
-def flights_generate(request):
-    form = FlightGenerateForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
+class FlightCreateView(FlightView, ScheduleFormView, CreateView):
+    form_class = FlightForm
+    page_title = "New flight"
+
+
+class FlightUpdateView(FlightView, ScheduleFormView, UpdateView):
+    form_class = FlightForm
+
+
+class FlightDeleteView(FlightView, ScheduleView, generic.ProtectedDeleteView):
+    page_title = "Delete flight"
+
+
+class FlightGenerateView(ScheduleView, generic.PageTitleMixin, generic.CancelUrlMixin, FormView):
+    form_class = FlightGenerateForm
+    template_name = "schedule/flight_generate.html"
+    page_title = "Generate flights"
+    cancel_url_name = "schedule:flights"
+
+    def form_valid(self, form):
         result = generate_flights(
             form.cleaned_data["template"],
             form.cleaned_data["date_from"],
@@ -94,116 +104,77 @@ def flights_generate(request):
             form.selected_weekdays(),
         )
         messages.success(
-            request, f"Generated {result.created} flights, skipped {result.skipped} existing."
+            self.request, f"Generated {result.created} flights, skipped {result.skipped} existing."
         )
-        query = (
-            f"date_from={form.cleaned_data['date_from'].isoformat()}&"
-            f"date_to={form.cleaned_data['date_to'].isoformat()}"
+        query = urlencode(
+            {"date_from": form.cleaned_data["date_from"], "date_to": form.cleaned_data["date_to"]}
         )
-        return redirect(f"{reverse('schedule:flights')}?{query}")
-    return render(request, "schedule/flight_generate.html", {"form": form})
+        self.success_url = f"{reverse('schedule:flights')}?{query}"
+        return super().form_valid(form)
 
 
-@role_required(Role.SCHEDULE)
-def crews(request):
-    return render(request, "schedule/crew_list.html", {"crews": schedule_crews()})
+class CrewView:
+    model = Crew
+    pk_url_kwarg = "crewid"
+    success_url = reverse_lazy("schedule:crews")
+    cancel_url_name = "schedule:crews"
 
 
-def _crew_form(request, crew):
-    form = CrewForm(request.POST or None, instance=crew)
-    if request.method == "POST" and form.is_valid():
-        saved = form.save()
-        messages.success(request, f"Crew {saved.pk} saved.")
-        return redirect("schedule:crews")
-    return render(request, "schedule/crew_form.html", {"form": form, "object": crew})
+class CrewListView(CrewView, ScheduleListView):
+    page_title = "Crews"
+    template_name = "schedule/crew_list.html"
+
+    def filter_queryset(self, queryset, form):
+        return queryset.with_members().with_shift_count()
 
 
-@role_required(Role.SCHEDULE)
-def crew_create(request):
-    return _crew_form(request, Crew())
+class CrewCreateView(CrewView, ScheduleFormView, CreateView):
+    form_class = CrewForm
+    page_title = "New crew"
 
 
-@role_required(Role.SCHEDULE)
-def crew_edit(request, crewid):
-    return _crew_form(request, get_object_or_404(Crew, pk=crewid))
+class CrewUpdateView(CrewView, ScheduleFormView, UpdateView):
+    form_class = CrewForm
 
 
-@role_required(Role.SCHEDULE)
-def crew_delete(request, crewid):
-    crew = get_object_or_404(Crew, pk=crewid)
-    if request.method == "POST":
-        count = crew.shifts.count()
-        if count:
-            messages.error(request, E_REF_01.format(Entity="Crew", n=count, related="shifts"))
-        else:
-            crew.delete()
-            messages.success(request, f"Crew {crewid} deleted.")
-        return redirect("schedule:crews")
-    return render(request, "schedule/crew_confirm_delete.html", {"crew": crew})
+class CrewDeleteView(CrewView, ScheduleView, generic.ProtectedDeleteView):
+    page_title = "Delete crew"
 
 
-@role_required(Role.SCHEDULE)
-def shifts(request):
-    today = timezone.localdate()
-    start, end = today, today + timedelta(days=30)
-    try:
-        if request.GET.get("date_from"):
-            start = date.fromisoformat(request.GET["date_from"])
-        if request.GET.get("date_to"):
-            end = date.fromisoformat(request.GET["date_to"])
-    except (TypeError, ValueError):
-        pass
-    try:
-        crew_id = int(request.GET["crew"]) if request.GET.get("crew") else None
-    except (TypeError, ValueError):
-        crew_id = None
-    page = Paginator(schedule_shifts(date_from=start, date_to=end, crew_id=crew_id), 20).get_page(
-        request.GET.get("page")
-    )
-    params = request.GET.copy()
-    params.pop("page", None)
-    return render(
-        request,
-        "schedule/shift_list.html",
-        {
-            "page_obj": page,
-            "date_from": start,
-            "date_to": end,
-            "selected_crew": crew_id,
-            "crews": Crew.objects.order_by("crewid"),
-            "query_params": params.urlencode(),
-        },
-    )
+class ShiftView:
+    model = Shift
+    pk_url_kwarg = "shiftid"
+    success_url = reverse_lazy("schedule:shifts")
+    cancel_url_name = "schedule:shifts"
 
 
-def _shift_form(request, shift):
-    form = ShiftForm(request.POST or None, instance=shift)
-    if request.method == "POST" and form.is_valid():
-        saved = form.save()
-        messages.success(request, f"Shift {saved.pk} saved.")
-        return redirect("schedule:shifts")
-    return render(request, "schedule/shift_form.html", {"form": form, "object": shift})
+class ShiftListView(ShiftView, ScheduleListView):
+    page_title = "Shifts"
+    template_name = "schedule/shift_list.html"
+    filter_form_class = ShiftFilterForm
+    paginate_by = 20
+
+    def filter_queryset(self, queryset, form):
+        today = timezone.localdate()
+        return (
+            queryset.in_period(
+                form.value("date_from", today), form.value("date_to", today + timedelta(days=30))
+            )
+            .for_crew(getattr(form.value("crew"), "pk", None))
+            .select_related("crew")
+            .with_flight_count()
+            .order_by("shiftdate", "begintime", "shiftid")
+        )
 
 
-@role_required(Role.SCHEDULE)
-def shift_create(request):
-    return _shift_form(request, Shift())
+class ShiftCreateView(ShiftView, ScheduleFormView, CreateView):
+    form_class = ShiftForm
+    page_title = "New shift"
 
 
-@role_required(Role.SCHEDULE)
-def shift_edit(request, shiftid):
-    return _shift_form(request, get_object_or_404(Shift, pk=shiftid))
+class ShiftUpdateView(ShiftView, ScheduleFormView, UpdateView):
+    form_class = ShiftForm
 
 
-@role_required(Role.SCHEDULE)
-def shift_delete(request, shiftid):
-    shift = get_object_or_404(Shift, pk=shiftid)
-    if request.method == "POST":
-        count = shift.flights.count()
-        if count:
-            messages.error(request, E_REF_01.format(Entity="Shift", n=count, related="flights"))
-        else:
-            shift.delete()
-            messages.success(request, f"Shift {shiftid} deleted.")
-        return redirect("schedule:shifts")
-    return render(request, "schedule/shift_confirm_delete.html", {"shift": shift})
+class ShiftDeleteView(ShiftView, ScheduleView, generic.ProtectedDeleteView):
+    page_title = "Delete shift"

@@ -3,23 +3,15 @@ from datetime import date
 import pytest
 from django.urls import reverse
 
+from accounts.roles import Role
 from core.messages import E_REF_01
 from operations.models import Shift
 from tests.factories import (
-    DepartmentFactory,
-    EmployeeFactory,
     FlightFactory,
     ShiftFactory,
-    UserFactory,
 )
 
 pytestmark = pytest.mark.django_db
-
-
-def login_as(client, deptid=9):
-    user = UserFactory()
-    EmployeeFactory(user=user, dept=DepartmentFactory(deptid=deptid))
-    client.force_login(user)
 
 
 def shift_data(shift, **updates):
@@ -33,10 +25,10 @@ def shift_data(shift, **updates):
     return data
 
 
-def test_shift_filters_and_crud(client):
-    login_as(client)
-    matching = ShiftFactory(shiftdate=date(2026, 10, 1))
-    other = ShiftFactory(shiftdate=date(2026, 10, 2))
+def test_shift_filters_and_crud(role_client):
+    client = role_client(Role.SCHEDULE)
+    matching = ShiftFactory(shiftid=101, shiftdate=date(2026, 10, 1))
+    other = ShiftFactory(shiftid=102, shiftdate=date(2026, 10, 2))
     response = client.get(
         reverse("schedule:shifts"),
         {"date_from": "2026-10-01", "date_to": "2026-10-02", "crew": matching.crew_id},
@@ -63,8 +55,8 @@ def test_shift_filters_and_crud(client):
     assert not Shift.objects.filter(pk=created.pk).exists()
 
 
-def test_shift_with_flights_cannot_be_deleted(client):
-    login_as(client)
+def test_shift_with_flights_cannot_be_deleted(role_client):
+    client = role_client(Role.SCHEDULE)
     shift = ShiftFactory()
     FlightFactory(shift=shift)
     response = client.post(reverse("schedule:shift_delete", args=[shift.pk]), follow=True)
@@ -84,6 +76,6 @@ def test_shift_with_flights_cannot_be_deleted(client):
         ("schedule:shift_delete", [1], "post"),
     ],
 )
-def test_sales_role_gets_403_for_every_shift_url(client, name, args, method):
-    login_as(client, 7)
+def test_sales_role_gets_403_for_every_shift_url(role_client, name, args, method):
+    client = role_client(Role.SALES)
     assert getattr(client, method)(reverse(name, args=args)).status_code == 403

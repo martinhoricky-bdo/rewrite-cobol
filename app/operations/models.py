@@ -3,9 +3,30 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Count, Q
 
 from accounts.models import Employee
 from fleet.models import Airplane, Airport
+
+
+class CrewQuerySet(models.QuerySet):
+    def with_member(self, employee):
+        return self.filter(
+            Q(commander=employee)
+            | Q(copilote=employee)
+            | Q(fachief=employee)
+            | Q(fliattendant1=employee)
+            | Q(fliattendant2=employee)
+            | Q(fliattendant3=employee)
+        ).distinct()
+
+    def with_shift_count(self):
+        return self.annotate(shift_count=Count("shifts"))
+
+    def with_members(self):
+        return self.select_related(
+            "commander", "copilote", "fachief", "fliattendant1", "fliattendant2", "fliattendant3"
+        )
 
 
 class Crew(models.Model):
@@ -37,6 +58,7 @@ class Crew(models.Model):
         db_column="fliattendant3",
         related_name="crews_as_fliattendant3",
     )
+    objects = CrewQuerySet.as_manager()
 
     class Meta:
         db_table = "crew"
@@ -69,12 +91,24 @@ class Crew(models.Model):
             raise ValidationError("Crew members must be unique.")
 
 
+class ShiftQuerySet(models.QuerySet):
+    def in_period(self, date_from, date_to):
+        return self.filter(shiftdate__range=(date_from, date_to))
+
+    def with_flight_count(self):
+        return self.annotate(flight_count=Count("flights"))
+
+    def for_crew(self, crew_id):
+        return self.filter(crew_id=crew_id) if crew_id is not None else self
+
+
 class Shift(models.Model):
     shiftid = models.AutoField(primary_key=True)
     shiftdate = models.DateField()
     begintime = models.TimeField()
     endtime = models.TimeField()
     crew = models.ForeignKey(Crew, models.PROTECT, db_column="crewid", related_name="shifts")
+    objects = ShiftQuerySet.as_manager()
 
     class Meta:
         db_table = "shift"
@@ -88,6 +122,17 @@ class Shift(models.Model):
 
     def __str__(self) -> str:
         return f"Shift {self.shiftid} ({self.shiftdate})"
+
+
+class FlightQuerySet(models.QuerySet):
+    def with_sold(self):
+        return self.annotate(sold=Count("tickets"))
+
+    def in_period(self, date_from, date_to):
+        return self.filter(flightdate__range=(date_from, date_to))
+
+    def with_related(self):
+        return self.select_related("airportdep", "airportarr", "airplane", "shift")
 
 
 class Flight(models.Model):
@@ -109,6 +154,7 @@ class Flight(models.Model):
         Airport, models.PROTECT, db_column="airportarr", related_name="arrivals"
     )
     price = models.DecimalField(max_digits=7, decimal_places=2, default=Decimal("120.99"))
+    objects = FlightQuerySet.as_manager()
 
     class Meta:
         db_table = "flight"

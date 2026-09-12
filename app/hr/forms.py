@@ -7,9 +7,20 @@ from django.db.models import Max
 from django.utils import timezone
 
 from accounts.models import Department, Employee
+from core.forms import FilterForm
 
 FUTURE_ADMISSION_ERROR = "Admission date cannot be in the future."
 MANAGER_DEPARTMENT_ERROR = "Manager must belong to this department."
+
+
+class EmployeeFilterForm(FilterForm):
+    name = forms.CharField(required=False, label="Name starts with")
+    dept = forms.ModelChoiceField(
+        required=False,
+        queryset=Department.objects.order_by("deptid"),
+        label="Department",
+        empty_label="All",
+    )
 
 
 def next_employee_id() -> str:

@@ -1,22 +1,4 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Flights</h1>
-<p><a role="button" href="{% url 'schedule:flight_create' %}">New flight</a> <a role="button" href="{% url 'schedule:flights_generate' %}">Generate flights</a></p>
-<form method="get">
-  <label>Date from <input type="date" name="date_from" value="{{ date_from|date:'Y-m-d' }}"></label>
-  <label>Date to <input type="date" name="date_to" value="{{ date_to|date:'Y-m-d' }}"></label>
-  <label>Flight number <input name="flightnum" value="{{ request.GET.flightnum }}"></label>
-  <label>Airport <input name="airport" value="{{ request.GET.airport }}"></label>
-  <button type="submit">Filter</button>
-</form>
-<table>
-<thead><tr><th>FLIGHTNUM</th><th>DATE</th><th>DEP</th><th>ARR</th><th>TDEP</th><th>TLAND</th><th>AIRPLANE</th><th>SHIFT</th><th>SOLD/SEATS</th><th>PRICE</th><th>ACTIONS</th></tr></thead>
-<tbody>{% for flight in page_obj %}<tr>
-  <td>{{ flight.flightnum }}</td><td>{{ flight.flightdate }}</td><td>{{ flight.airportdep_id }}</td><td>{{ flight.airportarr_id }}</td>
-  <td>{{ flight.deptime }}</td><td>{{ flight.arrtime }}</td><td>{{ flight.airplane_id }}</td><td>{{ flight.shift_id }}, crew {{ flight.shift.crew_id }}</td>
-  <td>{{ flight.sold }}/{{ flight.totpass }}</td><td>{{ flight.price }}</td>
-  <td><a href="{% url 'schedule:flight_edit' flight.pk %}">Edit</a> <a href="{% url 'schedule:flight_delete' flight.pk %}">Delete</a></td>
-</tr>{% empty %}<tr><td colspan="11">No flights found.</td></tr>{% endfor %}</tbody>
-</table>
-{% include "core/pagination.html" %}
-{% endblock %}
+{% extends "core/list.html" %}
+{% block actions %}<p><a role="button" href="{% url 'schedule:flight_create' %}">New flight</a> <a role="button" href="{% url 'schedule:flights_generate' %}">Generate flights</a></p>{% endblock %}
+{% block thead %}<tr><th>FLIGHTNUM</th><th>DATE</th><th>DEP</th><th>ARR</th><th>TDEP</th><th>TLAND</th><th>AIRPLANE</th><th>SHIFT</th><th>SOLD/SEATS</th><th>PRICE</th><th>ACTIONS</th></tr>{% endblock %}
+{% block rows %}{% for flight in object_list %}<tr><td>{{ flight.flightnum }}</td><td>{{ flight.flightdate }}</td><td>{{ flight.airportdep_id }}</td><td>{{ flight.airportarr_id }}</td><td>{{ flight.deptime }}</td><td>{{ flight.arrtime }}</td><td>{{ flight.airplane_id }}</td><td>{{ flight.shift_id }}, crew {{ flight.shift.crew_id }}</td><td>{{ flight.sold }}/{{ flight.totpass }}</td><td>{{ flight.price }}</td><td><a href="{% url 'schedule:flight_edit' flight.pk %}">Edit</a> <a href="{% url 'schedule:flight_delete' flight.pk %}">Delete</a></td></tr>{% empty %}<tr><td colspan="11">No flights found.</td></tr>{% endfor %}{% endblock %}
