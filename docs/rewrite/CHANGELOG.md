@@ -90,3 +90,8 @@ Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější n
 - Přidáno: `docs/rewrite/01-inventory.md` (inventář legacy systému), `02-functional-spec.md` (funkční specifikace), `03-target-architecture.md` (cílová architektura), `04-migration-plan.md` (plán kroků R01–R18), `AGENTS.md` (pravidla pro Codex), `CLAUDE.md` (pravidla pro Claude), tento CHANGELOG.
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: – (specifikace tímto PR vzniká; rozhodnutí o nejasných místech legacy jsou v `02-functional-spec.md` kap. 8).
+## R13 – IT Support: uživatelské účty, letiště, letadla
+- PR: #28 (codex/R13-it-support)
+- Přidáno: správa účtů zaměstnanců a CRUD letišť a letadel včetně validací, oprávnění a testů.
+- Změněno: navigace rolí IT a Schedule o nové administrační obrazovky.
+- Odchylky od specifikace: žádné.
