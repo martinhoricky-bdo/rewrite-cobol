@@ -17,6 +17,12 @@ MENU[Role.IT] = [
     ("Airplanes", "it:airplanes"),
 ]
 MENU[Role.SCHEDULE].extend([("Airports", "it:airports"), ("Airplanes", "it:airplanes")])
+ROLE_HOME[Role.SCHEDULE] = "schedule:flights"
+MENU[Role.SCHEDULE] = [
+    ("Flights", "schedule:flights"),
+    ("Generate flights", "schedule:flights_generate"),
+    *MENU[Role.SCHEDULE],
+]
 ROLE_HOME[Role.HR] = "hr:employees"
 MENU[Role.HR] = [("Employees", "hr:employees"), ("Departments", "hr:departments")]
 MENU[Role.CEO].append(("Employees", "hr:employees"))

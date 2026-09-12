@@ -10,7 +10,6 @@ from accounts.models import Department, Employee
 from fleet.models import Airplane, Airport
 from legacy_import.services import (
     flush_seed_data,
-    generate_flights,
     seed_crews,
     seed_employees,
     seed_passengers,
@@ -18,6 +17,7 @@ from legacy_import.services import (
     seed_reference_purchase,
 )
 from operations.models import Crew, Flight, Shift
+from operations.services import generate_seed_flights
 from sales.models import Buy, Passenger, Ticket
 
 
@@ -51,8 +51,8 @@ class Command(BaseCommand):
         seed_employees(employee_path)
         client = seed_passengers(passenger_paths)
         crews = seed_crews()
-        generate_flights(date(2022, 9, 1), 30, crews)
-        generate_flights(start, options["days"], crews)
+        generate_seed_flights(date(2022, 9, 1), 30, crews)
+        generate_seed_flights(start, options["days"], crews)
         seed_reference_purchase(client)
         counts = (
             ("dept", Department),

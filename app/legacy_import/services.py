@@ -1,5 +1,5 @@
 import logging
-from datetime import date, time, timedelta
+from datetime import date, time
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -9,6 +9,7 @@ from accounts.models import Department, Employee
 from accounts.services import ensure_user_for_employee
 from fleet.models import Airplane, Airport
 from operations.models import Crew, Flight, Shift
+from operations.services import generate_seed_flights
 from sales.models import Buy, Passenger, Ticket
 from sales.services import reset_ticket_sequence
 
@@ -158,6 +159,7 @@ def seed_crews() -> dict[int, Crew]:
 
 
 def generate_flights(start: date, days: int, crews: dict[int, Crew] | None = None) -> None:
+    """Backward-compatible seed entry point; implementation is shared with operations."""
     crews = (
         crews
         if crews is not None
@@ -171,38 +173,10 @@ def generate_flights(start: date, days: int, crews: dict[int, Crew] | None = Non
             )
         }
     )
-    patterns = [(pattern, crews.get(pattern[-1])) for pattern in FLIGHT_PATTERNS]
-    for pattern, crew in patterns:
-        if not crew:
+    for pattern in FLIGHT_PATTERNS:
+        if not crews.get(pattern[-1]):
             logger.warning("Skipping flight pattern %s: crew missing", pattern[0])
-    for offset in range(days):
-        day = start + timedelta(days=offset)
-        shifts = {
-            index: Shift.objects.get_or_create(
-                shiftdate=day, crew=crew, defaults={"begintime": time(9), "endtime": time(21)}
-            )[0]
-            for index, crew in crews.items()
-        }
-        for pattern, crew in patterns:
-            if not crew:
-                continue
-            number, dep, arr, departure, arrival, airplaneid, crew_index = pattern
-            airplane = Airplane.objects.get(pk=airplaneid)
-            Flight.objects.get_or_create(
-                flightnum=number,
-                flightdate=day,
-                defaults={
-                    "deptime": time.fromisoformat(departure),
-                    "arrtime": time.fromisoformat(arrival),
-                    "totpass": airplane.numseats,
-                    "totbagga": 0,
-                    "shift": shifts[crew_index],
-                    "airplane": airplane,
-                    "airportdep_id": dep,
-                    "airportarr_id": arr,
-                    "price": PRICE,
-                },
-            )
+    generate_seed_flights(start, days, crews)
 
 
 def seed_reference_purchase(client: Passenger) -> None:

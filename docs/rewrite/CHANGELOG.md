@@ -108,3 +108,8 @@ Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější n
 - Přidáno: `docs/rewrite/01-inventory.md` (inventář legacy systému), `02-functional-spec.md` (funkční specifikace), `03-target-architecture.md` (cílová architektura), `04-migration-plan.md` (plán kroků R01–R18), `AGENTS.md` (pravidla pro Codex), `CLAUDE.md` (pravidla pro Claude), tento CHANGELOG.
 - Změněno: nic v legacy souborech.
 - Odchylky od specifikace: – (specifikace tímto PR vzniká; rozhodnutí o nejasných místech legacy jsou v `02-functional-spec.md` kap. 8).
+## R16a – Schedule: lety a generování na období
+- PR: #TBD (codex/R16a-schedule-flights)
+- Přidáno: správa letů, filtrování a stránkování, generování letů na období a testy formulářů, služby a oprávnění.
+- Změněno: seed používá sdílený generátor z aplikace operations a role Schedule má domovskou stránku a navigaci letů.
+- Odchylky od specifikace: žádné.
