@@ -264,9 +264,7 @@ class PassengerFormView(
     model_label = "Passenger"
 
     def get_cancel_url(self):
-        """Process get cancel url for passenger and ticket sales workflows in UC-S01–S09 according
-        to the rules in this callable.
-        """
+        """Return to the edited passenger’s detail, or to the list when creating a passenger."""
         if self.object:
             return reverse("sales:passenger_detail", kwargs={"clientid": self.object.pk})
         return super().get_cancel_url()

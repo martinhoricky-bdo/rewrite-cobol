@@ -29,9 +29,7 @@ INVALID_TICKET_ID = "__invalid__"
 
 
 class SellStep1Form(forms.Form):
-    """Validates and normalizes sell step1 input for passenger and ticket sales workflows in
-    UC-S01–S09, using the field-specific messages declared below.
-    """
+    """Validates SELLCOB1 inputs with E-SEL-01 through E-SEL-04."""
 
     clientid = forms.IntegerField(
         min_value=1,
@@ -68,9 +66,7 @@ class SellStep1Form(forms.Form):
 
 
 class SellStep2Form(forms.Form):
-    """Validates and normalizes sell step2 input for passenger and ticket sales workflows in
-    UC-S01–S09, using the field-specific messages declared below.
-    """
+    """Validates SELLCOB2 IDs with E-SEL-01 and duplicates with E-SEL-11."""
 
     def __init__(self, count, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -93,9 +89,7 @@ class SellStep2Form(forms.Form):
             )
 
     def clean(self):
-        """Validate related fields together and attach the applicable domain error messages for
-        sell step2 form.
-        """
+        """Reject duplicate passenger identifiers with E-SEL-11 before sale confirmation."""
         cleaned_data = super().clean()
         seen = set()
         for client_id in cleaned_data.values():
