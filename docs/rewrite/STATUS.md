@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 00:12
-- Aktuální krok: R11 (Codex pracuje)
+- Poslední aktualizace: 2026-09-12 00:30
+- Aktuální krok: R12 (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -22,16 +22,17 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R08 cestující | #18 | #19 | 2026-09-11 23:18 (1. běh OK, review čisté, 159 testů, ruční průchod seznamu/detailu/formuláře a oprávnění) |
 | R09 prodej krok 1 | #20 | #21 | 2026-09-11 23:45 (1. běh OK, 178 testů, ruční průchod rekapitulace/hlášek/oprávnění; Claude opravil ve větvi izolaci testů – `DepartmentFactory` get_or_create) |
 | R10 prodej krok 2 + potvrzení | #22 | #23 | 2026-09-12 00:08 (1. běh OK, 196 testů vč. souběhu na PostgreSQL, ruční prodej 641+100+200 → CB00000002..4/A01..C01/362.97; Claude doplnil test 403 pro `buy_detail`, číslo PR v CHANGELOG a nezávislost testu ID na sekvenci) |
+| R11 účtenka + hromadný tisk | #24 | #25 | 2026-09-12 00:27 (1. běh OK, 208 testů, ruční průchod účtenky dle RECEIPT-FORMAT a 3 vstupenek; Claude doplnil číslo PR v CHANGELOG) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R11 účtenka + hromadný tisk | #24 | – | zadáno 00:12, čeká se na PR |
+| R12 e2e testy Sales (Playwright) | #26 | – | zadáno 00:30, čeká se na PR; Codex bez Dockeru – e2e má běžet přes runserver + BASE_URL |
 
 ## Fronta
-R12 → R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
+R13 → R14 → R15 → R16a → R16b → R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
-- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1, R09/1 a R10/1 prošly; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
+- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R11/1 prošly; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
