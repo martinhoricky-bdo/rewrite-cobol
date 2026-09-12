@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "core/detail.html" %}
 {% block title %}Passenger {{ passenger.clientid }} | COBOL AIRLINES{% endblock %}
-{% block content %}
+{% block detail_content %}
   <h1>Passenger {{ passenger.clientid }}</h1>
   <dl>
     <dt>CLIENT ID</dt><dd>{{ passenger.clientid }}</dd>

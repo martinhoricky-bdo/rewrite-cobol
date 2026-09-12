@@ -4,4 +4,4 @@ from . import views
 
 app_name = "crew"
 
-urlpatterns = [path("my-shifts/", views.my_shifts, name="my_shifts")]
+urlpatterns = [path("my-shifts/", views.MyShiftsView.as_view(), name="my_shifts")]

@@ -202,23 +202,13 @@ def confirm_sale(
         return buy
 
 
-def filter_passengers(
-    *,
-    clientid: int | None = None,
-    lastname: str | None = None,
-    firstname: str | None = None,
-    email: str | None = None,
-) -> QuerySet[Passenger]:
-    passengers = Passenger.objects.all()
-    if clientid is not None:
-        passengers = passengers.filter(clientid=clientid)
-    if lastname:
-        passengers = passengers.filter(lastname__istartswith=lastname)
-    if firstname:
-        passengers = passengers.filter(firstname__istartswith=firstname)
-    if email:
-        passengers = passengers.filter(email__icontains=email)
-    return passengers.order_by("lastname", "firstname", "clientid")
+def duplicate_email_warning(email: str, exclude_pk: int | None = None) -> str | None:
+    duplicates = Passenger.objects.filter(email__iexact=email)
+    if exclude_pk is not None:
+        duplicates = duplicates.exclude(pk=exclude_pk)
+    if duplicates.exists():
+        return "Another passenger with this email already exists."
+    return None
 
 
 def legacy_date(d: date) -> str:
@@ -254,9 +244,7 @@ def search_tickets(
     flightnum: str | None = None,
     flightdate: date | None = None,
 ) -> QuerySet[Ticket]:
-    tickets = Ticket.objects.select_related(
-        "client", "flight", "flight__airportdep", "flight__airportarr", "buy"
-    )
+    tickets = Ticket.objects.with_related()
     if ticketid:
         tickets = tickets.filter(ticketid=ticketid.upper())
     elif clientid:

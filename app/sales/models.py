@@ -6,6 +6,20 @@ from accounts.models import Employee
 from operations.models import Flight
 
 
+class PassengerQuerySet(models.QuerySet):
+    def filter_by(self, *, clientid=None, lastname=None, firstname=None, email=None):
+        queryset = self
+        if clientid is not None:
+            queryset = queryset.filter(clientid=clientid)
+        if lastname:
+            queryset = queryset.filter(lastname__istartswith=lastname)
+        if firstname:
+            queryset = queryset.filter(firstname__istartswith=firstname)
+        if email:
+            queryset = queryset.filter(email__icontains=email)
+        return queryset.order_by("lastname", "firstname", "clientid")
+
+
 class Passenger(models.Model):
     clientid = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=30)
@@ -16,6 +30,7 @@ class Passenger(models.Model):
     zipcode = models.CharField(max_length=15)
     telephone = models.CharField(max_length=18)
     email = models.EmailField(max_length=100)
+    objects = PassengerQuerySet.as_manager()
 
     class Meta:
         db_table = "passengers"
@@ -32,6 +47,11 @@ class Passenger(models.Model):
         return f"{self.firstname} {self.lastname}"
 
 
+class BuyQuerySet(models.QuerySet):
+    def with_related(self):
+        return self.select_related("emp", "client").prefetch_related("tickets__client")
+
+
 class Buy(models.Model):
     buyid = models.AutoField(primary_key=True)
     buydate = models.DateField()
@@ -39,6 +59,7 @@ class Buy(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     emp = models.ForeignKey(Employee, models.PROTECT, db_column="empid", related_name="sales")
     client = models.ForeignKey(Passenger, models.PROTECT, db_column="clientid", related_name="buys")
+    objects = BuyQuerySet.as_manager()
 
     class Meta:
         db_table = "buy"
@@ -46,6 +67,21 @@ class Buy(models.Model):
 
     def __str__(self) -> str:
         return f"Buy {self.buyid}"
+
+
+class TicketQuerySet(models.QuerySet):
+    def with_related(self):
+        return self.select_related(
+            "client", "flight", "flight__airportdep", "flight__airportarr", "buy", "buy__emp"
+        )
+
+    def for_passenger(self, passenger):
+        return self.filter(client=passenger).order_by(
+            "flight__flightdate", "flight__deptime", "ticketid"
+        )
+
+    def for_buy(self, buy):
+        return self.filter(buy=buy).order_by("ticketid")
 
 
 class Ticket(models.Model):
@@ -58,6 +94,7 @@ class Ticket(models.Model):
     )
     flight = models.ForeignKey(Flight, models.PROTECT, db_column="flightid", related_name="tickets")
     seat = models.CharField(max_length=3, validators=[RegexValidator(r"^[A-F]\d{2}$")])
+    objects = TicketQuerySet.as_manager()
 
     class Meta:
         db_table = "ticket"

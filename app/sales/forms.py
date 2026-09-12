@@ -1,7 +1,10 @@
+import re
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
+from core.forms import FilterForm
 from core.messages import (
     E_FLT_01,
     E_FLT_02,
@@ -54,8 +57,8 @@ class SellStep1Form(forms.Form):
 
 
 class SellStep2Form(forms.Form):
-    def __init__(self, count, data=None, initial=None):
-        super().__init__(data=data, initial=initial)
+    def __init__(self, count, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         for number in range(1, count + 1):
             self.fields[f"client_{number}"] = forms.IntegerField(
                 min_value=1,
@@ -83,8 +86,14 @@ class SellStep2Form(forms.Form):
             seen.add(client_id)
         return cleaned_data
 
+    def rows(self, names):
+        return [
+            {"field": self[f"client_{number}"], "name": names.get(number, "")}
+            for number in range(1, len(self.fields) + 1)
+        ]
 
-class PassengerFilterForm(forms.Form):
+
+class PassengerFilterForm(FilterForm):
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
     lastname = forms.CharField(max_length=30, required=False, label="LAST NAME")
     firstname = forms.CharField(max_length=30, required=False, label="FIRST NAME")
@@ -154,6 +163,12 @@ class TicketSearchForm(forms.Form):
         label="FLIGHT DATE",
         widget=forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"}),
     )
+
+    def clean_ticketid(self):
+        ticketid = self.cleaned_data["ticketid"]
+        if ticketid and not re.fullmatch(r"CB\d{8}", ticketid, re.IGNORECASE):
+            return "__invalid__"
+        return ticketid
 
     def clean(self):
         cleaned_data = super().clean()

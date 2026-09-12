@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "core/list.html" %}
 {% block title %}Passengers | COBOL AIRLINES{% endblock %}
-{% block content %}
+{% block table %}
   <h1>Passengers</h1>
   <p><a role="button" href="{% url 'sales:passenger_create' %}">New passenger</a></p>
   <form method="get">

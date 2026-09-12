@@ -2,7 +2,7 @@
 {% block title %}My shifts – COBOL AIRLINES{% endblock %}
 {% block content %}
 <h1>My shifts</h1>
-<form method="get"><label><input type="checkbox" name="past" value="1"{% if include_past %} checked{% endif %}> Show past shifts</label><button type="submit">Apply</button></form>
+<form method="get">{{ form }}<button type="submit">Apply</button></form>
 {% for shift in page_obj %}
 <article><header><strong>{{ shift.shiftdate }}</strong> · {{ shift.begintime|time:"H:i" }}–{{ shift.endtime|time:"H:i" }} · Crew {{ shift.crew_id }}</header>
 <table><thead><tr><th>FLIGHTNUM</th><th>ROUTE</th><th>TDEP–TLAND</th><th>AIRPLANE</th><th>PASSENGERS</th></tr></thead><tbody>
