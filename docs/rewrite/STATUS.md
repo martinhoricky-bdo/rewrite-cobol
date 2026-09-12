@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 02:14
-- Aktuální krok: R16a (Codex pracuje)
+- Poslední aktualizace: 2026-09-12 02:34
+- Aktuální krok: R16b (Codex pracuje)
 - Blokuje: nic
 
 ## Hotovo
@@ -27,18 +27,19 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R13 IT Support (účty, letiště, letadla) | #28 | #29 | 2026-09-12 01:24 (1. běh OK; review 1: chování správné, vráceno kvůli chybějícím testům ze zadání §5; fix run doplnil testy za 6 min; 226 testů, ruční průchod reset hesla → /password/, deaktivace, CRUD, E-REF-01, oprávnění) |
 | R14 import z exportu DB2 | #30 | #31 | 2026-09-12 01:50 (1. běh skončil prázdně; 2. běh OK, 231 testů, dry-run na fixtures dle AK 1, pořadí sloupců ověřeno proti DDL; Claude opravil umístění a číslo záznamu v CHANGELOG) |
 | R15 HR – zaměstnanci a oddělení | #32 | #33 | 2026-09-12 02:11 (1. běh OK, 244 testů, ruční průchod: 10000040 založen → IT reset → /password/, oddělení 7 manažer 10000019, CEO read-only; Claude opravil pád seznamu na nečíselný filtr `?dept=abc`) |
+| R16a Schedule – lety a generování | #34 | #35 | 2026-09-12 02:31 (1. běh OK, 258 testů, ruční průchod: generování CB2204 7/0 mimo seed a 0/7 v seedu, CRUD letů, E-REF-01, 403; seed po přesunu generátoru idempotentní; bez oprav) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R16a Schedule – lety a generování | #34 | – | zadáno 02:14, čeká se na PR |
+| R16b Schedule – posádky a směny | #36 | – | zadáno 02:34, čeká se na PR |
 
 ## Fronta
-R16b → R17 → R18 (zadání v `codex-tasks/`)
+R17 → R18 (zadání v `codex-tasks/`)
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
 - Codex sandbox: po resetu cache má fungovat `gh`; fallback „branch pushed“ platí dál.
 - Codex sandbox nemá Docker ani Chromium (`playwright install` → 403 „Domain forbidden“). E2E testy (R12, případně další) ověřuje Claude lokálně proti `runserver` s předinstalovaným Chromiem; Codex je odevzdává „naslepo“, drobné opravy lokátorů dělá Claude přímo ve větvi.
 - Dev DB (`airlines`) obsahuje po e2e bězích prodeje 641+100 na `CB1104` (19. 9., 13. 9., 14. 9., 15. 9.) a e2e cestující `E2E-<timestamp>`; seed je nemaže. Pro čistý stav `seed_demo --flush`.
-- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R13/1 prošly; R14/1 skončil za minutu prázdným komentářem bez větve, R14/2 OK; R15/1 OK; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
+- Push selhává nepravidelně na prvním běhu (R01/1, R03/1, R06/1 = 403; R07/1 = proxy 502; R08/1–R13/1 prošly; R14/1 skončil za minutu prázdným komentářem bez větve, R14/2 OK; R15/1 a R16a/1 OK; druhé běhy vždy prošly) – vypadá to na cache kontejneru bez tokenu. Pokud se to bude opakovat, je potřeba zásah uživatele v nastavení Codex Cloud prostředí.
