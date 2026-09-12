@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R14 – Import z exportu DB2
+- PR: #31 (codex/R14-import-legacy)
+- Přidáno: atomický a idempotentní import DB2 DEL souborů, JSON report, dry-run, normalizace a testovací exporty.
+- Změněno: sdílené legacy parsery nově zpracovávají explicitní formáty data a času; README popisuje export a obnovu účtů.
+- Odchylky od specifikace: žádné.
+
 ## R13 – IT Support: uživatelské účty, letiště, letadla
 - PR: #29 (codex/R13-it-support)
 - Přidáno: správa účtů zaměstnanců a CRUD letišť a letadel včetně validací, oprávnění a testů.

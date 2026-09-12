@@ -59,3 +59,23 @@ BASE_URL=http://localhost:8000 pytest -m e2e tests/e2e
 ```
 
 Běžné `pytest` a `make test` E2E scénáře automaticky vynechávají.
+
+## Import z DB2
+
+V DB2 vyexportujte tabulky `AIRPORT`, `AIRPLANE`, `DEPT`, `EMPLO`, `PASSENGERS`,
+`CREW`, `SHIFT`, `FLIGHT`, `BUY` a `TICKET` do samostatných souborů, například:
+
+```sql
+EXPORT TO AIRPORT.csv OF DEL SELECT * FROM AIRPORT;
+```
+
+Soubory ponechte s velkými názvy a spusťte import s JSON reportem:
+
+```sh
+python manage.py import_legacy --dir /cesta/k/exportu --report /tmp/import-report.json
+```
+
+Pro americká data použijte `--date-format us`; před skutečným importem lze použít
+`--dry-run`. Report po běhu zkontrolujte, zejména přeskočené řádky a chybějící
+cizí klíče. Hesla se nemigrují: vytvořené účty jsou neaktivní, mají nepoužitelné
+heslo a IT jim musí nastavit nové heslo a účet aktivovat.
