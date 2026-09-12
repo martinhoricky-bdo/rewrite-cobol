@@ -64,3 +64,25 @@ def reset_employee_password(employee: Employee) -> str:
     user.must_change_password = True
     user.save(update_fields=["password", "is_active", "must_change_password"])
     return password
+
+
+class AccountError(Exception):
+    pass
+
+
+def activate_account(employee: Employee) -> str:
+    if employee.user is None:
+        raise AccountError("This employee has no account.")
+    employee.user.is_active = True
+    employee.user.save(update_fields=["is_active"])
+    return f"Account {employee.empid} activated."
+
+
+def deactivate_account(employee: Employee, actor: User) -> str:
+    if employee.user_id == actor.pk:
+        raise AccountError("You cannot deactivate your own account.")
+    if employee.user is None:
+        raise AccountError("This employee has no account.")
+    employee.user.is_active = False
+    employee.user.save(update_fields=["is_active"])
+    return f"Account {employee.empid} deactivated."

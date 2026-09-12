@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date, time, timedelta
 
 from django.db import transaction
-from django.db.models import Count, F, IntegerField, OuterRef, Q, QuerySet, Subquery, Value
+from django.db.models import Count, F, IntegerField, OuterRef, QuerySet, Subquery, Value
 from django.db.models.functions import Coalesce
 
 from fleet.models import Airplane
@@ -129,38 +129,4 @@ def search_flights(
         .annotate(sold=Coalesce(free_seats_subquery(), Value(0)))
         .annotate(free_seats=F("airplane__numseats") - F("sold"))
         .order_by("flightdate", "deptime", "flightnum")
-    )
-
-
-def schedule_flights(
-    *, date_from: date, date_to: date, flightnum: str = "", airport: str = ""
-) -> QuerySet[Flight]:
-    filters = Q(flightdate__range=(date_from, date_to))
-    if flightnum.strip():
-        filters &= Q(flightnum__iexact=flightnum.strip())
-    if airport.strip():
-        code = airport.strip()
-        filters &= Q(airportdep__airportid__iexact=code) | Q(airportarr__airportid__iexact=code)
-    return (
-        Flight.objects.filter(filters)
-        .select_related("airplane", "airportdep", "airportarr", "shift__crew")
-        .annotate(sold=Coalesce(free_seats_subquery(), Value(0)))
-        .order_by("flightdate", "deptime", "flightnum")
-    )
-
-
-def schedule_crews() -> QuerySet[Crew]:
-    return Crew.objects.select_related(
-        "commander", "copilote", "fachief", "fliattendant1", "fliattendant2", "fliattendant3"
-    ).annotate(shift_count=Count("shifts"))
-
-
-def schedule_shifts(*, date_from: date, date_to: date, crew_id: int | None) -> QuerySet[Shift]:
-    queryset = Shift.objects.filter(shiftdate__range=(date_from, date_to))
-    if crew_id is not None:
-        queryset = queryset.filter(crew_id=crew_id)
-    return (
-        queryset.select_related("crew")
-        .annotate(flight_count=Count("flights"))
-        .order_by("shiftdate", "begintime", "shiftid")
     )

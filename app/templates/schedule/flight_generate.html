@@ -1,4 +1,1 @@
-{% extends "base.html" %}
-{% block content %}<h1>Generate flights</h1>
-<form method="post">{% csrf_token %}{{ form }}<button type="submit">Generate</button></form>
-<p><a href="{% url 'schedule:flights' %}">Cancel</a></p>{% endblock %}
+{% extends "core/form.html" %}{% block submit_label %}Generate{% endblock %}

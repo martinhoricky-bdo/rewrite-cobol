@@ -3,4 +3,4 @@
 {% block content %}<h1>{{ page_title }}</h1>
 <form method="post" novalidate>{% csrf_token %}
 {% block errors %}{% if form.errors %}<div role="alert"><strong>Please correct the errors below.</strong>{{ form.non_field_errors }}<ul>{% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}</ul></div>{% endif %}{% endblock %}
-{{ form }}<button type="submit">Save</button>{% if cancel_url %}<a role="button" href="{{ cancel_url }}">Cancel</a>{% endif %}</form>{% endblock %}
+{{ form }}<button type="submit">{% block submit_label %}Save{% endblock %}</button>{% if cancel_url %}<a role="button" href="{{ cancel_url }}">Cancel</a>{% endif %}</form>{% endblock %}

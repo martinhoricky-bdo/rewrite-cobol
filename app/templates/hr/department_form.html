@@ -1,1 +1,0 @@
-{% extends "base.html" %}{% block title %}Edit department | COBOL AIRLINES{% endblock %}{% block content %}<h1>Edit department {{ department.deptid }}</h1><form method="post">{% csrf_token %}{{ form }}<button type="submit">Save</button></form>{% endblock %}

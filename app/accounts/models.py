@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from .roles import ROLE_BY_DEPT
 
@@ -32,6 +33,27 @@ class Department(models.Model):
         return self.name
 
 
+class EmployeeQuerySet(models.QuerySet):
+    def search(self, text):
+        text = text.strip()
+        if not text:
+            return self
+        return self.filter(
+            Q(firstname__icontains=text)
+            | Q(lastname__icontains=text)
+            | Q(dept__name__icontains=text)
+        )
+
+    def name_starts_with(self, text):
+        text = text.strip()
+        if not text:
+            return self
+        return self.filter(Q(firstname__istartswith=text) | Q(lastname__istartswith=text))
+
+    def in_department(self, deptid):
+        return self.filter(dept_id=deptid) if deptid is not None else self
+
+
 class Employee(models.Model):
     empid = models.CharField(
         max_length=8,
@@ -58,6 +80,7 @@ class Employee(models.Model):
         db_column="user_id",
         related_name="employee",
     )
+    objects = EmployeeQuerySet.as_manager()
 
     class Meta:
         db_table = "emplo"

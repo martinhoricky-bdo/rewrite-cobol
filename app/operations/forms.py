@@ -4,8 +4,22 @@ from decimal import Decimal
 from django import forms
 
 from accounts.models import Employee
+from core.forms import FilterForm
 
 from .models import Crew, Flight, Shift
+
+
+class FlightFilterForm(FilterForm):
+    date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    flightnum = forms.CharField(required=False, label="Flight number")
+    airport = forms.CharField(required=False)
+
+
+class ShiftFilterForm(FilterForm):
+    date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    crew = forms.ModelChoiceField(required=False, queryset=Crew.objects.order_by("crewid"))
 
 
 class EmployeeChoiceField(forms.ModelChoiceField):

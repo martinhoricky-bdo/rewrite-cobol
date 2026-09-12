@@ -1,4 +1,0 @@
-{% extends "base.html" %}
-{% block content %}<h1>{% if object.pk %}Edit shift{% else %}New shift{% endif %}</h1>
-<form method="post">{% csrf_token %}{{ form }}<button type="submit">Save</button></form>
-<p><a href="{% url 'schedule:shifts' %}">Cancel</a></p>{% endblock %}

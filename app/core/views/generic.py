@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DeleteView, ListView
 
+from accounts.permissions import current_role
 from core.messages import E_REF_01
 
 
@@ -33,6 +34,14 @@ class CancelUrlMixin:
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         return super().get_context_data(cancel_url=self.get_cancel_url(), **kwargs)
+
+
+class EditableByMixin:
+    edit_roles = ()
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        can_edit = current_role(self.request.user) in self.edit_roles
+        return super().get_context_data(can_edit=can_edit, **kwargs)
 
 
 class SavedMessageMixin:
