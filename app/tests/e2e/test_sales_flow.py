@@ -52,7 +52,7 @@ def test_complete_sale_ticket_search_and_boarding_pass(sales_page: Page, base_ur
     sales_page.get_by_label("PASS NUMBER").fill("2")
     sales_page.get_by_role("button", name="Research").click()
     expect(sales_page.get_by_text("241.98 EUR", exact=True)).to_be_visible()
-    sales_page.get_by_role("link", name="Insert passengers").click()
+    sales_page.get_by_role("button", name="Insert passengers").click()
     passenger_fields = sales_page.get_by_label("CLIENTID")
     expect(passenger_fields.nth(0)).to_have_value("641")
     passenger_fields.nth(1).fill("100")
@@ -67,26 +67,28 @@ def test_complete_sale_ticket_search_and_boarding_pass(sales_page: Page, base_ur
     rafael_row = ticket_rows.filter(has_text="RAFAEL HILLETT")
     ticket_id = rafael_row.locator("td").nth(0).inner_text().strip()
     seat = rafael_row.locator("td").nth(2).inner_text().strip()
-    with sales_page.expect_popup() as receipt_info:
-        sales_page.get_by_role("link", name="Print receipt").click(modifiers=["Control"])
-    receipt = receipt_info.value
-    expect(receipt.get_by_text("MONTANT = 241.98 EUR", exact=True)).to_be_visible()
-    receipt.close()
+    sales_page.get_by_role("button", name="Print receipt").click()
+    expect(sales_page.get_by_text("MONTANT = 241.98 EUR", exact=True)).to_be_visible()
+    sales_page.get_by_role("link", name="Back").click()
+    expect(
+        sales_page.get_by_role("heading", name=re.compile(r"Sale \d+ completed\."))
+    ).to_be_visible()
     sales_page.get_by_role("link", name="Search ticket").click()
     sales_page.get_by_label("TICKET ID").fill(ticket_id)
     sales_page.get_by_role("button", name="Search").click()
     sales_page.get_by_role("link", name=ticket_id).click()
     with sales_page.expect_popup() as boarding_info:
-        sales_page.get_by_role("link", name="Print boarding pass").click()
+        sales_page.get_by_role("button", name="Print boarding pass").click()
     boarding_pass = boarding_info.value
-    expect(boarding_pass.get_by_text("RAFAEL HILLETT", exact=True)).to_be_visible()
-    expect(boarding_pass.get_by_text(seat, exact=True)).to_be_visible()
+    # The name and seat appear on the main pass and on the detachable stub.
+    expect(boarding_pass.get_by_text("RAFAEL HILLETT", exact=True).first).to_be_visible()
+    expect(boarding_pass.get_by_text(seat, exact=True).first).to_be_visible()
 
 
 def test_create_and_edit_passenger(sales_page: Page) -> None:
     unique = str(time_ns())
     sales_page.get_by_role("link", name="Passengers").click()
-    sales_page.get_by_role("link", name="New passenger").click()
+    sales_page.get_by_role("button", name="New passenger").click()
     values = {
         "FIRSTNAME": "PLAYWRIGHT",
         "LASTNAME": f"E2E-{unique}"[-30:],
@@ -101,7 +103,7 @@ def test_create_and_edit_passenger(sales_page: Page) -> None:
         sales_page.get_by_label(label).fill(value)
     sales_page.get_by_role("button", name="Save").click()
     expect(sales_page.get_by_text(values["LASTNAME"], exact=True)).to_be_visible()
-    sales_page.get_by_role("link", name="Edit", exact=True).click()
+    sales_page.get_by_role("button", name="Edit", exact=True).click()
     sales_page.get_by_label("CITY").fill("LYON")
     sales_page.get_by_role("button", name="Save").click()
     expect(sales_page.get_by_text("LYON", exact=True)).to_be_visible()

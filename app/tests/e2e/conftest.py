@@ -11,12 +11,12 @@ def login(page: Page, base_url: str, username: str, password: str) -> None:
     page.get_by_role("button", name="LOGIN").click()
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def base_url() -> str:
     return os.environ.get("BASE_URL", "http://localhost:8000").rstrip("/")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def browser_type_launch_args() -> dict[str, str]:
     executable = os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH")
     return {"executable_path": executable} if executable else {}

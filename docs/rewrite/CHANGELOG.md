@@ -3,7 +3,7 @@
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
 ## R12 – E2E testy toku Sales
-- PR: #TODO (codex/R12-e2e-sales)
+- PR: #27 (codex/R12-e2e-sales)
 - Přidáno: Playwright testy přihlášení rolí, kompletního prodeje, tisku, hledání letenky a správy cestujícího.
 - Změněno: samostatný E2E marker a Compose/Make příkaz; běžná testovací sada E2E testy vynechává.
 - Odchylky od specifikace: při opakovaném běhu test vybere první volný let CB1104 v okně dnes + 1 až 14 dní (preferuje dnes + 7).
