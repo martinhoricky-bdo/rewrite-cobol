@@ -37,9 +37,10 @@ def test_role_home_is_not_available(client, deptid):
     employee = EmployeeFactory(dept=department, with_user=True)
     client.force_login(employee.user)
     response = client.get("/")
-    if deptid in (6, 7):
+    if deptid in (5, 6, 7):
         assert response.status_code == 302
-        assert response.url == ("/it/users/" if deptid == 6 else "/sales/flights/")
+        expected = {5: "/hr/employees/", 6: "/it/users/", 7: "/sales/flights/"}
+        assert response.url == expected[deptid]
         return
     label = ROLE_BY_DEPT[deptid].label
     assert response.status_code == 200

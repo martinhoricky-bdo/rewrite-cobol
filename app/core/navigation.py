@@ -17,6 +17,9 @@ MENU[Role.IT] = [
     ("Airplanes", "it:airplanes"),
 ]
 MENU[Role.SCHEDULE].extend([("Airports", "it:airports"), ("Airplanes", "it:airplanes")])
+ROLE_HOME[Role.HR] = "hr:employees"
+MENU[Role.HR] = [("Employees", "hr:employees"), ("Departments", "hr:departments")]
+MENU[Role.CEO].append(("Employees", "hr:employees"))
 COMMON_MENU = [
     ("Change password", "accounts:password_change"),
     ("Logout", "accounts:logout"),

@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db import connection
 
 from accounts.models import Department, Employee
+from accounts.services import ensure_user_for_employee
 from fleet.models import Airplane, Airport
 from operations.models import Crew, Flight, Shift
 from sales.models import Buy, Passenger, Ticket
@@ -54,20 +55,18 @@ def seed_reference_data() -> None:
 
 def _employee(values: dict, password: str | None) -> Employee:
     empid = values.pop("empid")
-    user, created = User.objects.get_or_create(
-        username=empid, defaults={"is_active": password is not None}
-    )
+    values["dept_id"] = values.pop("deptid")
+    employee, _ = Employee.objects.update_or_create(empid=empid, defaults=values)
+    user = ensure_user_for_employee(employee)
     for field in ("first_name", "last_name", "email"):
         user_value = values[
             {"first_name": "firstname", "last_name": "lastname", "email": "email"}[field]
         ]
         setattr(user, field, user_value)
     user.is_active = password is not None
-    if created:
+    if password and not user.has_usable_password():
         user.set_password(password) if password else user.set_unusable_password()
     user.save()
-    values["dept_id"] = values.pop("deptid")
-    employee, _ = Employee.objects.update_or_create(empid=empid, defaults={**values, "user": user})
     return employee
 
 
