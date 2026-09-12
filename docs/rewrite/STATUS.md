@@ -3,7 +3,7 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 06:20
+- Poslední aktualizace: 2026-09-12 09:05
 - Fáze 1 (R00–R18): hotovo. **Fáze 2 – refaktoring na idiomatické Django (R19–R22)**: běží, zadáno uživatelem 2026-09-12 („není DRY, žádné generic views“).
 - Aktuální krok: R19 (Codex pracuje)
 - Blokuje: nic
@@ -36,7 +36,7 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | #42 | – | zadáno 06:25, čeká se na PR |
+| R19 Základ refaktoringu: generické views, mixiny, šablony, fleet | #42 | #43 | PR 08:44; review 1 (09:05) vráceno: 9 testů padá (chybí `template_name`), limit řádků obejit přes `fmt: off`/`noqa`, chybí testy §6, duplicitní smyčka chyb; Codex neměl PostgreSQL → sada neběžela; fix run zadán |
 
 ## Fronta
 R20 (schedule/HR/IT), R21 (sales/reports) – po R19, mohou běžet po sobě; R22 (úklid, matice oprávnění, docs) – po R20 a R21. Zadání v `codex-tasks/R20–R22.md`.

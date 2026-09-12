@@ -171,13 +171,14 @@ Společná akceptační kritéria pro každý krok fáze 2 (navíc k obecným):
 - Názvy URL, cesty, namespace, texty hlášek, hlavičky tabulek, texty tlačítek a `role="button"` u akčních odkazů zůstávají.
 - Žádná změna schématu (`makemigrations --check` čistý); přidání `QuerySet`/`Manager` nebo `verbose_name` migraci nevyžaduje – pokud by `makemigrations` migraci navrhl, je to chyba zadání a patří do PR jako odchylka.
 - V převedených aplikacích nezůstane žádná function-based view s `render(...)` kromě HTMX fragmentů výslovně uvedených v zadání; žádné `request.GET.get` ve views; žádné `Paginator` ve views; žádné `form.as_p` ani ruční cykly přes pole v šablonách.
-- Počet řádků převedených `views.py` klesne; duplicity uvedené v zadání zmizí (review to kontroluje diffem).
+- Počet řádků převedených `views.py` klesne; duplicity uvedené v zadání zmizí (review to kontroluje diffem). Limity řádků se plní čitelným kódem: `ruff format` beze změn, žádné `# noqa`, `# fmt: off` ani slučování atributů do jednoho řádku.
+- Bez PostgreSQL v sandboxu se PR otevírá jako draft s výčtem testů, které neběžely (`AGENTS.md` kap. 4).
 
 ## R19 – Základ: generické views, mixiny, sdílené šablony, `fleet` jako vzor (M)
 
 - **Cíl:** infrastruktura pro fázi 2 a její první použití.
 - **Rozsah:** `core/views/generic.py` (`FilteredListView`, `SearchListView`, `FormErrorsAsMessagesMixin`, `SavedMessageMixin`, `PageTitleMixin`, `CancelUrlMixin`, `ProtectedDeleteView`), `core/forms.py` (`FilterForm`, `FormRenderer`), `core/exceptions.py` (`NotFound`), `core/templatetags/core_tags.py` (`account_status`), šablony `core/list.html`, `core/form.html`, `core/confirm_delete.html`, `core/detail.html`, `core/forms/field.html`, stránkování přes `{% querystring %}`; `core/navigation.py` deklarativně; `RoleRequiredMixin` jako primární mechanismus oprávnění; `handler404` s `NotFound`; převod `fleet` (letiště, letadla) na generické views a zrušení `fleet/services.py`; sdílené fixtury `role_client`/`employee_of` v `tests/conftest.py`.
-- **Akceptace:** testy `tests/unit/test_generic_views.py` (každý mixin), `tests/unit/test_filter_form.py`, `tests/unit/test_core_tags.py`; existující testy `test_it_airports.py`, `test_it_airplanes.py`, `test_navigation.py`, `test_permissions.py` procházejí beze změn asercí; `fleet/views.py` ≤ 50 řádků.
+- **Akceptace:** testy `tests/unit/test_generic_views.py` (každý mixin), `tests/unit/test_filter_form.py`, `tests/unit/test_core_tags.py`; existující testy `test_it_airports.py`, `test_it_airplanes.py`, `test_navigation.py`, `test_permissions.py` procházejí beze změn asercí; `fleet/views.py` ≤ 80 řádků.
 - **Závislosti:** R18.
 
 ## R20 – Schedule, HR a IT na generických views (M)
