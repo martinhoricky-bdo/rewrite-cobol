@@ -1,7 +1,13 @@
+"""Role definitions derived from the legacy department assignments and the application use-
+case access matrix.
+"""
+
 from django.db import models
 
 
 class Role(models.TextChoices):
+    """Provide Role behavior for the LOGIN, EMPLO, and DEPT legacy lineage."""
+
     CEO = "ceo", "CEO"
     CREW = "crew", "Crew"
     HR = "hr", "HR"

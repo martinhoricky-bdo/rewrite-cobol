@@ -1,3 +1,7 @@
+"""Application exceptions translate service failures into consistent responses for
+reconstructed use cases.
+"""
+
 from django.http import Http404
 
 

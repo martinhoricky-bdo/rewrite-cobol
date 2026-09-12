@@ -1,9 +1,17 @@
+"""Middleware enforcing the password-change policy that complements the reconstructed LOGIN
+authentication flow.
+"""
+
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 
 
 class MustChangePasswordMiddleware:
+    """Provide MustChangePasswordMiddleware behavior for the LOGIN, EMPLO, and DEPT legacy
+    lineage.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 

@@ -1,3 +1,7 @@
+"""Design: management command seeds demo data from EMPLOYEE-LIST.json, PASSENGER1..8.xml,
+and reference fixtures.
+"""
+
 from datetime import date
 from pathlib import Path
 
@@ -22,15 +26,25 @@ from sales.models import Buy, Passenger, Ticket
 
 
 class Command(BaseCommand):
+    """Provide Command behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2 export
+    formats.
+    """
+
     help = "Seed development data from the read-only legacy files."
 
     def add_arguments(self, parser) -> None:
+        """Implement add_arguments behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and
+        DB2 export formats.
+        """
         parser.add_argument("--flush", action="store_true")
         parser.add_argument("--from-date", type=date.fromisoformat, default=None)
         parser.add_argument("--days", type=int, default=60)
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
+        """Implement handle behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML, and DB2
+        export formats.
+        """
         if options["days"] < 1:
             raise CommandError("--days must be a positive integer")
         start = options["from_date"] or timezone.localdate()

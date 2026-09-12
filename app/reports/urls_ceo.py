@@ -1,3 +1,5 @@
+"""Design: CEO reporting routes expose the UC-E01 operational overview."""
+
 from django.urls import path
 
 from . import views

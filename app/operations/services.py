@@ -1,3 +1,7 @@
+"""Flight generation reconstructs CBFLIGHT (COB-PROG/FLIGHT-DUPLICATE/FLIGHT-DUPLICATE-COB)
+for UC-P02.
+"""
+
 from dataclasses import dataclass
 from datetime import date, time, timedelta
 
@@ -13,6 +17,10 @@ from .models import Crew, Flight, Shift
 
 @dataclass(frozen=True)
 class GenerateResult:
+    """Provide GenerateResult behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     created: int
     skipped: int
 
@@ -94,6 +102,9 @@ def generate_seed_flights(start: date, days: int, crews: dict[int, Crew]) -> Non
 
 
 def free_seats_subquery() -> Subquery:
+    """Implement free_seats_subquery behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+    legacy lineage.
+    """
     ticket_counts = (
         Ticket.objects.filter(flight_id=OuterRef("pk"))
         .values("flight_id")
@@ -111,6 +122,9 @@ def search_flights(
     airportarr: str | None,
     today: date,
 ) -> QuerySet[Flight]:
+    """Implement search_flights behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
     filters = {}
     if flightnum and (flightnum := flightnum.strip()):
         filters["flightnum__iexact"] = flightnum

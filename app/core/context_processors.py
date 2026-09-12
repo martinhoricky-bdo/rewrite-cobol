@@ -1,3 +1,7 @@
+"""Context processors reproduce the CICS map header fields USERID, TERMINAL, DATE, TIME,
+MSG1, and MSG2 in base.html.
+"""
+
 from django.utils import timezone
 
 from accounts.permissions import current_role
@@ -6,6 +10,7 @@ from .navigation import menu_for
 
 
 def header(request):
+    """Implement header behavior for the shared CICS-inspired application design."""
     role = current_role(request.user)
     employee = getattr(request.user, "employee", None) if request.user.is_authenticated else None
     return {

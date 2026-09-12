@@ -1,3 +1,7 @@
+"""Sales models and query sets map DB2 PASSENGERS, BUY, and TICKET, whose CLIENTID and
+TICKETID are identities.
+"""
+
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.functions import Upper
@@ -8,7 +12,14 @@ from operations.models import Flight
 
 
 class PassengerQuerySet(models.QuerySet):
+    """Provide PassengerQuerySet behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     def filter_by(self, *, clientid=None, lastname=None, firstname=None, email=None):
+        """Implement filter_by behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         queryset = self
         if clientid is not None:
             queryset = queryset.filter(clientid=clientid)
@@ -22,6 +33,8 @@ class PassengerQuerySet(models.QuerySet):
 
 
 class Passenger(models.Model):
+    """Provide Passenger behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
     clientid = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=30)
     lastname = models.CharField(max_length=30)
@@ -34,6 +47,8 @@ class Passenger(models.Model):
     objects = PassengerQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
         db_table = "passengers"
         ordering = ["lastname", "firstname", "clientid"]
         indexes = [
@@ -44,19 +59,34 @@ class Passenger(models.Model):
         return self.full_name
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the sales legacy programs and UC-S01
+        through UC-S09.
+        """
         return reverse("sales:passenger_detail", kwargs={"clientid": self.pk})
 
     @property
     def full_name(self) -> str:
+        """Implement full_name behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         return f"{self.firstname} {self.lastname}"
 
 
 class BuyQuerySet(models.QuerySet):
+    """Provide BuyQuerySet behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     def with_related(self):
+        """Implement with_related behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         return self.select_related("emp", "client").prefetch_related("tickets__client")
 
 
 class Buy(models.Model):
+    """Provide Buy behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
     buyid = models.AutoField(primary_key=True)
     buydate = models.DateField()
     buytime = models.TimeField()
@@ -66,6 +96,8 @@ class Buy(models.Model):
     objects = BuyQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
         db_table = "buy"
         indexes = [models.Index(fields=["buydate"], name="buy_buydate_idx")]
 
@@ -73,25 +105,43 @@ class Buy(models.Model):
         return f"Buy {self.buyid}"
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the sales legacy programs and UC-S01
+        through UC-S09.
+        """
         return reverse("sales:buy_detail", kwargs={"buyid": self.pk})
 
 
 class TicketQuerySet(models.QuerySet):
+    """Provide TicketQuerySet behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     def with_related(self):
+        """Implement with_related behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         return self.select_related(
             "client", "flight", "flight__airportdep", "flight__airportarr", "buy", "buy__emp"
         )
 
     def for_passenger(self, passenger):
+        """Implement for_passenger behavior for the sales legacy programs and UC-S01
+        through UC-S09.
+        """
         return self.filter(client=passenger).order_by(
             "flight__flightdate", "flight__deptime", "ticketid"
         )
 
     def for_buy(self, buy):
+        """Implement for_buy behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         return self.filter(buy=buy).order_by("ticketid")
 
 
 class Ticket(models.Model):
+    """Provide Ticket behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
     ticketid = models.CharField(
         max_length=10, primary_key=True, validators=[RegexValidator(r"^CB\d{8}$")]
     )
@@ -104,6 +154,8 @@ class Ticket(models.Model):
     objects = TicketQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
         db_table = "ticket"
         constraints = [
             models.UniqueConstraint(fields=["flight", "seat"], name="ticket_flight_seat_uniq"),
@@ -114,4 +166,7 @@ class Ticket(models.Model):
         return self.ticketid
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the sales legacy programs and UC-S01
+        through UC-S09.
+        """
         return reverse("sales:ticket_detail", kwargs={"ticketid": self.pk})

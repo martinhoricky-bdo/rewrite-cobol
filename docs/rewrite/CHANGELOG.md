@@ -2,6 +2,12 @@
 
 Každý PR do `rewrite` přidává záznam na začátek souboru (nejnovější nahoře). Formát viz `AGENTS.md` kap. 5.
 
+## R23 – Docstringy a vazba na legacy
+- PR: doplní se (codex/R23-docstrings)
+- Přidáno: AST test kontrolující 52 modulů, 164 tříd a 184 veřejných funkcí a metod.
+- Změněno: aplikační moduly, třídy a veřejná API dokumentují původ v legacy programech, mapách, DB2 tabulkách a use casech.
+- Odchylky od specifikace: žádné.
+
 ## R22 – Závěr refaktoringu: úklid, testy, dokumentace
 - PR: #50 (codex/R22-refactor-cleanup)
 - Přidáno: kanonické URL modelů a úplná matice oprávnění pro všechny aplikační URL a role.

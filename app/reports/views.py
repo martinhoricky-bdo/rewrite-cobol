@@ -1,3 +1,5 @@
+"""Design: report views implement crew shifts in UC-C01 and CEO summaries in UC-E01."""
+
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -10,6 +12,8 @@ from .services import crew_shifts, dashboard_report
 
 
 class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredListView):
+    """Provide MyShiftsView behavior for Design use cases UC-C01 and UC-E01."""
+
     allowed_roles = (Role.CREW,)
     page_title = "My shifts"
     template_name = "reports/my_shifts.html"
@@ -17,6 +21,7 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
     paginate_by = 20
 
     def get_queryset(self):
+        """Implement get_queryset behavior for Design use cases UC-C01 and UC-E01."""
         self.filter_form = self.get_filter_form()
         include_past = self.filter_form.value("past", False)
         return crew_shifts(
@@ -26,16 +31,20 @@ class MyShiftsView(RoleRequiredMixin, generic.PageTitleMixin, generic.FilteredLi
         )
 
     def get_context_data(self, **kwargs):
+        """Implement get_context_data behavior for Design use cases UC-C01 and UC-E01."""
         return super().get_context_data(
             include_past=self.filter_form.value("past", False), **kwargs
         )
 
 
 class DashboardView(RoleRequiredMixin, TemplateView):
+    """Provide DashboardView behavior for Design use cases UC-C01 and UC-E01."""
+
     allowed_roles = (Role.CEO,)
     template_name = "reports/dashboard.html"
 
     def get_context_data(self, **kwargs):
+        """Implement get_context_data behavior for Design use cases UC-C01 and UC-E01."""
         today = timezone.localdate()
         first_day = today.replace(day=1)
         form = PeriodFilterForm(self.request.GET)

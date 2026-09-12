@@ -1,3 +1,7 @@
+"""Design: schedule forms for UC-P01, UC-P03, and UC-P04 plus CBFLIGHT generation under
+UC-P02.
+"""
+
 from datetime import timedelta
 from decimal import Decimal
 
@@ -10,6 +14,10 @@ from .models import Crew, Flight, Shift
 
 
 class FlightFilterForm(FilterForm):
+    """Provide FlightFilterForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     flightnum = forms.CharField(required=False, label="Flight number")
@@ -17,6 +25,10 @@ class FlightFilterForm(FilterForm):
 
 
 class ShiftFilterForm(FilterForm):
+    """Provide ShiftFilterForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     date_from = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     date_to = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
     crew = forms.ModelChoiceField(
@@ -25,11 +37,20 @@ class ShiftFilterForm(FilterForm):
 
 
 class EmployeeChoiceField(forms.ModelChoiceField):
+    """Provide EmployeeChoiceField behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+    legacy lineage.
+    """
+
     def label_from_instance(self, employee: Employee) -> str:
+        """Implement label_from_instance behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return f"{employee.pk} – {employee.full_name}"
 
 
 class CrewForm(forms.ModelForm):
+    """Provide CrewForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
     commander = EmployeeChoiceField(queryset=Employee.objects.none())
     copilote = EmployeeChoiceField(queryset=Employee.objects.none())
     fachief = EmployeeChoiceField(queryset=Employee.objects.none())
@@ -38,6 +59,8 @@ class CrewForm(forms.ModelForm):
     fliattendant3 = EmployeeChoiceField(queryset=Employee.objects.none())
 
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         model = Crew
         fields = [
             "commander",
@@ -57,6 +80,9 @@ class CrewForm(forms.ModelForm):
             self.fields[field].queryset = attendants
 
     def clean(self):
+        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         cleaned = super().clean()
         members = [cleaned.get(field) for field in self._meta.fields]
         members = [member for member in members if member is not None]
@@ -66,7 +92,11 @@ class CrewForm(forms.ModelForm):
 
 
 class ShiftForm(forms.ModelForm):
+    """Provide ShiftForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         model = Shift
         fields = ["shiftdate", "begintime", "endtime", "crew"]
         widgets = {
@@ -76,6 +106,9 @@ class ShiftForm(forms.ModelForm):
         }
 
     def clean(self):
+        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         cleaned = super().clean()
         day = cleaned.get("shiftdate")
         begin = cleaned.get("begintime")
@@ -97,16 +130,29 @@ class ShiftForm(forms.ModelForm):
 
 
 class ShiftChoiceField(forms.ModelChoiceField):
+    """Provide ShiftChoiceField behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     def label_from_instance(self, shift: Shift) -> str:
+        """Implement label_from_instance behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return (
             f"{shift.shiftdate} {shift.begintime:%H:%M}–{shift.endtime:%H:%M} crew {shift.crew_id}"
         )
 
 
 class FlightForm(forms.ModelForm):
+    """Provide FlightForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     shift = ShiftChoiceField(queryset=Shift.objects.none())
 
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         model = Flight
         fields = [
             "flightnum",
@@ -135,15 +181,24 @@ class FlightForm(forms.ModelForm):
         self._old_airplane_id = self.instance.airplane_id if self.instance.pk else None
 
     def clean_flightnum(self) -> str:
+        """Implement clean_flightnum behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return self.cleaned_data["flightnum"].strip().upper()
 
     def clean_price(self) -> Decimal:
+        """Implement clean_price behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         price = self.cleaned_data["price"]
         if price <= 0:
             raise forms.ValidationError("Price must be greater than zero.")
         return price
 
     def clean(self):
+        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         cleaned = super().clean()
         dep, arr = cleaned.get("airportdep"), cleaned.get("airportarr")
         if dep and arr and dep == arr:
@@ -158,6 +213,9 @@ class FlightForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
+        """Implement save behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         flight = super().save(commit=False)
         if not flight.pk or flight.airplane_id != self._old_airplane_id:
             flight.totpass = flight.airplane.numseats
@@ -170,6 +228,10 @@ class FlightForm(forms.ModelForm):
 
 
 class FlightGenerateForm(forms.Form):
+    """Provide FlightGenerateForm behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     WEEKDAYS = tuple(
         (index, name)
         for index, name in enumerate(("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
@@ -194,6 +256,9 @@ class FlightGenerateForm(forms.Form):
         )
 
     def clean(self):
+        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         cleaned = super().clean()
         start, end = cleaned.get("date_from"), cleaned.get("date_to")
         if start and end:
@@ -204,4 +269,7 @@ class FlightGenerateForm(forms.Form):
         return cleaned
 
     def selected_weekdays(self) -> set[int]:
+        """Implement selected_weekdays behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return {int(day) for day in self.cleaned_data["weekdays"]}

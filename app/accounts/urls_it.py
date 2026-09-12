@@ -1,3 +1,7 @@
+"""Design: routes for UC-I01 account maintenance; accounts are created with employees under
+UC-H01.
+"""
+
 from django.urls import path
 
 from . import views_it

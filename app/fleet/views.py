@@ -1,3 +1,7 @@
+"""Design: generic CRUD views for AIRPORT and AIRPLANE under UC-I02 and UC-I03, absent from
+legacy screens.
+"""
+
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 
@@ -14,20 +18,35 @@ ROLES = (Role.IT, Role.SCHEDULE)
 class FleetFormView(
     RoleRequiredMixin, generic.PageTitleMixin, generic.CancelUrlMixin, generic.SavedMessageMixin
 ):
+    """Provide FleetFormView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     allowed_roles = ROLES
     template_name = "core/form.html"
 
     def get_page_title(self) -> str:
+        """Implement get_page_title behavior for the AIRPORT and AIRPLANE tables and Design
+        use cases UC-I02/UC-I03.
+        """
         if not self.object:
             return self.page_title
         return f"Edit {self.model._meta.verbose_name} {self.object.pk}"
 
 
 class FleetDeleteView(RoleRequiredMixin, generic.ProtectedDeleteView):
+    """Provide FleetDeleteView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     allowed_roles = ROLES
 
 
 class AirportView:
+    """Provide AirportView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     model = Airport
     pk_url_kwarg = "airportid"
     cancel_url_name = "it:airports"
@@ -35,6 +54,10 @@ class AirportView:
 
 
 class AirplaneView:
+    """Provide AirplaneView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     model = Airplane
     pk_url_kwarg = "airplaneid"
     cancel_url_name = "it:airplanes"
@@ -42,38 +65,70 @@ class AirplaneView:
 
 
 class AirportListView(AirportView, RoleRequiredMixin, generic.PageTitleMixin, ListView):
+    """Provide AirportListView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     allowed_roles = ROLES
     page_title = "Airports"
     template_name = "it/airport_list.html"
 
 
 class AirportCreateView(AirportView, FleetFormView, CreateView):
+    """Provide AirportCreateView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     form_class = AirportForm
     page_title = "New airport"
 
 
 class AirportUpdateView(AirportView, FleetFormView, UpdateView):
+    """Provide AirportUpdateView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     form_class = AirportForm
 
 
 class AirportDeleteView(AirportView, FleetDeleteView):
+    """Provide AirportDeleteView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     page_title = "Delete airport"
 
 
 class AirplaneListView(AirplaneView, RoleRequiredMixin, generic.PageTitleMixin, ListView):
+    """Provide AirplaneListView behavior for the AIRPORT and AIRPLANE tables and Design use
+    cases UC-I02/UC-I03.
+    """
+
     allowed_roles = ROLES
     page_title = "Airplanes"
     template_name = "it/airplane_list.html"
 
 
 class AirplaneCreateView(AirplaneView, FleetFormView, CreateView):
+    """Provide AirplaneCreateView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     form_class = AirplaneForm
     page_title = "New airplane"
 
 
 class AirplaneUpdateView(AirplaneView, FleetFormView, UpdateView):
+    """Provide AirplaneUpdateView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     form_class = AirplaneForm
 
 
 class AirplaneDeleteView(AirplaneView, FleetDeleteView):
+    """Provide AirplaneDeleteView behavior for the AIRPORT and AIRPLANE tables and Design
+    use cases UC-I02/UC-I03.
+    """
+
     page_title = "Delete airplane"

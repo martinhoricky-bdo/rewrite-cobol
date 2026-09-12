@@ -1,3 +1,5 @@
+"""Operational models and query sets map the legacy DB2 FLIGHT, CREW, and SHIFT tables."""
+
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
@@ -11,7 +13,14 @@ from fleet.models import Airplane, Airport
 
 
 class CrewQuerySet(models.QuerySet):
+    """Provide CrewQuerySet behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     def with_member(self, employee):
+        """Implement with_member behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.filter(
             Q(commander=employee)
             | Q(copilote=employee)
@@ -22,15 +31,23 @@ class CrewQuerySet(models.QuerySet):
         ).distinct()
 
     def with_shift_count(self):
+        """Implement with_shift_count behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return self.annotate(shift_count=Count("shifts"))
 
     def with_members(self):
+        """Implement with_members behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.select_related(
             "commander", "copilote", "fachief", "fliattendant1", "fliattendant2", "fliattendant3"
         )
 
 
 class Crew(models.Model):
+    """Provide Crew behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
     crewid = models.AutoField(primary_key=True)
     commander = models.ForeignKey(
         Employee, models.PROTECT, db_column="commander", related_name="crews_as_commander"
@@ -62,15 +79,23 @@ class Crew(models.Model):
     objects = CrewQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         db_table = "crew"
 
     def __str__(self) -> str:
         return f"Crew {self.crewid}"
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return reverse("schedule:crew_edit", kwargs={"crewid": self.pk})
 
     def members(self) -> list[Employee]:
+        """Implement members behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return [
             self.commander,
             self.copilote,
@@ -81,6 +106,9 @@ class Crew(models.Model):
         ]
 
     def clean(self) -> None:
+        """Implement clean behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         super().clean()
         member_ids = [
             self.commander_id,
@@ -96,17 +124,32 @@ class Crew(models.Model):
 
 
 class ShiftQuerySet(models.QuerySet):
+    """Provide ShiftQuerySet behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     def in_period(self, date_from, date_to):
+        """Implement in_period behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.filter(shiftdate__range=(date_from, date_to))
 
     def with_flight_count(self):
+        """Implement with_flight_count behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return self.annotate(flight_count=Count("flights"))
 
     def for_crew(self, crew_id):
+        """Implement for_crew behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.filter(crew_id=crew_id) if crew_id is not None else self
 
 
 class Shift(models.Model):
+    """Provide Shift behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
     shiftid = models.AutoField(primary_key=True)
     shiftdate = models.DateField()
     begintime = models.TimeField()
@@ -115,6 +158,8 @@ class Shift(models.Model):
     objects = ShiftQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         db_table = "shift"
         constraints = [
             models.CheckConstraint(
@@ -128,21 +173,39 @@ class Shift(models.Model):
         return f"Shift {self.shiftid} ({self.shiftdate})"
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return reverse("schedule:shift_edit", kwargs={"shiftid": self.pk})
 
 
 class FlightQuerySet(models.QuerySet):
+    """Provide FlightQuerySet behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+    lineage.
+    """
+
     def with_sold(self):
+        """Implement with_sold behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.annotate(sold=Count("tickets"))
 
     def in_period(self, date_from, date_to):
+        """Implement in_period behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.filter(flightdate__range=(date_from, date_to))
 
     def with_related(self):
+        """Implement with_related behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy
+        lineage.
+        """
         return self.select_related("airportdep", "airportarr", "airplane", "shift")
 
 
 class Flight(models.Model):
+    """Provide Flight behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
     flightid = models.AutoField(primary_key=True)
     flightdate = models.DateField()
     deptime = models.TimeField()
@@ -164,6 +227,8 @@ class Flight(models.Model):
     objects = FlightQuerySet.as_manager()
 
     class Meta:
+        """Provide Meta behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT legacy lineage."""
+
         db_table = "flight"
         ordering = ["flightdate", "deptime", "flightnum"]
         constraints = [
@@ -185,4 +250,7 @@ class Flight(models.Model):
         return f"{self.flightnum} {self.flightdate}"
 
     def get_absolute_url(self) -> str:
+        """Implement get_absolute_url behavior for the FLIGHT, CREW, SHIFT, and CBFLIGHT
+        legacy lineage.
+        """
         return reverse("schedule:flight_edit", kwargs={"flightid": self.pk})

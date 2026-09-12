@@ -1,3 +1,7 @@
+"""Sales forms reconstruct SRCHFLY, SRCHTKT, SELLCOB1, and the missing SELLCOB2 workflows
+for UC-S01 through UC-S07.
+"""
+
 import re
 
 from django import forms
@@ -25,6 +29,10 @@ INVALID_TICKET_ID = "__invalid__"
 
 
 class SellStep1Form(forms.Form):
+    """Provide SellStep1Form behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     clientid = forms.IntegerField(
         min_value=1,
         label="CLIENT ID",
@@ -60,6 +68,10 @@ class SellStep1Form(forms.Form):
 
 
 class SellStep2Form(forms.Form):
+    """Provide SellStep2Form behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     def __init__(self, count, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for number in range(1, count + 1):
@@ -81,6 +93,9 @@ class SellStep2Form(forms.Form):
             )
 
     def clean(self):
+        """Implement clean behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         cleaned_data = super().clean()
         seen = set()
         for client_id in cleaned_data.values():
@@ -90,6 +105,7 @@ class SellStep2Form(forms.Form):
         return cleaned_data
 
     def rows(self, names):
+        """Implement rows behavior for the sales legacy programs and UC-S01 through UC-S09."""
         return [
             {"field": self[f"client_{number}"], "name": names.get(number, "")}
             for number in range(1, len(self.fields) + 1)
@@ -97,6 +113,10 @@ class SellStep2Form(forms.Form):
 
 
 class PassengerFilterForm(FilterForm):
+    """Provide PassengerFilterForm behavior for the sales legacy programs and UC-S01
+    through UC-S09.
+    """
+
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
     lastname = forms.CharField(max_length=30, required=False, label="LAST NAME")
     firstname = forms.CharField(max_length=30, required=False, label="FIRST NAME")
@@ -104,6 +124,10 @@ class PassengerFilterForm(FilterForm):
 
 
 class PassengerForm(forms.ModelForm):
+    """Provide PassengerForm behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     telephone = forms.CharField(
         max_length=18,
         validators=[RegexValidator(r"^[0-9 +\-]{1,18}$", TELEPHONE_ERROR)],
@@ -112,6 +136,8 @@ class PassengerForm(forms.ModelForm):
     email = forms.EmailField(max_length=100, label="EMAIL")
 
     class Meta:
+        """Provide Meta behavior for the sales legacy programs and UC-S01 through UC-S09."""
+
         model = Passenger
         fields = (
             "firstname",
@@ -125,6 +151,9 @@ class PassengerForm(forms.ModelForm):
         )
 
     def clean(self):
+        """Implement clean behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         cleaned_data = super().clean()
         for field_name in self.Meta.fields:
             value = cleaned_data.get(field_name)
@@ -134,6 +163,10 @@ class PassengerForm(forms.ModelForm):
 
 
 class FlightSearchForm(forms.Form):
+    """Provide FlightSearchForm behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     flightnum = forms.CharField(max_length=6, required=False, label="FLIGHT NUM")
     flightdate = forms.DateField(
         required=False,
@@ -146,6 +179,9 @@ class FlightSearchForm(forms.Form):
     airportarr = forms.CharField(min_length=3, max_length=4, required=False, label="LAND AIRPORT")
 
     def clean(self):
+        """Implement clean behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         cleaned_data = super().clean()
         field_names = ("flightnum", "flightdate", "airportdep", "airportarr")
         if not any(str(self.data.get(name, "")).strip() for name in field_names):
@@ -154,6 +190,10 @@ class FlightSearchForm(forms.Form):
 
 
 class TicketSearchForm(forms.Form):
+    """Provide TicketSearchForm behavior for the sales legacy programs and UC-S01 through
+    UC-S09.
+    """
+
     ticketid = forms.CharField(max_length=10, required=False, label="TICKET ID")
     clientid = forms.IntegerField(min_value=1, required=False, label="CLIENT ID")
     firstname = forms.CharField(max_length=30, required=False, label="FIRST NAME")
@@ -168,12 +208,18 @@ class TicketSearchForm(forms.Form):
     )
 
     def clean_ticketid(self):
+        """Implement clean_ticketid behavior for the sales legacy programs and UC-S01
+        through UC-S09.
+        """
         ticketid = self.cleaned_data["ticketid"]
         if ticketid and not re.fullmatch(r"CB\d{8}", ticketid, re.IGNORECASE):
             return INVALID_TICKET_ID
         return ticketid
 
     def clean(self):
+        """Implement clean behavior for the sales legacy programs and UC-S01 through
+        UC-S09.
+        """
         cleaned_data = super().clean()
         if not (
             cleaned_data.get("ticketid")

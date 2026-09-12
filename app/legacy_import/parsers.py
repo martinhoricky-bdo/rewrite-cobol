@@ -1,3 +1,7 @@
+"""Parsers read EMPINSRT/SUINSRT EMPLOYEE-LIST.json and PASSENG/SUXML PASSENGER1..8.xml
+exports.
+"""
+
 import json
 from datetime import date, datetime, time
 from decimal import Decimal
@@ -27,6 +31,9 @@ def parse_legacy_time(value: str) -> time:
 
 
 def parse_employee_json(path: Path) -> list[dict]:
+    """Implement parse_employee_json behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML,
+    and DB2 export formats.
+    """
     rows = json.loads(path.read_text(encoding="utf-8"))["ws-emplist"]["ws-emplist-table"]
     result = []
     for source in rows:
@@ -43,6 +50,9 @@ def parse_employee_json(path: Path) -> list[dict]:
 
 
 def parse_passenger_xml(path: Path) -> list[dict]:
+    """Implement parse_passenger_xml behavior for the EMPINSRT, SUINSRT, PASSENG, SUXML,
+    and DB2 export formats.
+    """
     names = {
         "FIRSTNAME": "firstname",
         "LASTNAME": "lastname",

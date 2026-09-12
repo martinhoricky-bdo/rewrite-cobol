@@ -1,3 +1,7 @@
+"""Routes for LOGIN (CICS/LOGIN/LOGIN-COB), CRYPTVE password verification, and UC-A01
+through UC-A03.
+"""
+
 from django.urls import path
 
 from .views import AccountLoginView, AccountLogoutView, AccountPasswordChangeView

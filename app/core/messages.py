@@ -1,3 +1,7 @@
+"""Message constants preserve the legacy-compatible validation and status text specified in
+functional section 6.
+"""
+
 E_AUTH_01 = "Password or userid incorrect."
 E_AUTH_02 = "You are not allowed to access this function."
 E_AUTH_03 = "Too many failed attempts. Try again in {minutes} minutes."
