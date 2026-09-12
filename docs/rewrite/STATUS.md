@@ -3,8 +3,8 @@
 Aktualizuje Claude po každé kontrole. Časy UTC.
 
 ## Souhrn
-- Poslední aktualizace: 2026-09-12 02:52
-- Aktuální krok: R17 (Codex pracuje)
+- Poslední aktualizace: 2026-09-12 03:12
+- Aktuální krok: R18 (Codex pracuje) – poslední krok plánu
 - Blokuje: nic
 
 ## Hotovo
@@ -29,14 +29,15 @@ Aktualizuje Claude po každé kontrole. Časy UTC.
 | R15 HR – zaměstnanci a oddělení | #32 | #33 | 2026-09-12 02:11 (1. běh OK, 244 testů, ruční průchod: 10000040 založen → IT reset → /password/, oddělení 7 manažer 10000019, CEO read-only; Claude opravil pád seznamu na nečíselný filtr `?dept=abc`) |
 | R16a Schedule – lety a generování | #34 | #35 | 2026-09-12 02:31 (1. běh OK, 258 testů, ruční průchod: generování CB2204 7/0 mimo seed a 0/7 v seedu, CRUD letů, E-REF-01, 403; seed po přesunu generátoru idempotentní; bez oprav) |
 | R16b Schedule – posádky a směny | #36 | #37 | 2026-09-12 02:49 (1. běh OK, 274 testů, ruční průchod: posádka 13 z oddělení 2/3/4, směna na zítřek, překryv/obrácené časy odmítnuty, E-REF-01, 403; Claude doplnil číslo PR v CHANGELOG) |
+| R17 Crew my shifts + CEO dashboard | #38 | #39 | 2026-09-12 03:04 (1. běh OK, 297 testů, ruční průchod: 10000003 → /crew/my-shifts/ s CB2204/CB2205, `past=1`, jiný člen posádky směny nevidí; CEO dashboard karty + 3 tabulky nad e2e prodeji, neplatné filtry 200, agregace v ORM (9 dotazů); 403 pro ostatní role; bez oprav) |
 
 ## Běží
 | Krok | Issue | PR | Stav |
 |---|---|---|---|
-| R17 Crew my shifts + CEO dashboard | #38 | – | zadáno 02:52, čeká se na PR |
+| R18 Hardening a závěr | #40 | – | zadáno 03:12, čeká se na PR |
 
 ## Fronta
-R18 (zadání v `codex-tasks/`)
+prázdná – R18 je poslední krok plánu; po jeho merge Claude zapíše závěrečné shrnutí a přestane plánovat kontroly.
 
 ## Poznámky
 - Vzdálená větev `claude/00-analysis-docs` zůstala na GitHubu (mazání větví přes git proxy neprochází) – neškodí, smazat ručně.
